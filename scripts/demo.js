@@ -9,9 +9,9 @@ import { ethers } from 'ethers';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import readline from 'readline';
 
-const CA         = '0x8DaFD7678Dc6bdc66a82dA50D541c4895757e362';
+const CA         = '0x6d69a00107Ed9d487904700a00E31e657dA8a392';
 const USDT_CA    = '0x9e29b3AaDa05Bf2D2c827Af80Bd28Dc0b9b4FB0c';
-const GRAPH      = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.4';
+const GRAPH      = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.6';
 const BOT_KEYS   = [
   '0x583dc5b9dc11530013bd427b8831aca5bbaddc3e4ce74fc0ad943dadcd461878',
   '0x1a55a9daad0d9fc46ce8bdaa33df0f2f734cd3a6e8a223f0bb9bbd4c470f7177',
