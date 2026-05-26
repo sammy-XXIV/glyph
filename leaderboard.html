@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLYPH — Leaderboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="nav.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100vw; min-height: 100vh;
+  background: #050510;
+  font-family: 'DM Sans', sans-serif;
+  color: #fff; overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 10% 20%, rgba(0,40,180,0.13) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 90% 80%, rgba(120,0,180,0.09) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ── NAV ── */
+
+/* ── PAGE ── */
+.page {
+  position: relative; z-index: 1;
+  max-width: 960px; margin: 0 auto;
+  padding: 100px 24px 80px;
+}
+
+/* ── TOP STATS ── */
+.top-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.top-stat {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 20px;
+}
+.top-stat .ts-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.25); margin-bottom: 8px;
+}
+.top-stat .ts-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px; letter-spacing: 2px; color: #fff; line-height: 1;
+}
+.top-stat.gold .ts-value { color: #FFD700; }
+.top-stat.green .ts-value { color: #4ade80; }
+
+/* ── PODIUM ── */
+.podium {
+  display: flex; align-items: flex-end; justify-content: center;
+  gap: 12px; margin-bottom: 32px;
+}
+.podium-slot {
+  flex: 1; max-width: 220px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 12px;
+}
+.podium-card {
+  width: 100%;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 20px 16px;
+  text-align: center;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.podium-slot.first .podium-card {
+  border-color: rgba(255,215,0,0.3);
+  background: rgba(255,215,0,0.04);
+  box-shadow: 0 0 40px rgba(255,215,0,0.06);
+}
+.podium-slot.second .podium-card {
+  border-color: rgba(192,132,252,0.25);
+  background: rgba(192,132,252,0.03);
+}
+.podium-slot.third .podium-card {
+  border-color: rgba(77,159,255,0.2);
+  background: rgba(77,159,255,0.03);
+}
+
+.podium-rank {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px; letter-spacing: 4px;
+  margin-bottom: 10px;
+}
+.first  .podium-rank { color: #FFD700; }
+.second .podium-rank { color: #c084fc; }
+.third  .podium-rank { color: #4d9fff; }
+
+.podium-avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin: 0 auto 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.podium-addr {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 1px;
+  color: rgba(255,255,255,0.4); margin-bottom: 12px;
+}
+.podium-tier {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2px;
+  padding: 3px 10px; border-radius: 10px;
+  margin-bottom: 12px;
+}
+.tier-legendary { color: #FFD700; background: rgba(255,215,0,0.1);  border: 1px solid rgba(255,215,0,0.25); }
+.tier-epic      { color: #c084fc; background: rgba(192,132,252,0.1); border: 1px solid rgba(192,132,252,0.25); }
+.tier-rare      { color: #4d9fff; background: rgba(77,159,255,0.1);  border: 1px solid rgba(77,159,255,0.25); }
+.tier-uncommon  { color: #4ade80; background: rgba(74,222,128,0.1);  border: 1px solid rgba(74,222,128,0.25); }
+.tier-common    { color: #94a3b8; background: rgba(148,163,184,0.1); border: 1px solid rgba(148,163,184,0.25); }
+
+.podium-score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px; letter-spacing: 2px; color: #fff; line-height: 1;
+}
+.podium-score-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2px;
+  color: rgba(255,255,255,0.2); margin-top: 2px;
+}
+
+/* podium stand */
+.podium-stand {
+  width: 100%; border-radius: 8px 8px 0 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.first  .podium-stand { height: 52px; background: linear-gradient(180deg, rgba(255,215,0,0.2), rgba(255,215,0,0.06)); border: 1px solid rgba(255,215,0,0.2); }
+.second .podium-stand { height: 36px; background: linear-gradient(180deg, rgba(192,132,252,0.15), rgba(192,132,252,0.04)); border: 1px solid rgba(192,132,252,0.15); }
+.third  .podium-stand { height: 24px; background: linear-gradient(180deg, rgba(77,159,255,0.12), rgba(77,159,255,0.03)); border: 1px solid rgba(77,159,255,0.12); }
+.stand-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px; letter-spacing: 2px;
+}
+.first  .stand-num { color: rgba(255,215,0,0.5); }
+.second .stand-num { color: rgba(192,132,252,0.4); }
+.third  .stand-num { color: rgba(77,159,255,0.4); }
+
+/* ── TABLE ── */
+.table-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.table-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px; letter-spacing: 4px;
+  color: rgba(255,255,255,0.6);
+}
+
+/* filter tabs */
+.filters { display: flex; gap: 8px; }
+.filter-tab {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 2px;
+  color: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  padding: 6px 14px; border-radius: 20px;
+  cursor: pointer; white-space: nowrap;
+  transition: all 0.2s;
+}
+.filter-tab:hover { color: rgba(255,255,255,0.6); }
+.filter-tab.active { color: #fff; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+
+/* table */
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.lb-table thead tr {
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.lb-table th {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.2);
+  text-align: left; padding: 10px 12px; font-weight: 400;
+}
+.lb-table th:last-child { text-align: right; }
+
+.lb-table tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.15s;
+}
+.lb-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+.lb-table tbody tr.you {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.lb-table td {
+  padding: 14px 12px; vertical-align: middle;
+}
+
+.rank-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px; letter-spacing: 2px;
+  color: rgba(255,255,255,0.25); width: 40px;
+}
+.rank-num.top3 { color: #fff; }
+
+.player-cell {
+  display: flex; align-items: center; gap: 12px;
+}
+.player-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; border: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+.player-addr {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 1px;
+  color: rgba(255,255,255,0.6);
+}
+.you-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 7px; letter-spacing: 2px;
+  color: #4ade80; background: rgba(74,222,128,0.1);
+  border: 1px solid rgba(74,222,128,0.2);
+  padding: 2px 6px; border-radius: 4px; margin-left: 6px;
+}
+
+.correct-cell {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px; letter-spacing: 1px; color: #fff;
+}
+.win-rate-cell {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: rgba(255,255,255,0.4);
+}
+
+/* mini progress bar */
+.mini-bar-wrap { width: 80px; }
+.mini-bar-track {
+  height: 4px; background: rgba(255,255,255,0.06);
+  border-radius: 2px; overflow: hidden;
+}
+.mini-bar-fill {
+  height: 100%; border-radius: 2px;
+}
+
+.tier-cell { text-align: right; }
+
+/* you row highlight bar on left */
+.lb-table tbody tr.you td:first-child { position: relative; }
+.lb-table tbody tr.you td:first-child::before {
+  content: '';
+  position: absolute; left: 0; top: 20%; bottom: 20%;
+  width: 2px; background: #4ade80; border-radius: 1px;
+}
+
+@media (max-width: 640px) {
+  .page { padding: 80px 14px 60px; }
+
+  /* stats: 2 cols */
+  .top-stats { grid-template-columns: repeat(2, 1fr); }
+  .top-stat .ts-value { font-size: 24px; }
+
+  /* podium: horizontal scroll */
+  .podium { overflow-x: auto; padding-bottom: 8px; gap: 8px; }
+  .podium-slot { min-width: 140px; max-width: 160px; flex-shrink: 0; }
+  .podium-card { padding: 14px 10px; }
+  .podium-avatar { width: 36px; height: 36px; font-size: 16px; }
+  .podium-score { font-size: 22px; }
+
+  /* table header */
+  .table-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+
+  /* hide less important columns */
+  .lb-table th:nth-child(4),
+  .lb-table td:nth-child(4),
+  .lb-table th:nth-child(5),
+  .lb-table td:nth-child(5) { display: none; }
+
+  .player-addr { font-size: 9px; }
+  .correct-cell { font-size: 16px; }
+  .lb-table td { padding: 10px 8px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="gallery.html">GLYPH</a>
+  <div class="nav-links">
+    <a href="dashboard.html">DASHBOARD</a>
+    <a href="predictions.html">PREDICT</a>
+    <a href="leaderboard.html" class="active">LEADERBOARD</a>
+    <a href="gallery.html">GALLERY</a>
+  </div>
+  <span class="nav-wallet" id="wallet-display">—</span>
+  <button class="nav-burger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="nav-drawer">
+  <a href="dashboard.html">DASHBOARD</a>
+  <a href="predictions.html">PREDICT</a>
+  <a href="leaderboard.html" class="active">LEADERBOARD</a>
+  <a href="gallery.html">GALLERY</a>
+  <div class="drawer-wallet" id="drawer-wallet-display">—</div>
+</div>
+
+<div class="page">
+
+  <!-- top stats -->
+  <div class="top-stats">
+    <div class="top-stat gold">
+      <div class="ts-label">PRIZE POOL</div>
+      <div class="ts-value" id="ts-pool">—</div>
+    </div>
+    <div class="top-stat">
+      <div class="ts-label">TOTAL PLAYERS</div>
+      <div class="ts-value" id="ts-players">—</div>
+    </div>
+    <div class="top-stat green">
+      <div class="ts-label">YOUR RANK</div>
+      <div class="ts-value" id="ts-rank">#—</div>
+    </div>
+    <div class="top-stat">
+      <div class="ts-label">LEGENDARY HOLDERS</div>
+      <div class="ts-value" id="ts-legendary" style="color:#FFD700">—</div>
+    </div>
+  </div>
+
+  <!-- podium top 3 -->
+  <div class="podium" id="podium"></div>
+
+  <!-- full table -->
+  <div class="table-header">
+    <div class="table-title">ALL PLAYERS</div>
+    <div class="filters">
+      <div class="filter-tab active" onclick="setFilter('all',this)">ALL</div>
+      <div class="filter-tab" onclick="setFilter('legendary',this)">LEGENDARY</div>
+      <div class="filter-tab" onclick="setFilter('epic',this)">EPIC</div>
+    </div>
+  </div>
+
+  <table class="lb-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>PLAYER</th>
+        <th>CORRECT</th>
+        <th>WIN RATE</th>
+        <th>PROGRESS</th>
+        <th style="text-align:right">TIER</th>
+      </tr>
+    </thead>
+    <tbody id="lb-body"></tbody>
+  </table>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+<script src="web3.js"></script>
+<script src="nav.js"></script>
+<script>
+const TIER_NAMES_ARR = ['COMMON','UNCOMMON','RARE','EPIC','LEGENDARY'];
+const TIER_NEXT_THRESHOLD = { COMMON: 10, UNCOMMON: 20, RARE: 35, EPIC: 55, LEGENDARY: 55 };
+const EMOJIS = ['🦁','🐉','🦊','🐺','🦅','🐬','🦋','🐸','🦎','🐙','🦜','🐧','🐝','👤','🐱','🐭','🦄','🐻','🦈','🦓'];
+
+let ALL_PLAYERS = [];
+let myAddr = null;
+
+async function init() {
+  // load chain stats and leaderboard independently
+  myAddr = await GLYPH.getWallet();
+
+  GLYPH.getChainStats().then(s => {
+    document.getElementById('ts-pool').textContent = s.prizePool + ' USDT';
+    document.getElementById('ts-legendary').textContent = s.legendaryCount;
+    document.getElementById('ts-players').textContent = s.totalMinted;
+  }).catch(() => {});
+
+  const KNOWN_PLAYERS = [
+    '0x18CA9a475Ab202ff734E81fD15f9bCb304c13534',
+    '0xeEe8DEFEf059a688A3d78e9a3cf1E06Ef1744175',
+    '0x536D94B2ecdc304D9b5Df7ef446b1A23e6901E6a',
+    '0xA059EA9f17d2d54AE83adb75E12e2BB12C2E2638',
+  ];
+
+  let raw = [];
+  try {
+    raw = await GLYPH.getLeaderboard();
+    if (!raw.length) throw new Error('Empty subgraph');
+  } catch (e) {
+    console.warn('Subgraph unavailable, falling back to chain', e);
+    try { raw = await GLYPH.getLeaderboardChain(KNOWN_PLAYERS); } catch (e2) { console.warn('Chain fallback failed', e2); }
+  }
+
+  ALL_PLAYERS = raw.map((p, i) => ({
+    addr: p.id.slice(0,6) + '...' + p.id.slice(-4),
+    fullAddr: p.id,
+    emoji: EMOJIS[i % EMOJIS.length],
+    correct: Number(p.correctPicks),
+    tier: TIER_NAMES_ARR[Number(p.tier)] || 'COMMON',
+    you: myAddr && p.id.toLowerCase() === myAddr.toLowerCase(),
+  }));
+
+  const myIdx = ALL_PLAYERS.findIndex(p => p.you);
+  document.getElementById('ts-rank').textContent = myIdx !== -1 ? '#' + (myIdx + 1) : '#—';
+
+  renderPodium(ALL_PLAYERS);
+  renderTable();
+}
+
+function tierColor(tier) {
+  return { LEGENDARY:'#FFD700', EPIC:'#c084fc', RARE:'#4d9fff', UNCOMMON:'#4ade80', COMMON:'#94a3b8' }[tier];
+}
+function tierBarGrad(tier) {
+  return {
+    LEGENDARY: 'linear-gradient(90deg,#cc9900,#FFD700)',
+    EPIC:      'linear-gradient(90deg,#7c3aed,#c084fc)',
+    RARE:      'linear-gradient(90deg,#1a6bcc,#4d9fff)',
+    UNCOMMON:  'linear-gradient(90deg,#15803d,#4ade80)',
+    COMMON:    'linear-gradient(90deg,#475569,#94a3b8)',
+  }[tier];
+}
+function tierClass(tier) {
+  return 'tier-' + tier.toLowerCase();
+}
+
+function progressPct(player) {
+  if (player.tier === 'LEGENDARY') return 100;
+  const threshold = TIER_NEXT_THRESHOLD[player.tier] || 10;
+  return Math.min(Math.round(player.correct / threshold * 100), 100);
+}
+
+function renderPodium(players) {
+  const top3 = players.slice(0, 3);
+  const order = [1, 0, 2]; // 2nd, 1st, 3rd
+  const classes = ['second','first','third'];
+  const labels  = ['2ND','1ST','3RD'];
+  const standNums = ['2','1','3'];
+
+  const podium = document.getElementById('podium');
+  podium.innerHTML = order.map((idx, i) => {
+    const p = top3[idx];
+    if (!p) return '';
+    const threshold = TIER_NEXT_THRESHOLD[p.tier] || 10;
+    const winRate = Math.min(Math.round(p.correct / threshold * 100), 100);
+    return `
+      <div class="podium-slot ${classes[i]}">
+        <div class="podium-card">
+          <div class="podium-rank">${labels[i]}</div>
+          <div class="podium-avatar">${p.emoji}</div>
+          <div class="podium-addr">${p.addr}</div>
+          <div class="podium-tier"><span class="${tierClass(p.tier)}">${p.tier}</span></div>
+          <div class="podium-score">${p.correct}</div>
+          <div class="podium-score-label">CORRECT PICKS</div>
+        </div>
+        <div class="podium-stand"><span class="stand-num">${standNums[i]}</span></div>
+      </div>`;
+  }).join('');
+}
+
+let activeFilter = 'all';
+function setFilter(f, el) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderTable();
+}
+
+function renderTable() {
+  let filtered = ALL_PLAYERS;
+  if (activeFilter === 'legendary') filtered = ALL_PLAYERS.filter(p => p.tier === 'LEGENDARY');
+  if (activeFilter === 'epic')      filtered = ALL_PLAYERS.filter(p => p.tier === 'EPIC');
+
+  const body = document.getElementById('lb-body');
+  body.innerHTML = filtered.map((p, i) => {
+    const rank    = ALL_PLAYERS.indexOf(p) + 1;
+    const threshold = TIER_NEXT_THRESHOLD[p.tier] || 10;
+    const winRate = Math.min(Math.round(p.correct / threshold * 100), 100);
+    const pct     = progressPct(p);
+    const color   = tierColor(p.tier);
+    const grad    = tierBarGrad(p.tier);
+
+    return `
+      <tr class="${p.you ? 'you' : ''}">
+        <td><div class="rank-num ${rank <= 3 ? 'top3' : ''}">${rank}</div></td>
+        <td>
+          <div class="player-cell">
+            <div class="player-avatar">${p.emoji}</div>
+            <div>
+              <span class="player-addr">${p.addr}</span>
+              ${p.you ? '<span class="you-tag">YOU</span>' : ''}
+            </div>
+          </div>
+        </td>
+        <td><div class="correct-cell">${p.correct}</div></td>
+        <td><div class="win-rate-cell">${winRate}%</div></td>
+        <td>
+          <div class="mini-bar-wrap">
+            <div class="mini-bar-track">
+              <div class="mini-bar-fill" style="width:${pct}%;background:${grad}"></div>
+            </div>
+          </div>
+        </td>
+        <td class="tier-cell">
+          <span class="${tierClass(p.tier)}">${p.tier}</span>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLYPH</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100vw; height: 100vh; overflow: hidden; background: #000; }
+
+/* background video — hidden until ball passes */
+#bgvid {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  z-index: 0;
+}
+#bgvid.show { opacity: 1; }
+
+/* dark overlay on top of video */
+#overlay {
+  position: fixed; inset: 0;
+  background: rgba(5, 5, 16, 0.62);
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  pointer-events: none;
+}
+#overlay.show { opacity: 1; }
+
+/* solid bg before video appears */
+#solidbg {
+  position: fixed; inset: 0;
+  background: #050510;
+  z-index: 0;
+  transition: opacity 1s ease;
+}
+#solidbg.hide { opacity: 0; }
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 30%, rgba(0,40,180,0.15) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(120,0,180,0.10) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* GLYPH logo — always visible */
+.logo {
+  position: fixed;
+  top: 36px; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px; letter-spacing: 10px;
+  color: rgba(255,255,255,0.4);
+  opacity: 0;
+  animation: fIn 0.8s ease forwards 0.3s;
+  z-index: 10;
+}
+@keyframes fIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ball */
+#ball {
+  position: fixed;
+  width: 64px; height: 64px;
+  pointer-events: none;
+  z-index: 20;
+  opacity: 0;
+  will-change: transform, left, top;
+}
+
+/* dust */
+.dust {
+  position: fixed;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  pointer-events: none;
+  z-index: 15;
+  animation: dustOut 0.55s ease-out forwards;
+}
+@keyframes dustOut {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 0; transform: scale(2.8) translateY(-10px); }
+}
+
+/* CTA */
+#cta {
+  position: fixed;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+#cta.visible { opacity: 1; pointer-events: all; }
+
+.connect-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px; letter-spacing: 3px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  height: 64px;
+  padding: 0 48px;
+  border-radius: 32px;
+  white-space: nowrap;
+  cursor: pointer; position: relative; overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.2s, background 0.2s, border-color 0.2s;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.connect-btn::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+  opacity: 1;
+}
+.connect-btn:hover {
+  transform: scale(1.04);
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.35);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.connect-btn:active { transform: scale(0.97); }
+
+.skip-link {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.25);
+  text-decoration: none; background: none;
+  border: none; cursor: pointer;
+  transition: color 0.2s;
+}
+.skip-link:hover { color: rgba(255,255,255,0.6); }
+</style>
+</head>
+<body>
+
+<div id="solidbg"></div>
+<video id="bgvid" src="assets/bg.mp4" loop muted playsinline></video>
+<div id="overlay"></div>
+
+<div class="logo">GLYPH</div>
+
+<div id="ball">
+  <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="bg" cx="38%" cy="34%" r="62%">
+        <stop offset="0%"  stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="#b8b8b8"/>
+      </radialGradient>
+      <radialGradient id="sh" cx="30%" cy="28%" r="34%">
+        <stop offset="0%"  stop-color="rgba(255,255,255,0.8)"/>
+        <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+      </radialGradient>
+      <clipPath id="bc"><circle cx="32" cy="32" r="30"/></clipPath>
+    </defs>
+    <circle cx="32" cy="32" r="30" fill="url(#bg)"/>
+    <g clip-path="url(#bc)" fill="#111" opacity="0.82">
+      <polygon points="32,17 40,23 37,32 27,32 24,23"/>
+      <polygon points="14,11 22,17 19,27 9,24 8,14"/>
+      <polygon points="50,11 54,21 44,24 41,14 46,7"/>
+      <polygon points="10,43 20,40 23,50 15,55 6,49"/>
+      <polygon points="54,43 58,49 50,55 42,52 43,42"/>
+      <polygon points="27,52 37,52 40,61 32,63 24,61"/>
+    </g>
+    <ellipse cx="24" cy="23" rx="9" ry="6" fill="url(#sh)"/>
+  </svg>
+</div>
+
+<div id="cta">
+  <button class="connect-btn" onclick="connectWallet()">CONNECT WALLET</button>
+  <a class="skip-link" href="gallery.html">ENTER GALLERY WITHOUT WALLET →</a>
+</div>
+
+<script>
+const ballEl  = document.getElementById('ball');
+const cta     = document.getElementById('cta');
+const bgvid   = document.getElementById('bgvid');
+const overlay = document.getElementById('overlay');
+const solidbg = document.getElementById('solidbg');
+
+const VW     = window.innerWidth;
+const VH     = window.innerHeight;
+const RADIUS = 32;
+
+// ball rolls across vertical center (where connect wallet will appear)
+const ROLL_Y = VH / 2 - RADIUS;
+
+// center CTA on ball's vertical midpoint
+cta.style.top = (ROLL_Y + RADIUS) + 'px';
+
+// physics: starts fast, friction slows to stop
+const TRAVEL = VW + RADIUS * 4;
+const T_STOP = 2.2;
+const A  = 2 * TRAVEL / (T_STOP * T_STOP);
+const V0 = A * T_STOP;
+
+let revealDone = false;
+let lastDustX  = -999;
+let startTime  = null;
+
+function spawnDust(x, speed) {
+  if (x - lastDustX < 20) return;
+  lastDustX = x;
+  const d = document.createElement('div');
+  d.className = 'dust';
+  const s   = 12 + Math.random() * 16;
+  const op  = Math.min(speed / V0, 1) * 0.65;
+  d.style.cssText = `width:${s}px;height:${s}px;left:${x - s/2}px;top:${ROLL_Y + RADIUS * 1.6 - s/2}px;opacity:${op}`;
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 580);
+}
+
+function roll(now) {
+  if (!startTime) startTime = now;
+  const t   = (now - startTime) / 1000;
+  const vel = Math.max(V0 - A * t, 0);
+  const x   = Math.min(V0 * t - 0.5 * A * t * t, TRAVEL);
+  const deg = (x / RADIUS) * (180 / Math.PI);
+
+  const screenX = -RADIUS * 2 + x;
+
+  ballEl.style.opacity   = '1';
+  ballEl.style.left      = screenX + 'px';
+  ballEl.style.top       = ROLL_Y + 'px';
+  ballEl.style.transform = `rotate(${deg}deg)`;
+
+  spawnDust(screenX + RADIUS, vel);
+
+  // ball passes over center → reveal button
+  if (!revealDone && screenX + RADIUS >= VW * 0.48) {
+    revealDone = true;
+    cta.classList.add('visible');
+  }
+
+  if (vel > 0 || screenX < VW) {
+    requestAnimationFrame(roll);
+  } else {
+    // ball fully off screen → start video
+    ballEl.style.opacity = '0';
+    bgvid.play();
+    bgvid.classList.add('show');
+    overlay.classList.add('show');
+    solidbg.classList.add('hide');
+  }
+}
+
+async function connectWallet() {
+  const btn = document.querySelector('.connect-btn');
+  btn.textContent = 'CONNECTING...';
+  btn.disabled = true;
+  try {
+    const addr = await GLYPH.connect();
+    if (!addr) {
+      btn.textContent = 'CONNECT WALLET';
+      btn.disabled = false;
+      return;
+    }
+    const player = await GLYPH.getPlayerData(addr);
+    window.location.href = player ? 'dashboard.html' : 'mint.html';
+  } catch (e) {
+    console.error(e);
+    btn.textContent = 'CONNECT WALLET';
+    btn.disabled = false;
+  }
+}
+
+setTimeout(() => requestAnimationFrame(roll), 1400);
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+<script src="web3.js"></script>
+</body>
+</html>

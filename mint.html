@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLYPH — Mint</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="nav.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100vw; min-height: 100vh;
+  background: #050510;
+  font-family: 'DM Sans', sans-serif;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 30%, rgba(0,40,180,0.15) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(120,0,180,0.10) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+
+
+/* pool banner */
+.pool-banner {
+  position: relative; z-index: 1;
+  margin-top: 100px;
+  margin-bottom: 40px;
+  display: flex; align-items: center; gap: 32px;
+}
+.pool-stat {
+  text-align: center;
+}
+.pool-stat .label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 4px;
+}
+.pool-stat .value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px; letter-spacing: 2px;
+  color: #fff;
+}
+.pool-divider {
+  width: 1px; height: 36px;
+  background: rgba(255,255,255,0.1);
+}
+
+/* card scene */
+.scene {
+  position: relative; z-index: 1;
+  width: 280px; height: 280px;
+  perspective: 1000px;
+  margin-bottom: 40px;
+}
+
+.card-inner {
+  width: 100%; height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-inner.flipped { transform: rotateY(180deg); }
+
+.card-front, .card-back {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* FRONT — mystery sealed card */
+.card-front {
+  background: linear-gradient(145deg, #0d0d1f, #1a1a3a);
+  border: 1px solid rgba(255,255,255,0.08);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 16px;
+  box-shadow: 0 0 60px rgba(0,0,255,0.08), 0 20px 60px rgba(0,0,0,0.5);
+}
+.card-front::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.015) 0px,
+      rgba(255,255,255,0.015) 1px,
+      transparent 1px,
+      transparent 12px
+    );
+}
+
+/* BACK — revealed card */
+.card-back {
+  transform: rotateY(180deg);
+  background: #050510;
+}
+.card-back svg {
+  width: 100%; height: 100%; display: block;
+}
+
+/* minting overlay on scene */
+.minting-overlay {
+  position: absolute; inset: 0;
+  border-radius: 16px;
+  background: rgba(5,5,16,0.85);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 16px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 10;
+}
+.minting-overlay.show { opacity: 1; pointer-events: all; }
+.spinner {
+  width: 48px; height: 48px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: rgba(148,163,184,0.8);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.minting-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.4);
+}
+
+/* info row */
+.info-row {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 6px;
+  margin-bottom: 32px;
+}
+.info-row .tier-label {
+  display: none;
+}
+.info-row .card-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px; letter-spacing: 4px;
+  color: #fff;
+  opacity: 0; transition: opacity 0.6s ease 0.4s;
+}
+.info-row .card-name.show { opacity: 1; }
+
+/* mint button */
+.mint-btn {
+  position: relative; z-index: 1;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px; letter-spacing: 3px;
+  color: #ffffff;
+  background: rgba(255,255,255,0.07);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.15);
+  height: 52px; padding: 0 48px;
+  border-radius: 26px;
+  cursor: pointer; white-space: nowrap;
+  transition: transform 0.15s, background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.mint-btn:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.3);
+  transform: scale(1.03);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.mint-btn:active { transform: scale(0.97); }
+.mint-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.price-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.2);
+  margin-top: 12px;
+  position: relative; z-index: 1;
+}
+
+/* revealed card nation */
+#revealed-nation {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="gallery.html">GLYPH</a>
+  <div class="nav-links">
+    <a href="dashboard.html">DASHBOARD</a>
+    <a href="predictions.html">PREDICT</a>
+    <a href="leaderboard.html">LEADERBOARD</a>
+    <a href="gallery.html">GALLERY</a>
+  </div>
+  <span class="nav-wallet" id="wallet-display">—</span>
+  <button class="nav-burger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="nav-drawer">
+  <a href="dashboard.html">DASHBOARD</a>
+  <a href="predictions.html">PREDICT</a>
+  <a href="leaderboard.html">LEADERBOARD</a>
+  <a href="gallery.html">GALLERY</a>
+  <div class="drawer-wallet" id="drawer-wallet-display">—</div>
+</div>
+
+<div class="pool-banner">
+  <div class="pool-stat">
+    <div class="label">PRIZE POOL</div>
+    <div class="value" id="pool-val">0 USDT</div>
+  </div>
+  <div class="pool-divider"></div>
+  <div class="pool-stat">
+    <div class="label">MINTED</div>
+    <div class="value" id="minted-val">0</div>
+  </div>
+  <div class="pool-divider"></div>
+  <div class="pool-stat">
+    <div class="label">NETWORK</div>
+    <div class="value" style="font-size:20px">XLAYER</div>
+  </div>
+</div>
+
+<!-- card flip scene -->
+<div class="scene">
+  <div class="card-inner" id="card-inner">
+
+    <!-- FRONT: mystery card in full SVG card style -->
+    <div class="card-front">
+      <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">
+        <defs>
+          <clipPath id="clip-mystery"><rect x="0" y="0" width="500" height="500"/></clipPath>
+          <linearGradient id="ov-mystery" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="rgba(5,5,16,0)"/>
+            <stop offset="40%"  stop-color="rgba(5,5,16,0.75)"/>
+            <stop offset="100%" stop-color="rgba(5,5,16,0.97)"/>
+          </linearGradient>
+          <linearGradient id="shim-m" gradientUnits="userSpaceOnUse" x1="-250" y1="500" x2="250" y2="0">
+            <stop offset="0%"   stop-color="rgba(0,0,0,0)"/>
+            <stop offset="44%"  stop-color="rgba(148,163,184,0.06)"/>
+            <stop offset="50%"  stop-color="rgba(203,213,225,0.12)"/>
+            <stop offset="56%"  stop-color="rgba(148,163,184,0.06)"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+            <animateTransform attributeName="gradientTransform" type="translate" values="750,0;-750,0" dur="5s" repeatCount="indefinite"/>
+          </linearGradient>
+          <filter id="glow-m" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur in="SourceGraphic"><animate attributeName="stdDeviation" values="10;22;10" dur="5s" repeatCount="indefinite"/></feGaussianBlur>
+          </filter>
+          <filter id="sp-m" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur in="SourceGraphic"><animate attributeName="stdDeviation" values="18;36;18" dur="5s" repeatCount="indefinite"/></feGaussianBlur>
+          </filter>
+        </defs>
+
+        <!-- dark jersey placeholder -->
+        <rect x="0" y="0" width="500" height="500" fill="#0d0d1f" clip-path="url(#clip-mystery)"/>
+        <!-- subtle grid pattern -->
+        <rect x="0" y="0" width="500" height="500" fill="url(#shim-m)" clip-path="url(#clip-mystery)"/>
+        <!-- big ? -->
+        <text x="250" y="210" font-family="'Bebas Neue',sans-serif" font-size="180" fill="rgba(148,163,184,0.08)" text-anchor="middle">?</text>
+        <!-- football icon -->
+        <text x="250" y="260" font-family="sans-serif" font-size="72" text-anchor="middle" dominant-baseline="middle">⚽</text>
+
+        <!-- bottom gradient -->
+        <rect x="0" y="270" width="500" height="230" fill="url(#ov-mystery)" clip-path="url(#clip-mystery)"/>
+
+        <!-- name row — hidden -->
+        <text x="16" y="356" font-family="'Bebas Neue',sans-serif" font-size="38" fill="rgba(255,255,255,0.12)" letter-spacing="2">??? ?????</text>
+        <line x1="16" y1="368" x2="484" y2="368" stroke="rgba(148,163,184,0.1)" stroke-width="1"/>
+
+        <!-- prediction score row -->
+        <text x="16"  y="384" font-family="'DM Mono',monospace" font-size="8" fill="rgba(255,255,255,0.35)" letter-spacing="2">PREDICTION SCORE</text>
+        <text x="484" y="384" font-family="'DM Mono',monospace" font-size="8" fill="rgba(148,163,184,0.4)" text-anchor="end">?? / 100</text>
+
+        <!-- empty progress bar -->
+        <rect x="16" y="390" width="468" height="8" rx="0" fill="rgba(255,255,255,0.05)" stroke="rgba(148,163,184,0.12)" stroke-width="1"/>
+        <line x1="133" y1="390" x2="133" y2="398" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+        <line x1="250" y1="390" x2="250" y2="398" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+        <line x1="367" y1="390" x2="367" y2="398" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+        <text x="16"  y="412" font-family="'DM Mono',monospace" font-size="7" fill="rgba(255,255,255,0.2)" letter-spacing="1">ROOKIE</text>
+        <text x="484" y="412" font-family="'DM Mono',monospace" font-size="7" fill="rgba(255,255,255,0.2)" text-anchor="end" letter-spacing="1">ORACLE</text>
+        <line x1="16" y1="424" x2="484" y2="424" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+        <!-- stats row -->
+        <text x="16"  y="440" font-family="'DM Mono',monospace" font-size="8" fill="rgba(255,255,255,0.3)" letter-spacing="1">FIFA WC WINS</text>
+        <text x="16"  y="462" font-family="'Bebas Neue',sans-serif" font-size="24" fill="rgba(148,163,184,0.25)">?</text>
+        <text x="484" y="440" font-family="'DM Mono',monospace" font-size="8" fill="rgba(255,255,255,0.3)" letter-spacing="1" text-anchor="end">TEAM OVR</text>
+        <text x="484" y="462" font-family="'Bebas Neue',sans-serif" font-size="24" fill="rgba(148,163,184,0.25)" text-anchor="end">??</text>
+
+        <text x="484" y="492" font-family="'DM Mono',monospace" font-size="6.5" fill="rgba(255,255,255,0.1)" text-anchor="end" letter-spacing="1">ERC-721 · #????</text>
+
+        <!-- tier chip -->
+        <rect x="374" y="12" width="112" height="18" rx="4" fill="rgba(0,0,0,0.65)" stroke="rgba(148,163,184,0.25)" stroke-width="1"/>
+        <text x="430" y="25" font-family="'DM Mono',monospace" font-size="8.5" fill="rgba(148,163,184,0.5)" text-anchor="middle" letter-spacing="2">COMMON</text>
+        <rect x="388" y="36" width="98" height="18" rx="4" fill="rgba(0,0,0,0.5)"/>
+        <text x="437" y="49" font-family="'DM Sans',sans-serif" font-size="10" font-weight="600" fill="rgba(255,255,255,0.3)" text-anchor="middle">??? 🌍</text>
+
+        <!-- border glow -->
+        <rect x="1" y="1" width="498" height="498" rx="0" fill="none" stroke="rgba(100,116,139,0.25)" stroke-width="8" filter="url(#sp-m)">
+          <animate attributeName="stroke-opacity" values="0.3;0.55;0.3" dur="5s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="1" y="1" width="498" height="498" rx="0" fill="none" stroke="rgba(148,163,184,0.55)" stroke-width="4" filter="url(#glow-m)">
+          <animate attributeName="stroke-opacity" values="0.65;1;0.65" dur="5s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="1" y="1" width="498" height="498" rx="0" fill="none" stroke="rgba(148,163,184,0.55)" stroke-width="2">
+          <animate attributeName="stroke-opacity" values="0.75;1;0.75" dur="5s" repeatCount="indefinite"/>
+        </rect>
+      </svg>
+    </div>
+
+    <!-- BACK: revealed SVG card injected by JS -->
+    <div class="card-back" id="card-back"></div>
+
+  </div>
+
+  <!-- minting spinner overlay -->
+  <div class="minting-overlay" id="minting-overlay">
+    <div class="spinner"></div>
+    <div class="minting-label">MINTING...</div>
+  </div>
+</div>
+
+<!-- card info below -->
+<div class="info-row">
+  <div class="tier-label">COMMON TIER · ERC-721</div>
+  <div class="card-name" id="card-name">?</div>
+  <div id="revealed-nation"></div>
+</div>
+
+<button class="mint-btn" id="mint-btn" onclick="handleMint()">MINT YOUR CARD — 0.5 USDT</button>
+
+<script>
+const COMMON_CARDS = [
+  { id:'nigeria',   name:'NIGERIA',      nation:'Nigeria 🇳🇬',      img:'assets/nigeria.png',   wc:0, ovr:70, score:35, token:'#0021' },
+  { id:'costarica', name:'COSTA RICA',   nation:'Costa Rica 🇨🇷',   img:'assets/costarica.png', wc:0, ovr:68, score:32, token:'#0022' },
+  { id:'saudi',     name:'SAUDI ARABIA', nation:'Saudi Arabia 🇸🇦',  img:'assets/saudi.png',     wc:0, ovr:67, score:30, token:'#0023' },
+  { id:'cameroon',  name:'CAMEROON',     nation:'Cameroon 🇨🇲',     img:'assets/cameroon.png',  wc:0, ovr:69, score:33, token:'#0024' },
+  { id:'ghana',     name:'GHANA',        nation:'Ghana 🇬🇭',        img:'assets/ghana.png',     wc:0, ovr:68, score:31, token:'#0025' },
+];
+
+const mintBtn       = document.getElementById('mint-btn');
+const cardInner     = document.getElementById('card-inner');
+const cardBack      = document.getElementById('card-back');
+const cardNameEl    = document.getElementById('card-name');
+const revealedNation= document.getElementById('revealed-nation');
+const mintOverlay   = document.getElementById('minting-overlay');
+
+async function init() {
+  let addr = await GLYPH.getWallet();
+
+  if (!addr) {
+    mintBtn.textContent = 'CONNECT WALLET TO MINT';
+    mintBtn.onclick = async () => {
+      mintBtn.disabled = true;
+      mintBtn.textContent = 'CONNECTING...';
+      addr = await GLYPH.connect();
+      if (addr) {
+        const player = await GLYPH.getPlayerData(addr);
+        if (player) { window.location.href = 'dashboard.html'; return; }
+        mintBtn.disabled = false;
+        mintBtn.textContent = 'MINT YOUR CARD — 0.5 USDT';
+        mintBtn.onclick = handleMint;
+        loadPoolStats();
+      } else {
+        mintBtn.disabled = false;
+        mintBtn.textContent = 'CONNECT WALLET TO MINT';
+      }
+    };
+    return;
+  }
+
+  // Check if already minted
+  try {
+    const player = await GLYPH.getPlayerData(addr);
+    if (player) { window.location.href = 'dashboard.html'; return; }
+  } catch(e) { console.error('getPlayerData:', e); }
+
+  loadPoolStats();
+}
+
+async function loadPoolStats() {
+  try {
+    const stats = await GLYPH.getChainStats();
+    document.getElementById('minted-val').textContent = stats.totalMinted;
+    document.getElementById('pool-val').textContent = stats.prizePool + ' USDT';
+  } catch(e) { console.error('loadPoolStats:', e); }
+}
+
+init();
+
+function cfg() {
+  return {
+    color:       '#94a3b8',
+    shimA:       'rgba(148,163,184,0.06)',
+    shimB:       'rgba(203,213,225,0.1)',
+    shimDur:     '6s',
+    glowOuter:   'rgba(100,116,139,0.25)',
+    glowTight:   'rgba(148,163,184,0.55)',
+    border:      'rgba(148,163,184,0.55)',
+    chipStroke:  'rgba(148,163,184,0.3)',
+    divider:     'rgba(148,163,184,0.12)',
+    trackStroke: 'rgba(148,163,184,0.15)',
+    prog0:       '#475569',
+    prog1:       '#94a3b8',
+    prog2:       '#e2e8f0',
+    ovrColor:    '#cbd5e1',
+    glowDur:     '5s',
+    pColors:     ['#94a3b8','#cbd5e1'],
+    pCount:      4,
+  };
+}
+
+function makeSVG(card) {
+  const c     = cfg();
+  const id    = card.id;
+  const fillW = Math.round(card.score / 100 * 468);
+  const tipEnd= 16 + fillW;
+
+  function particles() {
+    let out = '<g clip-path="url(#clip-' + id + ')">';
+    for (let i = 0; i < c.pCount; i++) {
+      const cx  = (20 + Math.random() * 460).toFixed(0);
+      const cy  = (430 + Math.random() * 50).toFixed(0);
+      const r   = (1 + Math.random() * 1.5).toFixed(1);
+      const dur = (2 + Math.random() * 2.5).toFixed(1);
+      const beg = (Math.random() * 7).toFixed(1);
+      const dx  = ((Math.random() - 0.5) * 20).toFixed(0);
+      const dy  = (80 + Math.random() * 60).toFixed(0);
+      const op  = (0.5 + Math.random() * 0.5).toFixed(2);
+      out += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${c.pColors[0]}" opacity="0">
+        <animate attributeName="opacity" values="0;${op};0" dur="${dur}s" begin="${beg}s" repeatCount="indefinite"/>
+        <animateTransform attributeName="transform" type="translate" values="0,0;${dx},-${dy}" dur="${dur}s" begin="${beg}s" repeatCount="indefinite"/>
+      </circle>`;
+    }
+    return out + '</g>';
+  }
+
+  return `<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+<defs>
+  <clipPath id="clip-${id}"><rect x="0" y="0" width="500" height="500"/></clipPath>
+  <linearGradient id="shim-${id}" gradientUnits="userSpaceOnUse" x1="-250" y1="500" x2="250" y2="0">
+    <stop offset="0%"   stop-color="rgba(0,0,0,0)"/>
+    <stop offset="44%"  stop-color="${c.shimA}"/>
+    <stop offset="50%"  stop-color="${c.shimB}"/>
+    <stop offset="56%"  stop-color="${c.shimA}"/>
+    <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    <animateTransform attributeName="gradientTransform" type="translate" values="750,0;-750,0" dur="${c.shimDur}" repeatCount="indefinite"/>
+  </linearGradient>
+  <linearGradient id="ov-${id}" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="rgba(5,5,16,0)"/>
+    <stop offset="45%"  stop-color="rgba(5,5,16,0.72)"/>
+    <stop offset="100%" stop-color="rgba(5,5,16,0.97)"/>
+  </linearGradient>
+  <linearGradient id="pg-${id}" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%"   stop-color="${c.prog0}"/>
+    <stop offset="70%"  stop-color="${c.prog1}"/>
+    <stop offset="100%" stop-color="${c.prog2}"/>
+  </linearGradient>
+  <filter id="bg-${id}" x="-40%" y="-40%" width="180%" height="180%">
+    <feGaussianBlur in="SourceGraphic"><animate attributeName="stdDeviation" values="10;22;10" dur="${c.glowDur}" repeatCount="indefinite"/></feGaussianBlur>
+  </filter>
+  <filter id="sp-${id}" x="-60%" y="-60%" width="220%" height="220%">
+    <feGaussianBlur in="SourceGraphic"><animate attributeName="stdDeviation" values="18;36;18" dur="${c.glowDur}" repeatCount="indefinite"/></feGaussianBlur>
+  </filter>
+  <filter id="tp-${id}" x="-120%" y="-120%" width="340%" height="340%">
+    <feGaussianBlur stdDeviation="3" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+<image href="${card.img}" x="0" y="0" width="500" height="500" preserveAspectRatio="xMidYMid slice" clip-path="url(#clip-${id})"/>
+<rect x="0" y="0" width="500" height="500" fill="url(#shim-${id})" clip-path="url(#clip-${id})"/>
+${particles()}
+<rect x="0" y="270" width="500" height="230" fill="url(#ov-${id})" clip-path="url(#clip-${id})"/>
+<text x="16" y="356" font-family="'Bebas Neue',sans-serif" font-size="38" fill="#ffffff" letter-spacing="2">${card.name}</text>
+<line x1="16" y1="368" x2="484" y2="368" stroke="${c.divider}" stroke-width="1"/>
+<text x="16"  y="384" font-family="'DM Mono',monospace" font-size="8" fill="rgba(255,255,255,0.6)" letter-spacing="2">PREDICTION SCORE</text>
+<text x="484" y="384" font-family="'DM Mono',monospace" font-size="8" fill="${c.color}" text-anchor="end">${card.score} / 100</text>
+<rect x="16" y="390" width="468" height="8" rx="0" fill="rgba(255,255,255,0.07)" stroke="${c.trackStroke}" stroke-width="1"/>
+<rect x="16" y="390" width="${fillW}" height="8" rx="0" fill="url(#pg-${id})"/>
+<text x="16"  y="412" font-family="'DM Mono',monospace" font-size="7" fill="rgba(255,255,255,0.4)" letter-spacing="1">ROOKIE</text>
+<text x="484" y="412" font-family="'DM Mono',monospace" font-size="7" fill="rgba(255,255,255,0.4)" text-anchor="end" letter-spacing="1">ORACLE</text>
+<line x1="16" y1="424" x2="484" y2="424" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+<text x="16"  y="440" font-family="'DM Mono',monospace" font-size="8" fill="rgba(255,255,255,0.55)" letter-spacing="1">FIFA WC WINS</text>
+<text x="16"  y="462" font-family="'Bebas Neue',sans-serif" font-size="24" fill="${c.color}">${card.wc}</text>
+<text x="484" y="440" font-family="'DM Mono',monospace" font-size="8" fill="rgba(255,255,255,0.55)" letter-spacing="1" text-anchor="end">TEAM OVR</text>
+<text x="484" y="462" font-family="'Bebas Neue',sans-serif" font-size="24" fill="${c.ovrColor}" text-anchor="end">${card.ovr}</text>
+<text x="484" y="492" font-family="'DM Mono',monospace" font-size="6.5" fill="rgba(255,255,255,0.18)" text-anchor="end" letter-spacing="1">ERC-721 · ${card.token}</text>
+<rect x="374" y="12" width="112" height="18" rx="4" fill="rgba(0,0,0,0.65)" stroke="${c.chipStroke}" stroke-width="1"/>
+<text x="430" y="25" font-family="'DM Mono',monospace" font-size="8.5" fill="${c.color}" text-anchor="middle" letter-spacing="2">COMMON</text>
+<rect x="388" y="36" width="98" height="18" rx="4" fill="rgba(0,0,0,0.6)"/>
+<text x="437" y="49" font-family="'DM Sans',sans-serif" font-size="10" font-weight="600" fill="#ffffff" text-anchor="middle">${card.nation}</text>
+<rect x="1" y="1" width="498" height="498" rx="0" fill="none" stroke="${c.glowOuter}" stroke-width="8" filter="url(#sp-${id})">
+  <animate attributeName="stroke-opacity" values="0.3;0.55;0.3" dur="${c.glowDur}" repeatCount="indefinite"/>
+</rect>
+<rect x="1" y="1" width="498" height="498" rx="0" fill="none" stroke="${c.glowTight}" stroke-width="4" filter="url(#bg-${id})">
+  <animate attributeName="stroke-opacity" values="0.65;1;0.65" dur="${c.glowDur}" repeatCount="indefinite"/>
+</rect>
+<rect x="1" y="1" width="498" height="498" rx="0" fill="none" stroke="${c.border}" stroke-width="2">
+  <animate attributeName="stroke-opacity" values="0.75;1;0.75" dur="${c.glowDur}" repeatCount="indefinite"/>
+</rect>
+</svg>`;
+}
+
+async function handleMint() {
+  mintBtn.disabled = true;
+  mintOverlay.classList.add('show');
+
+  try {
+    await GLYPH.mintCard();
+
+    // After tx confirmed, read which card was assigned
+    const addr = await GLYPH.getWallet();
+    const player = await GLYPH.getPlayerData(addr);
+    const card = COMMON_CARDS[player ? player.cardIndex % COMMON_CARDS.length : 0];
+
+    cardBack.innerHTML = makeSVG(card);
+    mintOverlay.classList.remove('show');
+
+    setTimeout(() => {
+      cardInner.classList.add('flipped');
+      setTimeout(() => {
+        cardNameEl.textContent = card.name;
+        cardNameEl.classList.add('show');
+        revealedNation.textContent = card.nation;
+
+        if (player) {
+          document.getElementById('minted-val').textContent = player.totalMinted;
+          document.getElementById('pool-val').textContent = (Number(player.totalMinted) * 0.5).toFixed(2) + ' USDT';
+        }
+
+        mintBtn.disabled = false;
+        mintBtn.textContent = 'GO TO DASHBOARD';
+        mintBtn.onclick = () => window.location.href = 'dashboard.html';
+      }, 600);
+    }, 200);
+
+  } catch (e) {
+    console.error(e);
+    mintOverlay.classList.remove('show');
+    mintBtn.disabled = false;
+    alert('Mint failed: ' + (e.reason || e.message));
+  }
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+<script src="web3.js"></script>
+<script src="nav.js"></script>
+</body>
+</html>

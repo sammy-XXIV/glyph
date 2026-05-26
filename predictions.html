@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLYPH — Predictions</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="nav.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100vw; min-height: 100vh;
+  background: #050510;
+  font-family: 'DM Sans', sans-serif;
+  color: #fff; overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 10% 20%, rgba(0,40,180,0.13) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 90% 80%, rgba(120,0,180,0.09) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+.page {
+  position: relative; z-index: 1;
+  max-width: 860px; margin: 0 auto;
+  padding: 100px 24px 80px;
+}
+
+/* ── Page header ───────────────────────────────────────────── */
+.page-header {
+  margin-bottom: 32px;
+}
+.page-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px; letter-spacing: 6px; color: #fff;
+}
+.page-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.25); margin-top: 4px;
+}
+
+/* ── Slot navigation dots ──────────────────────────────────── */
+.slot-dots {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; margin-bottom: 28px; flex-wrap: wrap;
+}
+.slot-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  cursor: pointer; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.slot-dot:hover { background: rgba(255,255,255,0.3); }
+.slot-dot.active {
+  background: #fff; width: 24px; border-radius: 4px;
+}
+.slot-dot.past { background: rgba(255,255,255,0.08); }
+.slot-dot.has-pick { background: rgba(74,222,128,0.5); }
+.slot-dot.has-pick.active { background: #4ade80; }
+
+/* ── Slot viewer ───────────────────────────────────────────── */
+.slot-viewer {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 20px;
+  padding: 28px;
+  margin-bottom: 20px;
+  min-height: 320px;
+}
+.slot-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 24px; gap: 12px;
+}
+.slot-meta { flex: 1; }
+.slot-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 4px;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 6px;
+  display: flex; align-items: center; gap: 10px;
+}
+.simultaneous-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 7px; letter-spacing: 2px;
+  color: #a78bfa; background: rgba(167,139,250,0.1);
+  border: 1px solid rgba(167,139,250,0.25);
+  padding: 2px 8px; border-radius: 6px;
+}
+.slot-time {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px; letter-spacing: 4px; color: #fff;
+}
+.slot-nav {
+  display: flex; gap: 8px; align-items: center;
+}
+.nav-btn {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s;
+}
+.nav-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.1);
+  color: #fff; border-color: rgba(255,255,255,0.25);
+}
+.nav-btn:disabled { opacity: 0.2; cursor: default; }
+
+.status-pill {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2px;
+  padding: 4px 12px; border-radius: 10px;
+  white-space: nowrap;
+  margin-top: 4px; display: inline-block;
+}
+.status-pill.open    { color: #4ade80; background: rgba(74,222,128,0.1);  border: 1px solid rgba(74,222,128,0.25); }
+.status-pill.locked  { color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
+.status-pill.past    { color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); }
+.status-pill.live    { color: #fb923c; background: rgba(251,146,60,0.1);  border: 1px solid rgba(251,146,60,0.3); }
+.status-pill.upcoming{ color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+
+/* ── Match cards ───────────────────────────────────────────── */
+.matches-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+.matches-container.dual {
+  grid-template-columns: 1fr 1fr;
+}
+.match-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 20px 20px;
+  transition: border-color 0.2s;
+  display: flex; flex-direction: column;
+}
+.match-card .teams-row { margin-bottom: 0; flex: 1; align-items: center; }
+.match-card .picks-row,
+.match-card .result-pick-row,
+.match-card .tbd-notice { margin-top: 16px; }
+.match-card:hover { border-color: rgba(255,255,255,0.12); }
+.match-card.has-pick { border-color: rgba(74,222,128,0.2); }
+.match-card.locked-card { opacity: 0.5; pointer-events: none; }
+.match-card.result-card { border-color: rgba(255,255,255,0.05); }
+
+.match-top {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 16px;
+}
+.match-stage-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2px;
+  color: rgba(255,255,255,0.2);
+}
+.match-pick-pill {
+  margin-left: auto;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 1px;
+}
+.match-pick-pill.correct { color: #4ade80; background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.25); padding: 2px 8px; border-radius: 8px; }
+.match-pick-pill.wrong   { color: #f87171; background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); padding: 2px 8px; border-radius: 8px; }
+.match-pick-pill.saved   { color: rgba(74,222,128,0.7); font-size: 9px; }
+
+.teams-row {
+  display: flex; align-items: center; gap: 0; margin-bottom: 16px;
+}
+.team {
+  display: flex; align-items: center; gap: 10px; flex: 1;
+}
+.team.right { flex-direction: row-reverse; }
+.team-flag { width: 36px; height: 27px; object-fit: cover; border-radius: 3px; display: block; }
+.team-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px; letter-spacing: 2px; color: #fff;
+}
+.team.right .team-name { text-align: right; }
+.vs-block { flex: 0 0 64px; text-align: center; }
+.vs-text {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px; letter-spacing: 4px;
+  color: rgba(255,255,255,0.12);
+}
+.result-score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px; letter-spacing: 4px; color: #fff;
+}
+
+.picks-row { display: flex; gap: 6px; }
+.pick-btn {
+  flex: 1;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 1px;
+  color: rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  padding: 9px 4px; border-radius: 7px;
+  cursor: pointer; text-align: center;
+  transition: all 0.15s;
+}
+.pick-btn:hover {
+  color: #fff; background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.18);
+}
+.pick-btn.sel-home, .pick-btn.sel-away {
+  color: #fff; background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.35);
+}
+.pick-btn.sel-draw {
+  color: #94a3b8; background: rgba(148,163,184,0.1);
+  border-color: rgba(148,163,184,0.35);
+}
+.pick-btn.correct-pick {
+  color: #4ade80; background: rgba(74,222,128,0.08);
+  border-color: rgba(74,222,128,0.3); pointer-events: none;
+}
+.pick-btn.wrong-pick {
+  color: #f87171; background: rgba(248,113,113,0.06);
+  border-color: rgba(248,113,113,0.2); pointer-events: none;
+}
+.pick-btn.neutral-pick { pointer-events: none; }
+
+.tbd-notice {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.15);
+  text-align: center; padding: 10px 0;
+}
+.result-pick-row {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 2px;
+  margin-top: 12px; padding: 8px 12px;
+  border-radius: 8px; text-align: center;
+}
+.result-pick-row.correct { color: #4ade80; background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); }
+.result-pick-row.wrong   { color: #f87171; background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.15); }
+
+/* ── Submit bar ────────────────────────────────────────────── */
+.submit-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(74,222,128,0.06);
+  border: 1px solid rgba(74,222,128,0.15);
+  border-radius: 14px; padding: 14px 20px;
+  margin-bottom: 20px;
+  display: none;
+}
+.submit-bar span {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 2px;
+  color: rgba(74,222,128,0.7);
+}
+.submit-bar strong { color: #4ade80; }
+.submit-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 2px;
+  color: #050510; background: #4ade80;
+  border: none; padding: 0 22px; height: 38px;
+  border-radius: 19px; cursor: pointer;
+  transition: transform 0.15s, opacity 0.2s;
+}
+.submit-btn:hover { transform: scale(1.03); }
+.submit-btn:active { transform: scale(0.97); }
+.submit-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* ── Next match banner ─────────────────────────────────────── */
+.next-up {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px; padding: 18px 22px;
+  display: flex; align-items: center; gap: 16px;
+}
+.next-up-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.2);
+  white-space: nowrap;
+}
+.next-up-teams {
+  flex: 1;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.6);
+}
+.next-up-countdown {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px; letter-spacing: 2px;
+  color: #fff;
+  white-space: nowrap;
+}
+.next-up-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2px;
+  color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 6px 16px; border-radius: 8px;
+  cursor: pointer; transition: all 0.18s;
+  white-space: nowrap;
+}
+.next-up-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .page { padding: 80px 12px 80px; }
+  .slot-viewer { padding: 18px 14px; }
+  .matches-container.dual { grid-template-columns: 1fr; }
+  .team-flag { font-size: 22px; }
+  .team-name { font-size: 14px; letter-spacing: 1px; }
+  .vs-block  { flex: 0 0 48px; }
+  .pick-btn  { font-size: 7px; padding: 8px 2px; }
+  .slot-time { font-size: 22px; }
+  .next-up-teams { font-size: 13px; }
+}
+
+/* ── Live match featured ───────────────────────────────────── */
+.live-match-viewer {
+  border-color: rgba(251,146,60,0.3);
+  background: rgba(251,146,60,0.03);
+}
+.won-card {
+  border-color: rgba(74,222,128,0.35);
+  background: rgba(74,222,128,0.05);
+}
+.lost-card {
+  border-color: rgba(248,113,113,0.25);
+  background: rgba(248,113,113,0.03);
+}
+.live-timer-wrap {
+  text-align: center;
+  margin: 20px 0 24px;
+}
+.live-phase-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 4px;
+  color: rgba(251,146,60,0.7);
+  margin-bottom: 8px;
+}
+.live-timer {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 52px; letter-spacing: 6px;
+  color: #fff; line-height: 1;
+}
+.live-timer.urgent { color: #fb923c; }
+.live-timer-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.25);
+  margin-top: 6px;
+}
+.break-viewer {
+  border-color: rgba(148,163,184,0.15);
+  background: rgba(148,163,184,0.02);
+}
+
+/* ── Queue & history ───────────────────────────────────────── */
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 4px;
+  color: rgba(255,255,255,0.2);
+  margin: 28px 0 12px;
+}
+.queue-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  opacity: 0.4;
+}
+.queue-teams {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.6); flex: 1;
+}
+.queue-group {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2px;
+  color: rgba(255,255,255,0.2);
+}
+.history-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.02);
+  transition: border-color 0.3s, background 0.3s;
+}
+.history-item.correct {
+  border-color: rgba(74,222,128,0.4);
+  background: rgba(74,222,128,0.08);
+}
+.history-item.wrong {
+  border-color: rgba(248,113,113,0.18);
+  background: rgba(248,113,113,0.03);
+}
+.history-item.no-pick { opacity: 0.4; }
+.history-teams {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px; letter-spacing: 2px;
+  color: rgba(255,255,255,0.7); flex: 1;
+}
+.history-score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px; letter-spacing: 3px; color: #fff;
+  margin: 0 12px;
+}
+.history-verdict {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2px;
+  white-space: nowrap;
+}
+.history-item.correct .history-verdict { color: #4ade80; }
+.history-item.wrong   .history-verdict { color: #f87171; }
+.history-item.no-pick .history-verdict { color: rgba(255,255,255,0.2); }
+.demo-idle {
+  text-align: center; padding: 48px 24px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.2);
+  border: 1px dashed rgba(255,255,255,0.07);
+  border-radius: 16px;
+  line-height: 2;
+}
+
+/* demo controls */
+.demo-controls {
+  display: flex; gap: 10px; margin-bottom: 20px;
+}
+.demo-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 2px;
+  border: none; padding: 0 20px; height: 36px;
+  border-radius: 18px; cursor: pointer;
+  transition: transform 0.15s, opacity 0.2s;
+}
+.demo-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.demo-btn.start { background: #4ade80; color: #050510; }
+.demo-btn.start:hover:not(:disabled) { transform: scale(1.03); }
+.demo-btn.stop  { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+.demo-btn.stop:hover:not(:disabled)  { background: rgba(248,113,113,0.25); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="gallery.html">GLYPH</a>
+  <div class="nav-links">
+    <a href="dashboard.html">DASHBOARD</a>
+    <a href="predictions.html" class="active">PREDICT</a>
+    <a href="leaderboard.html">LEADERBOARD</a>
+    <a href="gallery.html">GALLERY</a>
+  </div>
+  <span class="nav-wallet" id="wallet-display">—</span>
+  <button class="nav-burger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="nav-drawer">
+  <a href="dashboard.html">DASHBOARD</a>
+  <a href="predictions.html" class="active">PREDICT</a>
+  <a href="leaderboard.html">LEADERBOARD</a>
+  <a href="gallery.html">GALLERY</a>
+  <div class="drawer-wallet" id="drawer-wallet-display">—</div>
+</div>
+
+<div class="page">
+
+  <div class="page-header">
+    <div class="page-title">PREDICTIONS</div>
+    <div class="page-sub">FIFA WORLD CUP 2026 · 104 MATCHES</div>
+  </div>
+
+  <!-- Demo controls -->
+  <div class="demo-controls" id="demo-controls" style="display:none">
+    <button class="demo-btn start" id="btn-start" onclick="triggerDemo('start')">▶ START DEMO</button>
+    <button class="demo-btn stop"  id="btn-stop"  onclick="triggerDemo('stop')" disabled>■ STOP DEMO</button>
+  </div>
+
+  <!-- Submit bar (shown when pending picks exist) -->
+  <div class="submit-bar" id="submit-bar">
+    <span><strong id="pending-count">0</strong> UNSAVED PICKS · SUBMIT BEFORE KICKOFF</span>
+    <button class="submit-btn" id="submit-btn" onclick="submitPicks()">SUBMIT PICKS</button>
+  </div>
+
+  <!-- Live / active match -->
+  <div id="live-section"></div>
+
+  <!-- Upcoming queue -->
+  <div id="queue-section"></div>
+
+  <!-- Past results -->
+  <div id="history-section"></div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+<script src="web3.js?v=2"></script>
+<script src="nav.js"></script>
+<script>
+// ── Demo match sequence (in order) ────────────────────────────────────────
+const DEMO_MATCH_IDS = [1, 2, 14, 20];
+
+const MATCHES = [
+  // ── GROUP A ──────────────────────────────────────────────────────────────
+  { id:1,  group:'GROUP A', home:'USA',        homeFlag:'🇺🇸', away:'Mexico',      awayFlag:'🇲🇽', time:'11 Jun · 19:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:2,  group:'GROUP A', home:'Canada',     homeFlag:'🇨🇦', away:'Panama',      awayFlag:'🇵🇦', time:'11 Jun · 22:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:3,  group:'GROUP A', home:'USA',        homeFlag:'🇺🇸', away:'Canada',      awayFlag:'🇨🇦', time:'18 Jun · 16:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:4,  group:'GROUP A', home:'Mexico',     homeFlag:'🇲🇽', away:'Panama',      awayFlag:'🇵🇦', time:'18 Jun · 19:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:5,  group:'GROUP A', home:'Mexico',     homeFlag:'🇲🇽', away:'Canada',      awayFlag:'🇨🇦', time:'25 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+  { id:6,  group:'GROUP A', home:'Panama',     homeFlag:'🇵🇦', away:'USA',         awayFlag:'🇺🇸', time:'25 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+
+  // ── GROUP B ──────────────────────────────────────────────────────────────
+  { id:7,  group:'GROUP B', home:'Brazil',     homeFlag:'🇧🇷', away:'Colombia',    awayFlag:'🇨🇴', time:'12 Jun · 19:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:8,  group:'GROUP B', home:'Ecuador',    homeFlag:'🇪🇨', away:'Bolivia',     awayFlag:'🇧🇴', time:'12 Jun · 22:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:9,  group:'GROUP B', home:'Brazil',     homeFlag:'🇧🇷', away:'Ecuador',     awayFlag:'🇪🇨', time:'19 Jun · 16:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:10, group:'GROUP B', home:'Colombia',   homeFlag:'🇨🇴', away:'Bolivia',     awayFlag:'🇧🇴', time:'19 Jun · 19:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:11, group:'GROUP B', home:'Colombia',   homeFlag:'🇨🇴', away:'Ecuador',     awayFlag:'🇪🇨', time:'26 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+  { id:12, group:'GROUP B', home:'Bolivia',    homeFlag:'🇧🇴', away:'Brazil',      awayFlag:'🇧🇷', time:'26 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+
+  // ── GROUP C ──────────────────────────────────────────────────────────────
+  { id:13, group:'GROUP C', home:'Argentina',  homeFlag:'🇦🇷', away:'Uruguay',     awayFlag:'🇺🇾', time:'12 Jun · 16:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:14, group:'GROUP C', home:'Paraguay',   homeFlag:'🇵🇾', away:'Venezuela',   awayFlag:'🇻🇪', time:'12 Jun · 22:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:15, group:'GROUP C', home:'Argentina',  homeFlag:'🇦🇷', away:'Paraguay',    awayFlag:'🇵🇾', time:'19 Jun · 16:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:16, group:'GROUP C', home:'Uruguay',    homeFlag:'🇺🇾', away:'Venezuela',   awayFlag:'🇻🇪', time:'19 Jun · 19:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:17, group:'GROUP C', home:'Uruguay',    homeFlag:'🇺🇾', away:'Paraguay',    awayFlag:'🇵🇾', time:'26 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+  { id:18, group:'GROUP C', home:'Venezuela',  homeFlag:'🇻🇪', away:'Argentina',   awayFlag:'🇦🇷', time:'26 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+
+  // ── GROUP D ──────────────────────────────────────────────────────────────
+  { id:19, group:'GROUP D', home:'France',     homeFlag:'🇫🇷', away:'Morocco',     awayFlag:'🇲🇦', time:'13 Jun · 19:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:20, group:'GROUP D', home:'Senegal',    homeFlag:'🇸🇳', away:'Mali',        awayFlag:'🇲🇱', time:'13 Jun · 22:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:21, group:'GROUP D', home:'France',     homeFlag:'🇫🇷', away:'Senegal',     awayFlag:'🇸🇳', time:'20 Jun · 16:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:22, group:'GROUP D', home:'Morocco',    homeFlag:'🇲🇦', away:'Mali',        awayFlag:'🇲🇱', time:'20 Jun · 19:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:23, group:'GROUP D', home:'Morocco',    homeFlag:'🇲🇦', away:'Senegal',     awayFlag:'🇸🇳', time:'27 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+  { id:24, group:'GROUP D', home:'Mali',       homeFlag:'🇲🇱', away:'France',      awayFlag:'🇫🇷', time:'27 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+
+  // ── GROUP E ──────────────────────────────────────────────────────────────
+  { id:25, group:'GROUP E', home:'Spain',      homeFlag:'🇪🇸', away:'Japan',       awayFlag:'🇯🇵', time:'14 Jun · 19:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:26, group:'GROUP E', home:'S. Korea',   homeFlag:'🇰🇷', away:'Iraq',        awayFlag:'🇮🇶', time:'14 Jun · 22:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:27, group:'GROUP E', home:'Spain',      homeFlag:'🇪🇸', away:'S. Korea',    awayFlag:'🇰🇷', time:'21 Jun · 16:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:28, group:'GROUP E', home:'Japan',      homeFlag:'🇯🇵', away:'Iraq',        awayFlag:'🇮🇶', time:'21 Jun · 19:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:29, group:'GROUP E', home:'Japan',      homeFlag:'🇯🇵', away:'S. Korea',    awayFlag:'🇰🇷', time:'28 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+  { id:30, group:'GROUP E', home:'Iraq',       homeFlag:'🇮🇶', away:'Spain',       awayFlag:'🇪🇸', time:'28 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+
+  // ── GROUP F ──────────────────────────────────────────────────────────────
+  { id:31, group:'GROUP F', home:'England',    homeFlag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', away:'Denmark',    awayFlag:'🇩🇰', time:'14 Jun · 16:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:32, group:'GROUP F', home:'Poland',     homeFlag:'🇵🇱', away:'Serbia',      awayFlag:'🇷🇸', time:'14 Jun · 22:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:33, group:'GROUP F', home:'England',    homeFlag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', away:'Poland',     awayFlag:'🇵🇱', time:'21 Jun · 16:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:34, group:'GROUP F', home:'Denmark',    homeFlag:'🇩🇰', away:'Serbia',      awayFlag:'🇷🇸', time:'21 Jun · 19:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:35, group:'GROUP F', home:'Denmark',    homeFlag:'🇩🇰', away:'Poland',      awayFlag:'🇵🇱', time:'28 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+  { id:36, group:'GROUP F', home:'Serbia',     homeFlag:'🇷🇸', away:'England',     awayFlag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', time:'28 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+
+  // ── GROUP G ──────────────────────────────────────────────────────────────
+  { id:37, group:'GROUP G', home:'Germany',    homeFlag:'🇩🇪', away:'Croatia',     awayFlag:'🇭🇷', time:'15 Jun · 19:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:38, group:'GROUP G', home:'Hungary',    homeFlag:'🇭🇺', away:'Georgia',     awayFlag:'🇬🇪', time:'15 Jun · 22:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:39, group:'GROUP G', home:'Germany',    homeFlag:'🇩🇪', away:'Hungary',     awayFlag:'🇭🇺', time:'22 Jun · 16:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:40, group:'GROUP G', home:'Croatia',    homeFlag:'🇭🇷', away:'Georgia',     awayFlag:'🇬🇪', time:'22 Jun · 19:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:41, group:'GROUP G', home:'Croatia',    homeFlag:'🇭🇷', away:'Hungary',     awayFlag:'🇭🇺', time:'29 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+  { id:42, group:'GROUP G', home:'Georgia',    homeFlag:'🇬🇪', away:'Germany',     awayFlag:'🇩🇪', time:'29 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+
+  // ── GROUP H ──────────────────────────────────────────────────────────────
+  { id:43, group:'GROUP H', home:'Portugal',   homeFlag:'🇵🇹', away:'Nigeria',     awayFlag:'🇳🇬', time:'16 Jun · 19:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:44, group:'GROUP H', home:'Egypt',      homeFlag:'🇪🇬', away:'S. Africa',   awayFlag:'🇿🇦', time:'16 Jun · 22:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:45, group:'GROUP H', home:'Portugal',   homeFlag:'🇵🇹', away:'Egypt',       awayFlag:'🇪🇬', time:'23 Jun · 16:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:46, group:'GROUP H', home:'Nigeria',    homeFlag:'🇳🇬', away:'S. Africa',   awayFlag:'🇿🇦', time:'23 Jun · 19:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:47, group:'GROUP H', home:'Nigeria',    homeFlag:'🇳🇬', away:'Egypt',       awayFlag:'🇪🇬', time:'30 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+  { id:48, group:'GROUP H', home:'S. Africa',  homeFlag:'🇿🇦', away:'Portugal',    awayFlag:'🇵🇹', time:'30 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+
+  // ── GROUP I ──────────────────────────────────────────────────────────────
+  { id:49, group:'GROUP I', home:'Netherlands',homeFlag:'🇳🇱', away:'Belgium',     awayFlag:'🇧🇪', time:'16 Jun · 16:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:50, group:'GROUP I', home:'Czech Rep',  homeFlag:'🇨🇿', away:'Romania',     awayFlag:'🇷🇴', time:'16 Jun · 22:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:51, group:'GROUP I', home:'Netherlands',homeFlag:'🇳🇱', away:'Czech Rep',   awayFlag:'🇨🇿', time:'23 Jun · 16:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:52, group:'GROUP I', home:'Belgium',    homeFlag:'🇧🇪', away:'Romania',     awayFlag:'🇷🇴', time:'23 Jun · 19:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:53, group:'GROUP I', home:'Belgium',    homeFlag:'🇧🇪', away:'Czech Rep',   awayFlag:'🇨🇿', time:'30 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+  { id:54, group:'GROUP I', home:'Romania',    homeFlag:'🇷🇴', away:'Netherlands', awayFlag:'🇳🇱', time:'30 Jun · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+
+  // ── GROUP J ──────────────────────────────────────────────────────────────
+  { id:55, group:'GROUP J', home:'Italy',      homeFlag:'🇮🇹', away:'Switzerland', awayFlag:'🇨🇭', time:'17 Jun · 19:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:56, group:'GROUP J', home:'Slovakia',   homeFlag:'🇸🇰', away:'Albania',     awayFlag:'🇦🇱', time:'17 Jun · 22:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:57, group:'GROUP J', home:'Italy',      homeFlag:'🇮🇹', away:'Slovakia',    awayFlag:'🇸🇰', time:'24 Jun · 16:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:58, group:'GROUP J', home:'Switzerland',homeFlag:'🇨🇭', away:'Albania',     awayFlag:'🇦🇱', time:'24 Jun · 19:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:59, group:'GROUP J', home:'Switzerland',homeFlag:'🇨🇭', away:'Slovakia',    awayFlag:'🇸🇰', time:' 1 Jul · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+  { id:60, group:'GROUP J', home:'Albania',    homeFlag:'🇦🇱', away:'Italy',       awayFlag:'🇮🇹', time:' 1 Jul · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+
+  // ── GROUP K ──────────────────────────────────────────────────────────────
+  { id:61, group:'GROUP K', home:'Saudi Arabia',homeFlag:'🇸🇦',away:'Australia',   awayFlag:'🇦🇺', time:'17 Jun · 16:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:62, group:'GROUP K', home:'Iran',        homeFlag:'🇮🇷',away:'Thailand',    awayFlag:'🇹🇭', time:'17 Jun · 22:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:63, group:'GROUP K', home:'Saudi Arabia',homeFlag:'🇸🇦',away:'Iran',        awayFlag:'🇮🇷', time:'24 Jun · 16:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:64, group:'GROUP K', home:'Australia',   homeFlag:'🇦🇺',away:'Thailand',    awayFlag:'🇹🇭', time:'24 Jun · 19:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:65, group:'GROUP K', home:'Australia',   homeFlag:'🇦🇺',away:'Iran',        awayFlag:'🇮🇷', time:' 1 Jul · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+  { id:66, group:'GROUP K', home:'Thailand',    homeFlag:'🇹🇭',away:'Saudi Arabia',awayFlag:'🇸🇦', time:' 1 Jul · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+
+  // ── GROUP L ──────────────────────────────────────────────────────────────
+  { id:67, group:'GROUP L', home:'Cameroon',   homeFlag:'🇨🇲', away:'Ghana',       awayFlag:'🇬🇭', time:'17 Jun · 16:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:68, group:'GROUP L', home:'Costa Rica', homeFlag:'🇨🇷', away:'Jamaica',     awayFlag:'🇯🇲', time:'17 Jun · 22:00 UTC', stage:'MD1', status:'open',   result:null },
+  { id:69, group:'GROUP L', home:'Cameroon',   homeFlag:'🇨🇲', away:'Costa Rica',  awayFlag:'🇨🇷', time:'24 Jun · 16:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:70, group:'GROUP L', home:'Ghana',      homeFlag:'🇬🇭', away:'Jamaica',     awayFlag:'🇯🇲', time:'24 Jun · 19:00 UTC', stage:'MD2', status:'open',   result:null },
+  { id:71, group:'GROUP L', home:'Ghana',      homeFlag:'🇬🇭', away:'Costa Rica',  awayFlag:'🇨🇷', time:' 1 Jul · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+  { id:72, group:'GROUP L', home:'Jamaica',    homeFlag:'🇯🇲', away:'Cameroon',    awayFlag:'🇨🇲', time:' 1 Jul · 22:00 UTC', stage:'MD3', status:'open',   result:null },
+
+  // ── ROUND OF 32 ──────────────────────────────────────────────────────────
+  { id:73,  group:'ROUND OF 32', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:' 4 Jul · 16:00 UTC', stage:'R32', status:'locked', result:null },
+  { id:74,  group:'ROUND OF 32', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:' 4 Jul · 19:00 UTC', stage:'R32', status:'locked', result:null },
+  { id:75,  group:'ROUND OF 32', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:' 4 Jul · 22:00 UTC', stage:'R32', status:'locked', result:null },
+  { id:76,  group:'ROUND OF 32', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:' 5 Jul · 16:00 UTC', stage:'R32', status:'locked', result:null },
+  { id:77,  group:'ROUND OF 32', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:' 5 Jul · 19:00 UTC', stage:'R32', status:'locked', result:null },
+  { id:78,  group:'ROUND OF 32', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:' 5 Jul · 22:00 UTC', stage:'R32', status:'locked', result:null },
+  { id:79,  group:'ROUND OF 32', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:' 6 Jul · 16:00 UTC', stage:'R32', status:'locked', result:null },
+  { id:80,  group:'ROUND OF 32', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:' 6 Jul · 19:00 UTC', stage:'R32', status:'locked', result:null },
+  { id:81,  group:'ROUND OF 32', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:' 6 Jul · 22:00 UTC', stage:'R32', status:'locked', result:null },
+  { id:82,  group:'ROUND OF 32', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:' 7 Jul · 16:00 UTC', stage:'R32', status:'locked', result:null },
+  { id:83,  group:'ROUND OF 32', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:' 7 Jul · 19:00 UTC', stage:'R32', status:'locked', result:null },
+  { id:84,  group:'ROUND OF 32', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:' 7 Jul · 22:00 UTC', stage:'R32', status:'locked', result:null },
+  { id:85,  group:'ROUND OF 32', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:' 8 Jul · 16:00 UTC', stage:'R32', status:'locked', result:null },
+  { id:86,  group:'ROUND OF 32', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:' 8 Jul · 19:00 UTC', stage:'R32', status:'locked', result:null },
+  { id:87,  group:'ROUND OF 32', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:' 8 Jul · 22:00 UTC', stage:'R32', status:'locked', result:null },
+  { id:88,  group:'ROUND OF 32', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:' 8 Jul · 23:59 UTC', stage:'R32', status:'locked', result:null },
+
+  // ── ROUND OF 16 ──────────────────────────────────────────────────────────
+  { id:89,  group:'ROUND OF 16', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:'10 Jul · 19:00 UTC', stage:'R16', status:'locked', result:null },
+  { id:90,  group:'ROUND OF 16', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:'10 Jul · 22:00 UTC', stage:'R16', status:'locked', result:null },
+  { id:91,  group:'ROUND OF 16', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:'11 Jul · 16:00 UTC', stage:'R16', status:'locked', result:null },
+  { id:92,  group:'ROUND OF 16', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:'11 Jul · 19:00 UTC', stage:'R16', status:'locked', result:null },
+  { id:93,  group:'ROUND OF 16', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:'12 Jul · 16:00 UTC', stage:'R16', status:'locked', result:null },
+  { id:94,  group:'ROUND OF 16', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:'12 Jul · 19:00 UTC', stage:'R16', status:'locked', result:null },
+  { id:95,  group:'ROUND OF 16', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:'13 Jul · 16:00 UTC', stage:'R16', status:'locked', result:null },
+  { id:96,  group:'ROUND OF 16', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:'13 Jul · 19:00 UTC', stage:'R16', status:'locked', result:null },
+
+  // ── QUARTER-FINALS ────────────────────────────────────────────────────────
+  { id:97,  group:'QUARTER-FINALS', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:'17 Jul · 19:00 UTC', stage:'QF', status:'locked', result:null },
+  { id:98,  group:'QUARTER-FINALS', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:'17 Jul · 22:00 UTC', stage:'QF', status:'locked', result:null },
+  { id:99,  group:'QUARTER-FINALS', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:'18 Jul · 19:00 UTC', stage:'QF', status:'locked', result:null },
+  { id:100, group:'QUARTER-FINALS', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:'18 Jul · 22:00 UTC', stage:'QF', status:'locked', result:null },
+
+  // ── SEMI-FINALS ───────────────────────────────────────────────────────────
+  { id:101, group:'SEMI-FINALS', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:'22 Jul · 22:00 UTC', stage:'SF',    status:'locked', result:null },
+  { id:102, group:'SEMI-FINALS', home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:'23 Jul · 22:00 UTC', stage:'SF',    status:'locked', result:null },
+
+  // ── THIRD PLACE ───────────────────────────────────────────────────────────
+  { id:103, group:'THIRD PLACE',  home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:'26 Jul · 19:00 UTC', stage:'3RD',   status:'locked', result:null },
+
+  // ── FINAL ─────────────────────────────────────────────────────────────────
+  { id:104, group:'FINAL',        home:'TBD', homeFlag:'🏳', away:'TBD', awayFlag:'🏳', time:'27 Jul · 20:00 UTC', stage:'FINAL', status:'locked', result:null },
+];
+
+// ── Flag images ────────────────────────────────────────────────────────────
+const FLAGS = {
+  'USA':'us','Mexico':'mx','Canada':'ca','Panama':'pa',
+  'Brazil':'br','Colombia':'co','Ecuador':'ec','Bolivia':'bo',
+  'Argentina':'ar','Uruguay':'uy','Paraguay':'py','Venezuela':'ve',
+  'France':'fr','Morocco':'ma','Senegal':'sn','Mali':'ml',
+  'Spain':'es','Japan':'jp','S. Korea':'kr','Iraq':'iq',
+  'England':'gb-eng','Denmark':'dk','Poland':'pl','Serbia':'rs',
+  'Germany':'de','Croatia':'hr','Hungary':'hu','Georgia':'ge',
+  'Portugal':'pt','Nigeria':'ng','Egypt':'eg','S. Africa':'za',
+  'Netherlands':'nl','Belgium':'be','Czech Rep':'cz','Romania':'ro',
+  'Italy':'it','Switzerland':'ch','Slovakia':'sk','Albania':'al',
+  'Saudi Arabia':'sa','Australia':'au','Iran':'ir','Thailand':'th',
+  'Cameroon':'cm','Ghana':'gh','Costa Rica':'cr','Jamaica':'jm',
+  'TBD':null,
+};
+function flagImg(name) {
+  const code = FLAGS[name];
+  if (!code) return `<span style="font-size:22px">🏳</span>`;
+  return `<img class="team-flag" src="https://flagcdn.com/40x30/${code}.png" alt="${name}">`;
+}
+
+// ── State ─────────────────────────────────────────────────────────────────
+const userPicks = {};
+const pending   = {};
+let demoState   = { phase:'idle', matchId:null, secondsLeft:0, nextMatchId:null, scored:[] };
+
+function getMatch(id) { return MATCHES.find(m => m.id === id); }
+function fmt(s) { return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }
+
+// ── Poll state.json ────────────────────────────────────────────────────────
+async function pollState() {
+  try {
+    const r = await fetch('https://glyph-demo-production.up.railway.app/state.json?t=' + Date.now());
+    if (r.ok) {
+      const s = await r.json();
+      // Adjust secondsLeft using the timestamp so the timer stays correct after a refresh
+      if (s.ts && s.secondsLeft > 0) {
+        const elapsed = Math.floor((Date.now() - s.ts) / 1000);
+        s.secondsLeft = Math.max(0, s.secondsLeft - elapsed);
+      }
+      demoState = s;
+    }
+  } catch(_) {}
+  render();
+}
+
+// ── Pick & submit ──────────────────────────────────────────────────────────
+function pick(matchId, choice) {
+  if (pending[matchId] === choice) delete pending[matchId];
+  else pending[matchId] = choice;
+  updateSubmitBar();
+  renderLive();
+}
+
+function updateSubmitBar() {
+  const count = Object.keys(pending).length;
+  document.getElementById('pending-count').textContent = count;
+  document.getElementById('submit-bar').style.display = count > 0 ? 'flex' : 'none';
+}
+
+async function submitPicks() {
+  const addr = await GLYPH.getWallet();
+  if (!addr) { alert('Connect your wallet first.'); return; }
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = 'SUBMITTING...';
+  try {
+    for (const [matchId, choice] of Object.entries(pending)) {
+      await GLYPH.submitPrediction(Number(matchId), ['home','draw','away'].indexOf(choice));
+    }
+    Object.assign(userPicks, pending);
+    Object.keys(pending).forEach(k => delete pending[k]);
+    updateSubmitBar();
+    renderLive();
+    btn.textContent = 'SAVED ✓';
+    setTimeout(() => { btn.textContent = 'SUBMIT PICKS'; btn.disabled = false; }, 2500);
+  } catch(e) {
+    btn.textContent = 'SUBMIT PICKS'; btn.disabled = false;
+    alert('Submit failed: ' + (e.reason || e.message));
+  }
+}
+
+// ── Render live match ──────────────────────────────────────────────────────
+function renderLive() {
+  const el = document.getElementById('live-section');
+  const { phase, matchId, secondsLeft, nextMatchId } = demoState;
+
+  if (!phase || phase === 'idle' || phase === 'done') {
+    el.innerHTML = `<div class="demo-idle">DEMO NOT RUNNING<br>RUN node demo.js score TO START</div>`;
+    return;
+  }
+
+  if (phase === 'break') {
+    const next = getMatch(nextMatchId);
+    el.innerHTML = `<div class="slot-viewer break-viewer">
+      <div class="match-top"><span class="status-pill upcoming">BREAK</span></div>
+      <div class="live-timer-wrap">
+        <div class="live-phase-label">NEXT MATCH IN</div>
+        <div class="live-timer ${secondsLeft < 30 ? 'urgent' : ''}">${fmt(secondsLeft)}</div>
+        ${next ? `<div class="live-timer-sub">${next.home.toUpperCase()} VS ${next.away.toUpperCase()} · ${next.group}</div>` : ''}
+      </div>
+    </div>`;
+    return;
+  }
+
+  const m = getMatch(matchId);
+  if (!m) { el.innerHTML = ''; return; }
+
+  const myPick   = pending[m.id] || userPicks[m.id] || null;
+  const isScored = phase === 'scored';
+  const scored   = demoState.scored?.find(s => s.matchId === m.id);
+  const winner   = scored ? ['home','draw','away'][scored.result] : null;
+  const correct  = isScored && myPick && myPick === winner;
+  const wrong    = isScored && myPick && myPick !== winner;
+
+  const pickBtnCls = (type) => {
+    if (!myPick) return 'pick-btn';
+    if (isScored) {
+      if (type === winner) return 'pick-btn correct-pick';
+      if (type === myPick) return 'pick-btn wrong-pick';
+      return 'pick-btn neutral-pick';
+    }
+    if (type === myPick) return `pick-btn sel-${type === 'draw' ? 'draw' : type === 'home' ? 'home' : 'away'}`;
+    return 'pick-btn';
+  };
+
+  let bottomHTML = '';
+  if (isScored && myPick) {
+    const label = myPick === 'home' ? m.home.toUpperCase() + ' WIN' : myPick === 'away' ? m.away.toUpperCase() + ' WIN' : 'DRAW';
+    bottomHTML = `<div class="result-pick-row ${correct ? 'correct' : 'wrong'}">${correct ? '✓' : '✗'} YOUR PICK · ${label}</div>`;
+  } else if (!isScored) {
+    if (userPicks[m.id]) {
+      // pick already submitted — show locked state, no buttons
+      const lockedLabel = userPicks[m.id] === 'home' ? m.home.toUpperCase() + ' WIN' : userPicks[m.id] === 'away' ? m.away.toUpperCase() + ' WIN' : 'DRAW';
+      bottomHTML = `<div class="result-pick-row correct" style="opacity:0.7">🔒 PICK LOCKED · ${lockedLabel}</div>`;
+    } else {
+      bottomHTML = `<div class="picks-row">
+        <button class="${pickBtnCls('home')}" onclick="pick(${m.id},'home')">${m.home.toUpperCase()} WIN</button>
+        <button class="${pickBtnCls('draw')}" onclick="pick(${m.id},'draw')">DRAW</button>
+        <button class="${pickBtnCls('away')}" onclick="pick(${m.id},'away')">${m.away.toUpperCase()} WIN</button>
+      </div>`;
+    }
+  }
+
+  const idx = DEMO_MATCH_IDS.indexOf(m.id);
+  el.innerHTML = `<div class="slot-viewer ${phase === 'live' ? 'live-match-viewer' : correct ? 'won-card' : wrong ? 'lost-card' : ''}">
+    <div class="match-top">
+      <span class="match-stage-tag">${m.group} · ${m.stage}</span>
+      ${idx >= 0 ? `<span style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;color:rgba(255,255,255,0.2)">MATCH ${idx+1} / ${DEMO_MATCH_IDS.length}</span>` : ''}
+      <span class="status-pill ${phase === 'live' ? 'live' : phase === 'scored' ? 'past' : 'open'}" style="margin-left:auto">
+        ${phase === 'live' ? '⚡ LIVE' : phase === 'scored' ? 'FULL TIME' : 'OPEN'}
+      </span>
+    </div>
+    ${phase === 'live' ? `<div class="live-timer-wrap">
+      <div class="live-phase-label">MATCH IN PROGRESS</div>
+      <div class="live-timer ${secondsLeft < 30 ? 'urgent' : ''}">${fmt(secondsLeft)}</div>
+    </div>` : ''}
+    <div class="teams-row" style="margin-bottom:0">
+      <div class="team">${flagImg(m.home)}<div class="team-name">${m.home.toUpperCase()}</div></div>
+      <div class="vs-block">
+        ${isScored && scored ? `<div class="result-score">${scored.score}</div>` : `<div class="vs-text">VS</div>`}
+      </div>
+      <div class="team right"><div class="team-name">${m.away.toUpperCase()}</div>${flagImg(m.away)}</div>
+    </div>
+    <div style="margin-top:16px">${bottomHTML}</div>
+  </div>`;
+}
+
+// ── Render upcoming queue ──────────────────────────────────────────────────
+function renderQueue() {
+  const el = document.getElementById('queue-section');
+  const scoredIds = new Set((demoState.scored || []).map(s => s.matchId));
+  const activeId  = demoState.matchId;
+
+  const upcoming = DEMO_MATCH_IDS.filter(id => !scoredIds.has(id) && id !== activeId);
+  if (!upcoming.length) { el.innerHTML = ''; return; }
+
+  const items = upcoming.map(id => {
+    const m = getMatch(id);
+    if (!m) return '';
+    return `<div class="queue-item">
+      <div class="queue-group">${m.group} · ${m.stage}</div>
+      <div class="queue-teams">${m.home.toUpperCase()} <span style="opacity:0.3;font-size:12px">VS</span> ${m.away.toUpperCase()}</div>
+      ${flagImg(m.home)}${flagImg(m.away)}
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `<div class="section-label">UPCOMING</div>${items}`;
+}
+
+// ── Render past results ────────────────────────────────────────────────────
+function renderHistory() {
+  const el = document.getElementById('history-section');
+  const scored = demoState.scored || [];
+  if (!scored.length) { el.innerHTML = ''; return; }
+
+  const items = [...scored].reverse().map(s => {
+    const m = getMatch(s.matchId);
+    if (!m) return '';
+    const winner  = ['home','draw','away'][s.result];
+    const myPick  = userPicks[s.matchId];
+    const correct = myPick && myPick === winner;
+    const wrong   = myPick && myPick !== winner;
+    const cls     = !myPick ? 'no-pick' : correct ? 'correct' : 'wrong';
+    const verdict = !myPick ? 'NO PICK' : correct ? '✓ CORRECT' : '✗ WRONG';
+    return `<div class="history-item ${cls}">
+      ${flagImg(m.home)}
+      <div class="history-teams">${m.home.toUpperCase()}</div>
+      <div class="history-score">${s.score}</div>
+      <div class="history-teams" style="text-align:right">${m.away.toUpperCase()}</div>
+      ${flagImg(m.away)}
+      <div class="history-verdict">${verdict}</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `<div class="section-label">RESULTS</div>${items}`;
+}
+
+// ── Main render ────────────────────────────────────────────────────────────
+function render() {
+  renderLive();
+  renderQueue();
+  renderHistory();
+}
+
+// ── Demo controls ──────────────────────────────────────────────────────────
+const DEMO_SERVER = 'https://glyph-demo-production.up.railway.app';
+
+async function triggerDemo(action) {
+  const addr = await GLYPH.getWallet();
+  if (!addr && action === 'start') { alert('Connect your wallet first.'); return; }
+
+  const btnStart = document.getElementById('btn-start');
+  const btnStop  = document.getElementById('btn-stop');
+  btnStart.disabled = true;
+  btnStop.disabled  = true;
+
+  try {
+    const res = await fetch(`${DEMO_SERVER}/${action}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: action === 'start' ? JSON.stringify({ player: addr }) : '{}',
+    });
+    const data = await res.json();
+    if (!data.ok) alert(data.message);
+  } catch(e) {
+    alert('Could not reach demo server');
+  }
+
+  syncDemoButtons();
+}
+
+async function syncDemoButtons() {
+  try {
+    const res  = await fetch(`${DEMO_SERVER}/status`);
+    const data = await res.json();
+    const running = data.running;
+    document.getElementById('btn-start').disabled = running;
+    document.getElementById('btn-stop').disabled  = !running;
+  } catch {}
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+async function init() {
+  const addr = await GLYPH.getWallet();
+
+  // Show demo controls if wallet connected
+  if (addr) {
+    document.getElementById('demo-controls').style.display = 'flex';
+    syncDemoButtons();
+    setInterval(syncDemoButtons, 5000);
+  }
+
+  // Load any saved on-chain picks from subgraph
+  if (addr) {
+    try {
+      const preds = await GLYPH.getMyPredictions(addr);
+      preds.forEach(p => {
+        userPicks[Number(p.matchId)] = ['home','draw','away'][Number(p.pick)];
+      });
+    } catch(_) {}
+  }
+  await pollState();
+  setInterval(pollState, 1000);
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+name = "lucky-credit-3f16"
+main = "worker.js"
+compatibility_date = "2026-05-23"
+account_id = "cb6d1549f77448969de818746a879b0a"

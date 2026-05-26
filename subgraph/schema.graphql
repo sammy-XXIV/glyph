@@ -1,0 +1,32 @@
+type Player @entity(immutable: false) {
+  id: ID!
+  tokenId: BigInt!
+  tier: Int!
+  cardIndex: Int!
+  correctPicks: Int!
+  totalPicks: Int!
+  predictions: [Prediction!]! @derivedFrom(field: "player")
+}
+
+type Match @entity(immutable: false) {
+  id: ID!
+  result: Int
+  predictions: [Prediction!]! @derivedFrom(field: "match")
+}
+
+type Prediction @entity(immutable: false) {
+  id: ID!
+  player: Player!
+  match: Match!
+  matchId: BigInt!
+  pick: Int!
+  isCorrect: Boolean
+  submittedAt: BigInt!
+}
+
+type PrizeClaim @entity(immutable: true) {
+  id: ID!
+  player: Player!
+  amount: BigInt!
+  timestamp: BigInt!
+}

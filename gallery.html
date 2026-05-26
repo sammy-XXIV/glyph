@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLYPH NFT Gallery</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="nav.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #050510;
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+  padding: 100px 24px 60px;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 30%, rgba(0,40,180,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(120,0,180,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.section { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto 60px; }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 6px;
+}
+.section-title.legendary { color: #FFD700; }
+.section-title.epic       { color: #c084fc; }
+.section-title.rare       { color: #4d9fff; }
+.section-title.uncommon   { color: #4ade80; }
+.section-title.common     { color: #94a3b8; }
+
+.section-line { flex: 1; height: 1px; }
+.section-line.legendary { background: linear-gradient(90deg, rgba(255,215,0,0.4), transparent); }
+.section-line.epic       { background: linear-gradient(90deg, rgba(192,132,252,0.4), transparent); }
+.section-line.rare       { background: linear-gradient(90deg, rgba(77,159,255,0.4), transparent); }
+.section-line.uncommon   { background: linear-gradient(90deg, rgba(74,222,128,0.4), transparent); }
+.section-line.common     { background: linear-gradient(90deg, rgba(148,163,184,0.4), transparent); }
+
+.section-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.section-count.legendary { color: #FFD700; background: rgba(255,215,0,0.1);  border: 1px solid rgba(255,215,0,0.3); }
+.section-count.epic       { color: #c084fc; background: rgba(192,132,252,0.1); border: 1px solid rgba(192,132,252,0.3); }
+.section-count.rare       { color: #4d9fff; background: rgba(77,159,255,0.1);  border: 1px solid rgba(77,159,255,0.3); }
+.section-count.uncommon   { color: #4ade80; background: rgba(74,222,128,0.1);  border: 1px solid rgba(74,222,128,0.3); }
+.section-count.common     { color: #94a3b8; background: rgba(148,163,184,0.1); border: 1px solid rgba(148,163,184,0.3); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 24px;
+}
+
+.card-float svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+.card-float.legendary { animation: floatLeg  4s ease-in-out infinite; }
+.card-float.epic       { animation: floatEpic 5s ease-in-out infinite; }
+.card-float.rare       { animation: floatRare 6s ease-in-out infinite; }
+.card-float.uncommon   { animation: floatUnco 7s ease-in-out infinite; }
+.card-float.common     { animation: floatComm 8s ease-in-out infinite; }
+
+@keyframes floatLeg  { 0%,100% { transform: translateY(0) rotate(-0.8deg); } 50% { transform: translateY(-14px) rotate(0.8deg); } }
+@keyframes floatEpic { 0%,100% { transform: translateY(0); }               50% { transform: translateY(-8px); } }
+@keyframes floatRare { 0%,100% { transform: translateY(0) rotate(0.3deg);  } 50% { transform: translateY(-5px) rotate(-0.3deg); } }
+@keyframes floatUnco { 0%,100% { transform: translateY(0); }               50% { transform: translateY(-3px); } }
+@keyframes floatComm { 0%,100% { transform: translateY(0); }               50% { transform: translateY(-2px); } }
+
+@media (max-width: 1100px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 750px)  { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px)  { .grid { grid-template-columns: 1fr; } body { padding: 80px 14px 48px; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="gallery.html">GLYPH</a>
+  <div class="nav-links">
+    <a href="dashboard.html">DASHBOARD</a>
+    <a href="predictions.html">PREDICT</a>
+    <a href="leaderboard.html">LEADERBOARD</a>
+    <a href="gallery.html" class="active">GALLERY</a>
+  </div>
+  <span class="nav-wallet">0xA3f...91bC</span>
+  <button class="nav-burger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="nav-drawer">
+  <a href="dashboard.html">DASHBOARD</a>
+  <a href="predictions.html">PREDICT</a>
+  <a href="leaderboard.html">LEADERBOARD</a>
+  <a href="gallery.html" class="active">GALLERY</a>
+  <div class="drawer-wallet">0xA3f...91bC</div>
+</div>
+
+<!-- LEGENDARY -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-title legendary">LEGENDARY</span>
+    <div class="section-line legendary"></div>
+    <span class="section-count legendary">5 CARDS</span>
+  </div>
+  <div class="grid" id="grid-legendary"></div>
+</div>
+
+<!-- EPIC -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-title epic">EPIC</span>
+    <div class="section-line epic"></div>
+    <span class="section-count epic">5 CARDS</span>
+  </div>
+  <div class="grid" id="grid-epic"></div>
+</div>
+
+<!-- RARE -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-title rare">RARE</span>
+    <div class="section-line rare"></div>
+    <span class="section-count rare">5 CARDS</span>
+  </div>
+  <div class="grid" id="grid-rare"></div>
+</div>
+
+<!-- UNCOMMON -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-title uncommon">UNCOMMON</span>
+    <div class="section-line uncommon"></div>
+    <span class="section-count uncommon">5 CARDS</span>
+  </div>
+  <div class="grid" id="grid-uncommon"></div>
+</div>
+
+<!-- COMMON -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-title common">COMMON</span>
+    <div class="section-line common"></div>
+    <span class="section-count common">5 CARDS</span>
+  </div>
+  <div class="grid" id="grid-common"></div>
+</div>
+
+<script>
+const CARDS = [
+  // ── LEGENDARY ──
+  { id:'france',      tier:'LEGENDARY', name:'FRANCE',      nation:'France \u{1F1EB}\u{1F1F7}',      img:'assets/player.jpg',      wc:2,  ovr:91, score:65, token:'#0001' },
+  { id:'brazil',      tier:'LEGENDARY', name:'BRAZIL',      nation:'Brazil \u{1F1E7}\u{1F1F7}',      img:'assets/brazil.jpg',      wc:5,  ovr:89, score:72, token:'#0002' },
+  { id:'england',     tier:'LEGENDARY', name:'ENGLAND',     nation:'England \u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}',     img:'assets/england.jpg',     wc:1,  ovr:88, score:58, token:'#0003' },
+  { id:'argentina',   tier:'LEGENDARY', name:'ARGENTINA',   nation:'Argentina \u{1F1E6}\u{1F1F7}',   img:'assets/argentina.jpg',   wc:3,  ovr:92, score:78, token:'#0004' },
+  { id:'spain',       tier:'LEGENDARY', name:'SPAIN',       nation:'Spain \u{1F1EA}\u{1F1F8}',       img:'assets/spain.png',       wc:1,  ovr:90, score:70, token:'#0005' },
+  // ── EPIC ──
+  { id:'italy',       tier:'EPIC',      name:'ITALY',       nation:'Italy \u{1F1EE}\u{1F1F9}',       img:'assets/italy.jpg',       wc:4,  ovr:86, score:62, token:'#0006' },
+  { id:'portugal',    tier:'EPIC',      name:'PORTUGAL',    nation:'Portugal \u{1F1F5}\u{1F1F9}',    img:'assets/portugal.jpg',    wc:0,  ovr:87, score:68, token:'#0007' },
+  { id:'germany',     tier:'EPIC',      name:'GERMANY',     nation:'Germany \u{1F1E9}\u{1F1EA}',     img:'assets/germany.jpg',     wc:4,  ovr:85, score:64, token:'#0008' },
+  { id:'belgium',     tier:'EPIC',      name:'BELGIUM',     nation:'Belgium \u{1F1E7}\u{1F1EA}',     img:'assets/belgium.jpg',     wc:0,  ovr:84, score:60, token:'#0009' },
+  { id:'netherlands', tier:'EPIC',      name:'NETHERLANDS', nation:'Netherlands \u{1F1F3}\u{1F1F1}', img:'assets/netherlands.jpg', wc:0,  ovr:85, score:63, token:'#0010' },
+  // ── RARE ──
+  { id:'croatia',     tier:'RARE',      name:'CROATIA',     nation:'Croatia \u{1F1ED}\u{1F1F7}',     img:'assets/croatia.png',     wc:0,  ovr:82, score:55, token:'#0011' },
+  { id:'uruguay',     tier:'RARE',      name:'URUGUAY',     nation:'Uruguay \u{1F1FA}\u{1F1FE}',     img:'assets/uruguay.png',     wc:2,  ovr:80, score:52, token:'#0012' },
+  { id:'usa',         tier:'RARE',      name:'USA',         nation:'USA \u{1F1FA}\u{1F1F8}',         img:'assets/usa.png',         wc:0,  ovr:76, score:45, token:'#0013' },
+  { id:'japan',       tier:'RARE',      name:'JAPAN',       nation:'Japan \u{1F1EF}\u{1F1F5}',       img:'assets/japan.png',       wc:0,  ovr:78, score:48, token:'#0014' },
+  { id:'senegal',     tier:'RARE',      name:'SENEGAL',     nation:'Senegal \u{1F1F8}\u{1F1F3}',     img:'assets/senegal.png',     wc:0,  ovr:77, score:50, token:'#0015' },
+  // ── UNCOMMON ──
+  { id:'mexico',      tier:'UNCOMMON',  name:'MEXICO',      nation:'Mexico \u{1F1F2}\u{1F1FD}',      img:'assets/mexico.png',      wc:0,  ovr:74, score:43, token:'#0016' },
+  { id:'colombia',    tier:'UNCOMMON',  name:'COLOMBIA',    nation:'Colombia \u{1F1E8}\u{1F1F4}',    img:'assets/colombia.png',    wc:0,  ovr:73, score:41, token:'#0017' },
+  { id:'morocco',     tier:'UNCOMMON',  name:'MOROCCO',     nation:'Morocco \u{1F1F2}\u{1F1E6}',     img:'assets/morocco.png',     wc:0,  ovr:75, score:44, token:'#0018' },
+  { id:'switzerland', tier:'UNCOMMON',  name:'SWITZERLAND', nation:'Switzerland \u{1F1E8}\u{1F1ED}', img:'assets/switzerland.png', wc:0,  ovr:72, score:40, token:'#0019' },
+  { id:'denmark',     tier:'UNCOMMON',  name:'DENMARK',     nation:'Denmark \u{1F1E9}\u{1F1F0}',     img:'assets/denmark.png',     wc:0,  ovr:71, score:38, token:'#0020' },
+  // ── COMMON ──
+  { id:'nigeria',     tier:'COMMON',    name:'NIGERIA',     nation:'Nigeria \u{1F1F3}\u{1F1EC}',     img:'assets/nigeria.png',     wc:0,  ovr:70, score:35, token:'#0021' },
+  { id:'costarica',   tier:'COMMON',    name:'COSTA RICA',  nation:'Costa Rica \u{1F1E8}\u{1F1F7}',  img:'assets/costarica.png',   wc:0,  ovr:68, score:32, token:'#0022' },
+  { id:'saudi',       tier:'COMMON',    name:'SAUDI ARABIA',nation:'Saudi Arabia \u{1F1F8}\u{1F1E6}',img:'assets/saudi.png',       wc:0,  ovr:67, score:30, token:'#0023' },
+  { id:'cameroon',    tier:'COMMON',    name:'CAMEROON',    nation:'Cameroon \u{1F1E8}\u{1F1F2}',    img:'assets/cameroon.png',    wc:0,  ovr:69, score:33, token:'#0024' },
+  { id:'ghana',       tier:'COMMON',    name:'GHANA',       nation:'Ghana \u{1F1EC}\u{1F1ED}',       img:'assets/ghana.png',       wc:0,  ovr:68, score:31, token:'#0025' },
+];
+
+function cfg(tier) {
+  if (tier === 'LEGENDARY') return {
+    color:       '#FFD700',
+    shimA:       'rgba(255,215,0,0.22)',
+    shimB:       'rgba(255,255,180,0.55)',
+    shimDur:     '1.8s',
+    glowOuter:   'rgba(255,180,0,0.45)',
+    glowTight:   'rgba(255,215,0,0.9)',
+    border:      'rgba(255,215,0,0.95)',
+    chipStroke:  'rgba(255,215,0,0.4)',
+    divider:     'rgba(255,215,0,0.15)',
+    trackStroke: 'rgba(255,215,0,0.2)',
+    prog0:       '#cc9900',
+    prog1:       '#FFD700',
+    prog2:       '#fff5a0',
+    ovrColor:    '#4d9fff',
+    glowDur:     '2.5s',
+    pColors:     ['#FFD700','#FFE55C'],
+    pCount:      18,
+  };
+  if (tier === 'EPIC') return {
+    color:       '#c084fc',
+    shimA:       'rgba(192,132,252,0.08)',
+    shimB:       'rgba(220,180,255,0.14)',
+    shimDur:     '4s',
+    glowOuter:   'rgba(140,60,255,0.35)',
+    glowTight:   'rgba(192,132,252,0.8)',
+    border:      'rgba(192,132,252,0.8)',
+    chipStroke:  'rgba(192,132,252,0.4)',
+    divider:     'rgba(192,132,252,0.15)',
+    trackStroke: 'rgba(192,132,252,0.2)',
+    prog0:       '#7c3aed',
+    prog1:       '#c084fc',
+    prog2:       '#e9d5ff',
+    ovrColor:    '#4d9fff',
+    glowDur:     '3s',
+    pColors:     ['#c084fc','#d8b4fe'],
+    pCount:      10,
+  };
+  if (tier === 'COMMON') return {
+    color:       '#94a3b8',
+    shimA:       'rgba(148,163,184,0.06)',
+    shimB:       'rgba(203,213,225,0.1)',
+    shimDur:     '6s',
+    glowOuter:   'rgba(100,116,139,0.25)',
+    glowTight:   'rgba(148,163,184,0.55)',
+    border:      'rgba(148,163,184,0.55)',
+    chipStroke:  'rgba(148,163,184,0.3)',
+    divider:     'rgba(148,163,184,0.12)',
+    trackStroke: 'rgba(148,163,184,0.15)',
+    prog0:       '#475569',
+    prog1:       '#94a3b8',
+    prog2:       '#e2e8f0',
+    ovrColor:    '#cbd5e1',
+    glowDur:     '5s',
+    pColors:     ['#94a3b8','#cbd5e1'],
+    pCount:      4,
+  };
+  if (tier === 'UNCOMMON') return {
+    color:       '#4ade80',
+    shimA:       'rgba(74,222,128,0.07)',
+    shimB:       'rgba(134,239,172,0.13)',
+    shimDur:     '5s',
+    glowOuter:   'rgba(22,163,74,0.3)',
+    glowTight:   'rgba(74,222,128,0.7)',
+    border:      'rgba(74,222,128,0.7)',
+    chipStroke:  'rgba(74,222,128,0.35)',
+    divider:     'rgba(74,222,128,0.15)',
+    trackStroke: 'rgba(74,222,128,0.2)',
+    prog0:       '#15803d',
+    prog1:       '#4ade80',
+    prog2:       '#bbf7d0',
+    ovrColor:    '#86efac',
+    glowDur:     '4s',
+    pColors:     ['#4ade80','#86efac'],
+    pCount:      6,
+  };
+  return {
+    color:       '#4d9fff',
+    shimA:       'rgba(77,159,255,0.1)',
+    shimB:       'rgba(150,200,255,0.2)',
+    shimDur:     '3s',
+    glowOuter:   'rgba(30,100,255,0.35)',
+    glowTight:   'rgba(77,159,255,0.8)',
+    border:      'rgba(77,159,255,0.8)',
+    chipStroke:  'rgba(77,159,255,0.4)',
+    divider:     'rgba(77,159,255,0.15)',
+    trackStroke: 'rgba(77,159,255,0.2)',
+    prog0:       '#1a6bcc',
+    prog1:       '#4d9fff',
+    prog2:       '#bfdbfe',
+    ovrColor:    '#93c5fd',
+    glowDur:     '3.5s',
+    pColors:     ['#4d9fff','#93c5fd'],
+    pCount:      8,
+  };
+}
+
+function particles(id, c) {
+  let out = '<g clip-path="url(#clip-' + id + ')">';
+  const solid = Math.ceil(c.pCount * 0.85);
+  for (let i = 0; i < solid; i++) {
+    const cx  = (20 + Math.random() * 460).toFixed(0);
+    const cy  = (430 + Math.random() * 50).toFixed(0);
+    const r   = (1 + Math.random() * 1.5).toFixed(1);
+    const dur = (2 + Math.random() * 2.5).toFixed(1);
+    const beg = (Math.random() * 7).toFixed(1);
+    const dx  = ((Math.random() - 0.5) * 20).toFixed(0);
+    const dy  = (80 + Math.random() * 60).toFixed(0);
+    const op  = (0.5 + Math.random() * 0.5).toFixed(2);
+    const col = c.pColors[Math.floor(Math.random() * c.pColors.length)];
+    out += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${col}" opacity="0"><animate attributeName="opacity" values="0;${op};0" dur="${dur}s" begin="${beg}s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0,0;${dx},-${dy}" dur="${dur}s" begin="${beg}s" repeatCount="indefinite"/></circle>`;
+  }
+  const rings = c.pCount - solid;
+  for (let i = 0; i < rings; i++) {
+    const cx  = (50 + Math.random() * 400).toFixed(0);
+    const cy  = (435 + Math.random() * 30).toFixed(0);
+    const r   = (2 + Math.random() * 1.5).toFixed(1);
+    const dur = (3.5 + Math.random() * 2).toFixed(1);
+    const beg = (Math.random() * 7).toFixed(1);
+    const dx  = ((Math.random() - 0.5) * 20).toFixed(0);
+    const dy  = (90 + Math.random() * 50).toFixed(0);
+    out += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${c.pColors[0]}" stroke-width="0.7" opacity="0"><animate attributeName="opacity" values="0;0.35;0" dur="${dur}s" begin="${beg}s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0,0;${dx},-${dy}" dur="${dur}s" begin="${beg}s" repeatCount="indefinite"/></circle>`;
+  }
+  return out + '</g>';
+}
+
+function makeSVG(card) {
+  const c      = cfg(card.tier);
+  const id     = card.id;
+  const fillW  = Math.round(card.score / 100 * 468);
+  const tipEnd = 16 + fillW;
+
+  return `<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+<defs>
+  <clipPath id="clip-${id}"><rect x="0" y="0" width="500" height="500"/></clipPath>
+  <linearGradient id="shim-${id}" gradientUnits="userSpaceOnUse" x1="-250" y1="500" x2="250" y2="0">
+    <stop offset="0%"   stop-color="rgba(0,0,0,0)"/>
+    <stop offset="25%"  stop-color="rgba(0,0,0,0)"/>
+    <stop offset="44%"  stop-color="${c.shimA}"/>
+    <stop offset="50%"  stop-color="${c.shimB}"/>
+    <stop offset="56%"  stop-color="${c.shimA}"/>
+    <stop offset="75%"  stop-color="rgba(0,0,0,0)"/>
+    <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    <animateTransform attributeName="gradientTransform" type="translate" values="750,0;-750,0" dur="${c.shimDur}" repeatCount="indefinite"/>
+  </linearGradient>
+  <linearGradient id="ov-${id}" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="rgba(5,5,16,0)"/>
+    <stop offset="45%"  stop-color="rgba(5,5,16,0.72)"/>
+    <stop offset="100%" stop-color="rgba(5,5,16,0.97)"/>
+  </linearGradient>
+  <linearGradient id="pg-${id}" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%"   stop-color="${c.prog0}"/>
+    <stop offset="70%"  stop-color="${c.prog1}"/>
+    <stop offset="100%" stop-color="${c.prog2}"/>
+  </linearGradient>
+  <filter id="bg-${id}" x="-40%" y="-40%" width="180%" height="180%">
+    <feGaussianBlur in="SourceGraphic"><animate attributeName="stdDeviation" values="10;22;10" dur="${c.glowDur}" repeatCount="indefinite"/></feGaussianBlur>
+  </filter>
+  <filter id="sp-${id}" x="-60%" y="-60%" width="220%" height="220%">
+    <feGaussianBlur in="SourceGraphic"><animate attributeName="stdDeviation" values="18;36;18" dur="${c.glowDur}" repeatCount="indefinite"/></feGaussianBlur>
+  </filter>
+  <filter id="tp-${id}" x="-120%" y="-120%" width="340%" height="340%">
+    <feGaussianBlur stdDeviation="3" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+
+<image href="${card.img}" x="0" y="0" width="500" height="500" preserveAspectRatio="xMidYMid slice" clip-path="url(#clip-${id})"/>
+<rect x="0" y="0" width="500" height="500" fill="url(#shim-${id})" clip-path="url(#clip-${id})"/>
+${particles(id, c)}
+<rect x="0" y="270" width="500" height="230" fill="url(#ov-${id})" clip-path="url(#clip-${id})"/>
+
+<text x="16" y="356" font-family="'Bebas Neue',sans-serif" font-size="38" fill="#ffffff" letter-spacing="2">${card.name}</text>
+<line x1="16" y1="368" x2="484" y2="368" stroke="${c.divider}" stroke-width="1"/>
+
+<text x="16"  y="384" font-family="'DM Mono',monospace" font-size="8" fill="rgba(255,255,255,0.6)" letter-spacing="2">PREDICTION SCORE</text>
+<text x="484" y="384" font-family="'DM Mono',monospace" font-size="8" fill="${c.color}" text-anchor="end">${card.score} / 100</text>
+
+<rect x="16" y="390" width="468" height="8" rx="0" fill="rgba(255,255,255,0.07)" stroke="${c.trackStroke}" stroke-width="1"/>
+<line x1="133" y1="390" x2="133" y2="398" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+<line x1="250" y1="390" x2="250" y2="398" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+<line x1="367" y1="390" x2="367" y2="398" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+<rect x="16" y="390" width="0" height="8" rx="0" fill="url(#pg-${id})">
+  <animate attributeName="width" values="0;${fillW}" dur="1.5s" begin="0.3s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1"/>
+</rect>
+<circle cx="16" cy="394" r="5.5" fill="${c.prog1}" filter="url(#tp-${id})">
+  <animate attributeName="cx" values="16;${tipEnd}" dur="1.5s" begin="0.3s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1"/>
+</circle>
+
+<text x="16"  y="412" font-family="'DM Mono',monospace" font-size="7" fill="rgba(255,255,255,0.4)" letter-spacing="1">ROOKIE</text>
+<text x="250" y="412" font-family="'DM Mono',monospace" font-size="7" fill="${c.color}" text-anchor="middle" letter-spacing="1">&#9733; ANALYST</text>
+<text x="484" y="412" font-family="'DM Mono',monospace" font-size="7" fill="rgba(255,255,255,0.4)" text-anchor="end" letter-spacing="1">ORACLE</text>
+
+<line x1="16" y1="424" x2="484" y2="424" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+<text x="16"  y="440" font-family="'DM Mono',monospace" font-size="8" fill="rgba(255,255,255,0.55)" letter-spacing="1">FIFA WC WINS</text>
+<text x="16"  y="462" font-family="'Bebas Neue',sans-serif" font-size="24" fill="${c.color}">${card.wc}</text>
+
+<text x="484" y="440" font-family="'DM Mono',monospace" font-size="8" fill="rgba(255,255,255,0.55)" letter-spacing="1" text-anchor="end">TEAM OVR</text>
+<text x="484" y="462" font-family="'Bebas Neue',sans-serif" font-size="24" fill="${c.ovrColor}" text-anchor="end">${card.ovr}</text>
+
+<text x="484" y="492" font-family="'DM Mono',monospace" font-size="6.5" fill="rgba(255,255,255,0.18)" text-anchor="end" letter-spacing="1">ERC-721 · ${card.token}</text>
+
+<rect x="374" y="12" width="112" height="18" rx="4" fill="rgba(0,0,0,0.65)" stroke="${c.chipStroke}" stroke-width="1"/>
+<text x="430" y="25" font-family="'DM Mono',monospace" font-size="8.5" fill="${c.color}" text-anchor="middle" letter-spacing="2">${card.tier}</text>
+<rect x="388" y="36" width="98" height="18" rx="4" fill="rgba(0,0,0,0.6)"/>
+<text x="437" y="49" font-family="'DM Sans',sans-serif" font-size="10" font-weight="600" fill="#ffffff" text-anchor="middle">${card.nation}</text>
+
+<rect x="1" y="1" width="498" height="498" rx="0" fill="none" stroke="${c.glowOuter}" stroke-width="8" filter="url(#sp-${id})">
+  <animate attributeName="stroke-opacity" values="0.3;0.55;0.3" dur="${c.glowDur}" repeatCount="indefinite"/>
+</rect>
+<rect x="1" y="1" width="498" height="498" rx="0" fill="none" stroke="${c.glowTight}" stroke-width="4" filter="url(#bg-${id})">
+  <animate attributeName="stroke-opacity" values="0.65;1;0.65" dur="${c.glowDur}" repeatCount="indefinite"/>
+</rect>
+<rect x="1" y="1" width="498" height="498" rx="0" fill="none" stroke="${c.border}" stroke-width="2">
+  <animate attributeName="stroke-opacity" values="0.75;1;0.75" dur="${c.glowDur}" repeatCount="indefinite"/>
+</rect>
+</svg>`;
+}
+
+(function render() {
+  const grids = { LEGENDARY: 'grid-legendary', EPIC: 'grid-epic', RARE: 'grid-rare', UNCOMMON: 'grid-uncommon', COMMON: 'grid-common' };
+  CARDS.forEach(card => {
+    const wrap = document.createElement('div');
+    wrap.className = 'card-float ' + card.tier.toLowerCase();
+    wrap.innerHTML = makeSVG(card);
+    document.getElementById(grids[card.tier]).appendChild(wrap);
+  });
+})();
+</script>
+
+<script src="nav.js"></script>
+</body>
+</html>

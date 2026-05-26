@@ -1,0 +1,16 @@
+contracts/
+subgraph/
+backend/
+assets/
+node_modules/
+scripts/node_modules/
+.env
+*.log
+wrangler.toml
+svg-demo.html
+export.html
+*.html
+nav.css
+nav.js
+web3.js
+state.json

@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLYPH — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="nav.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100vw; min-height: 100vh;
+  background: #050510;
+  font-family: 'DM Sans', sans-serif;
+  color: #fff;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 10% 20%, rgba(0,40,180,0.13) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 90% 80%, rgba(120,0,180,0.09) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+
+
+/* ── MAIN LAYOUT ── */
+.main {
+  position: relative; z-index: 1;
+  max-width: 1200px; margin: 0 auto;
+  padding: 110px 24px 60px;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 28px;
+}
+
+/* ── LEFT: card column ── */
+.card-col {
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.card-wrap {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+}
+.card-wrap svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+/* tier badge */
+.tier-badge {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+}
+.tier-badge .tier-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px; letter-spacing: 4px;
+  color: #94a3b8;
+}
+.tier-badge .tier-rank {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 2px;
+  color: rgba(255,255,255,0.25);
+}
+.tier-dots {
+  display: flex; gap: 6px; align-items: center;
+}
+.tier-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+}
+.tier-dot.filled { background: #94a3b8; }
+
+/* ── RIGHT: stats column ── */
+.stats-col {
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+/* section label */
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.25);
+  margin-bottom: 2px;
+}
+
+/* progress card */
+.progress-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 24px;
+}
+.progress-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 20px;
+}
+.progress-header .next-tier {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px; letter-spacing: 4px;
+  color: rgba(255,255,255,0.25);
+}
+.progress-header .next-tier span {
+  color: #4ade80;
+}
+.progress-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; letter-spacing: 1px;
+  color: rgba(255,255,255,0.4);
+}
+.progress-count strong {
+  font-size: 22px; color: #fff;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 2px;
+}
+
+/* progress bar */
+.bar-track {
+  width: 100%; height: 10px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 5px;
+  border: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.bar-fill {
+  height: 100%; border-radius: 5px;
+  background: linear-gradient(90deg, #15803d, #4ade80, #bbf7d0);
+  width: 0%;
+  transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+}
+.bar-fill::after {
+  content: '';
+  position: absolute; right: 0; top: 0; bottom: 0;
+  width: 20px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
+  border-radius: 5px;
+}
+.bar-labels {
+  display: flex; justify-content: space-between;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2px;
+  color: rgba(255,255,255,0.2);
+}
+.bar-labels span:last-child { color: #4ade80; }
+
+/* stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.stat-box {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.stat-box .s-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2px;
+  color: rgba(255,255,255,0.25);
+}
+.stat-box .s-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px; letter-spacing: 2px;
+  line-height: 1; color: #fff;
+}
+.stat-box .s-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 1px;
+  color: rgba(255,255,255,0.2);
+}
+.stat-box.green .s-value { color: #4ade80; }
+.stat-box.grey  .s-value { color: rgba(255,255,255,0.35); }
+
+/* pool card */
+.pool-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.pool-left .pool-amount {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px; letter-spacing: 2px; color: #fff; line-height: 1;
+}
+.pool-left .pool-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.25); margin-top: 4px;
+}
+.pool-right {
+  text-align: right;
+}
+.pool-right .minted-count {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px; letter-spacing: 2px; color: rgba(255,255,255,0.5);
+}
+.pool-right .minted-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2px;
+  color: rgba(255,255,255,0.2);
+}
+.pool-right .legendary-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 2px;
+  color: #FFD700; margin-top: 8px;
+}
+
+/* predict CTA */
+.predict-btn {
+  width: 100%;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px; letter-spacing: 3px;
+  color: #050510; background: #ffffff;
+  border: none; height: 56px; border-radius: 28px;
+  cursor: pointer; white-space: nowrap;
+  transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+  box-shadow: 0 4px 24px rgba(255,255,255,0.1);
+}
+.predict-btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 32px rgba(255,255,255,0.15);
+}
+.predict-btn:active { transform: scale(0.98); }
+
+/* upcoming match teaser */
+.match-teaser {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.match-team {
+  text-align: center; flex: 1;
+}
+.match-team .flag { font-size: 28px; }
+.match-team .name {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 2px;
+  color: rgba(255,255,255,0.4); margin-top: 6px;
+}
+.match-vs {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px; letter-spacing: 4px;
+  color: rgba(255,255,255,0.15); flex: 0 0 auto; padding: 0 16px;
+}
+.match-meta {
+  text-align: center;
+}
+.match-meta .kick-time {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 2px;
+  color: rgba(255,255,255,0.5);
+}
+.match-meta .match-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2px;
+  color: rgba(255,255,255,0.2); margin-top: 4px;
+}
+.predict-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2px;
+  color: #4ade80;
+  background: rgba(74,222,128,0.08);
+  border: 1px solid rgba(74,222,128,0.2);
+  padding: 4px 10px; border-radius: 20px;
+}
+
+/* responsive */
+@media (max-width: 860px) {
+  .main { grid-template-columns: 1fr; }
+  .card-wrap { max-width: 300px; margin: 0 auto; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="gallery.html">GLYPH</a>
+  <div class="nav-links">
+    <a href="dashboard.html" class="active">DASHBOARD</a>
+    <a href="predictions.html">PREDICT</a>
+    <a href="leaderboard.html">LEADERBOARD</a>
+    <a href="gallery.html">GALLERY</a>
+  </div>
+  <span class="nav-wallet" id="wallet-display">—</span>
+  <button class="nav-burger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="nav-drawer">
+  <a href="dashboard.html" class="active">DASHBOARD</a>
+  <a href="predictions.html">PREDICT</a>
+  <a href="leaderboard.html">LEADERBOARD</a>
+  <a href="gallery.html">GALLERY</a>
+  <div class="drawer-wallet" id="drawer-wallet-display">—</div>
+</div>
+
+<div class="main">
+
+  <!-- LEFT: card -->
+  <div class="card-col">
+    <div class="card-wrap" id="card-wrap"></div>
+
+    <!-- tier progress dots -->
+    <div class="tier-badge">
+      <div>
+        <div class="tier-name" id="tier-name">COMMON</div>
+        <div class="tier-rank">TIER 1 OF 5</div>
+      </div>
+      <div class="tier-dots">
+        <div class="tier-dot filled" title="Common"></div>
+        <div class="tier-dot" title="Uncommon"></div>
+        <div class="tier-dot" title="Rare"></div>
+        <div class="tier-dot" title="Epic"></div>
+        <div class="tier-dot" title="Legendary"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: stats -->
+  <div class="stats-col">
+
+    <!-- progress to next tier -->
+    <div class="progress-card">
+      <div class="progress-header">
+        <div>
+          <div class="section-label">PROGRESS TO NEXT TIER</div>
+          <div class="next-tier">COMMON → <span>UNCOMMON</span></div>
+        </div>
+        <div class="progress-count">
+          <strong id="correct-count">3</strong>
+          <span> / 10 correct</span>
+        </div>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" id="bar-fill"></div>
+      </div>
+      <div class="bar-labels">
+        <span>0</span>
+        <span>5</span>
+        <span>10 → UNCOMMON</span>
+      </div>
+    </div>
+
+    <!-- stat boxes -->
+    <div class="stats-grid">
+      <div class="stat-box green">
+        <div class="s-label">CORRECT PREDICTIONS</div>
+        <div class="s-value" id="stat-correct">3</div>
+        <div class="s-sub">CORRECT PICKS</div>
+      </div>
+      <div class="stat-box">
+        <div class="s-label">WIN RATE</div>
+        <div class="s-value" id="stat-winrate">—<span style="font-size:20px;color:rgba(255,255,255,0.4)">%</span></div>
+        <div class="s-sub">TOWARD NEXT TIER</div>
+      </div>
+      <div class="stat-box">
+        <div class="s-label">TOTAL MINTED</div>
+        <div class="s-value" id="stat-minted">—</div>
+        <div class="s-sub">PLAYERS</div>
+      </div>
+      <div class="stat-box grey">
+        <div class="s-label">CURRENT RANK</div>
+        <div class="s-value" id="stat-rank">#—</div>
+        <div class="s-sub" id="stat-rank-sub">LOADING...</div>
+      </div>
+    </div>
+
+    <!-- prize pool -->
+    <div class="pool-card">
+      <div class="pool-left">
+        <div class="section-label">PRIZE POOL</div>
+        <div class="pool-amount" id="pool-amount">—</div>
+        <div class="pool-sub">USDT · SPLIT BETWEEN LEGENDARY HOLDERS</div>
+      </div>
+      <div class="pool-right">
+        <div class="minted-count" id="pool-minted">—</div>
+        <div class="minted-label">MINTED</div>
+        <div class="legendary-count" id="legendary-count">★ — LEGENDARY</div>
+      </div>
+    </div>
+
+    <!-- upcoming match -->
+    <div id="next-match-section" style="display:none">
+      <div class="section-label" style="margin-bottom:10px">NEXT MATCH TO PREDICT</div>
+      <div class="match-teaser">
+        <div class="match-team">
+          <img id="nm-home-flag" style="width:36px;height:27px;object-fit:cover;border-radius:3px" src="" alt="">
+          <div class="name" id="nm-home">—</div>
+        </div>
+        <div class="match-vs">VS</div>
+        <div class="match-team">
+          <img id="nm-away-flag" style="width:36px;height:27px;object-fit:cover;border-radius:3px" src="" alt="">
+          <div class="name" id="nm-away">—</div>
+        </div>
+        <div style="flex:0 0 auto; padding-left:24px; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+          <div class="match-meta">
+            <div class="kick-time" id="nm-time">—</div>
+            <div class="match-label" id="nm-label">—</div>
+          </div>
+          <span class="predict-tag">OPEN</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- predict CTA -->
+    <button class="predict-btn" onclick="window.location.href='predictions.html'">
+      MAKE PREDICTIONS →
+    </button>
+
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+<script src="web3.js"></script>
+<script src="nav.js"></script>
+<script>
+const TIER_NAMES = ['COMMON','UNCOMMON','RARE','EPIC','LEGENDARY'];
+const THRESHOLDS = [10, 20, 35, 55];
+
+const ALL_CARDS = {
+  COMMON: [
+    { id:'nigeria',   name:'NIGERIA',      nation:'Nigeria 🇳🇬',      img:'assets/nigeria.png',   wc:0, ovr:70, token:'#0021' },
+    { id:'costarica', name:'COSTA RICA',   nation:'Costa Rica 🇨🇷',   img:'assets/costarica.png', wc:0, ovr:68, token:'#0022' },
+    { id:'saudi',     name:'SAUDI ARABIA', nation:'Saudi Arabia 🇸🇦',  img:'assets/saudi.png',     wc:0, ovr:67, token:'#0023' },
+    { id:'cameroon',  name:'CAMEROON',     nation:'Cameroon 🇨🇲',     img:'assets/cameroon.png',  wc:0, ovr:69, token:'#0024' },
+    { id:'ghana',     name:'GHANA',        nation:'Ghana 🇬🇭',        img:'assets/ghana.png',     wc:0, ovr:68, token:'#0025' },
+  ],
+  UNCOMMON: [
+    { id:'mexico',      name:'MEXICO',      nation:'Mexico 🇲🇽',      img:'assets/mexico.png',      wc:0, ovr:74, token:'#0016' },
+    { id:'colombia',    name:'COLOMBIA',    nation:'Colombia 🇨🇴',    img:'assets/colombia.png',    wc:0, ovr:73, token:'#0017' },
+    { id:'morocco',     name:'MOROCCO',     nation:'Morocco 🇲🇦',     img:'assets/morocco.png',     wc:0, ovr:75, token:'#0018' },
+    { id:'switzerland', name:'SWITZERLAND', nation:'Switzerland 🇨🇭', img:'assets/switzerland.png', wc:0, ovr:72, token:'#0019' },
+    { id:'denmark',     name:'DENMARK',     nation:'Denmark 🇩🇰',     img:'assets/denmark.png',     wc:0, ovr:71, token:'#0020' },
+  ],
+  RARE: [
+    { id:'japan',    name:'JAPAN',    nation:'Japan 🇯🇵',    img:'assets/japan.png',    wc:0, ovr:78, token:'#0014' },
+    { id:'senegal',  name:'SENEGAL',  nation:'Senegal 🇸🇳',  img:'assets/senegal.png',  wc:0, ovr:77, token:'#0015' },
+    { id:'uruguay',  name:'URUGUAY',  nation:'Uruguay 🇺🇾',  img:'assets/uruguay.png',  wc:2, ovr:80, token:'#0012' },
+    { id:'usa',      name:'USA',      nation:'USA 🇺🇸',      img:'assets/usa.png',      wc:0, ovr:76, token:'#0013' },
+    { id:'croatia',  name:'CROATIA',  nation:'Croatia 🇭🇷',  img:'assets/croatia.png',  wc:0, ovr:82, token:'#0011' },
+  ],
+  EPIC: [
+    { id:'germany',     name:'GERMANY',     nation:'Germany 🇩🇪',     img:'assets/germany.jpg',     wc:4, ovr:85, token:'#0008' },
+    { id:'belgium',     name:'BELGIUM',     nation:'Belgium 🇧🇪',     img:'assets/belgium.jpg',     wc:0, ovr:84, token:'#0009' },
+    { id:'netherlands', name:'NETHERLANDS', nation:'Netherlands 🇳🇱', img:'assets/netherlands.jpg', wc:0, ovr:85, token:'#0010' },
+    { id:'italy',       name:'ITALY',       nation:'Italy 🇮🇹',       img:'assets/italy.jpg',       wc:4, ovr:86, token:'#0006' },
+    { id:'portugal',    name:'PORTUGAL',    nation:'Portugal 🇵🇹',    img:'assets/portugal.jpg',    wc:0, ovr:87, token:'#0007' },
+  ],
+  LEGENDARY: [
+    { id:'france',    name:'FRANCE',    nation:'France 🇫🇷',    img:'assets/player.jpg',    wc:2, ovr:91, token:'#0001' },
+    { id:'brazil',    name:'BRAZIL',    nation:'Brazil 🇧🇷',    img:'assets/brazil.jpg',    wc:5, ovr:89, token:'#0002' },
+    { id:'argentina', name:'ARGENTINA', nation:'Argentina 🇦🇷', img:'assets/argentina.jpg', wc:3, ovr:92, token:'#0004' },
+    { id:'england',   name:'ENGLAND',   nation:'England 🏴󠁧󠁢󠁥󠁮󠁧󠁿',   img:'assets/england.jpg',   wc:1, ovr:88, token:'#0003' },
+    { id:'spain',     name:'SPAIN',     nation:'Spain 🇪🇸',     img:'assets/spain.png',     wc:1, ovr:90, token:'#0005' },
+  ],
+};
+
+const FLAG_CODES = {
+  'USA':'us','Mexico':'mx','Canada':'ca','Panama':'pa','Brazil':'br','Colombia':'co',
+  'Ecuador':'ec','Bolivia':'bo','Argentina':'ar','Uruguay':'uy','Paraguay':'py','Venezuela':'ve',
+  'France':'fr','Morocco':'ma','Senegal':'sn','Mali':'ml','Spain':'es','Japan':'jp',
+  'S. Korea':'kr','Iraq':'iq','England':'gb-eng','Denmark':'dk','Poland':'pl','Serbia':'rs',
+  'Germany':'de','Croatia':'hr','Hungary':'hu','Georgia':'ge','Portugal':'pt','Nigeria':'ng',
+  'Egypt':'eg','S. Africa':'za','Netherlands':'nl','Belgium':'be','Czech Rep':'cz','Romania':'ro',
+  'Italy':'it','Switzerland':'ch','Slovakia':'sk','Albania':'al','Saudi Arabia':'sa',
+  'Australia':'au','Iran':'ir','Thailand':'th','Cameroon':'cm','Ghana':'gh',
+  'Costa Rica':'cr','Jamaica':'jm',
+};
+
+const OPEN_MATCHES = [
+  { home:'USA',         away:'Mexico',    time:'11 Jun · 19:00', group:'GROUP A · MD1' },
+  { home:'Canada',      away:'Panama',    time:'11 Jun · 22:00', group:'GROUP A · MD1' },
+  { home:'Argentina',   away:'Uruguay',   time:'12 Jun · 16:00', group:'GROUP C · MD1' },
+  { home:'Brazil',      away:'Colombia',  time:'12 Jun · 19:00', group:'GROUP B · MD1' },
+];
+
+function populateNextMatch() {
+  const m = OPEN_MATCHES[0];
+  const hCode = FLAG_CODES[m.home];
+  const aCode = FLAG_CODES[m.away];
+  document.getElementById('nm-home-flag').src = hCode ? `https://flagcdn.com/40x30/${hCode}.png` : '';
+  document.getElementById('nm-away-flag').src = aCode ? `https://flagcdn.com/40x30/${aCode}.png` : '';
+  document.getElementById('nm-home').textContent = m.home.toUpperCase();
+  document.getElementById('nm-away').textContent = m.away.toUpperCase();
+  document.getElementById('nm-time').textContent = m.time + ' UTC';
+  document.getElementById('nm-label').textContent = m.group;
+  document.getElementById('next-match-section').style.display = 'block';
+}
+populateNextMatch();
+
+async function init() {
+  // load chain stats immediately, no wallet needed
+  GLYPH.getChainStats().then(stats => {
+    document.getElementById('pool-amount').textContent = stats.prizePool + ' USDT';
+    document.getElementById('pool-minted').textContent = stats.totalMinted;
+    document.getElementById('stat-minted').textContent = stats.totalMinted;
+    document.getElementById('legendary-count').textContent = `★ ${stats.legendaryCount} LEGENDARY`;
+  }).catch(() => {});
+
+  const addr = await GLYPH.getWallet();
+  if (!addr) { window.location.href = 'index.html'; return; }
+
+  const player = await GLYPH.getPlayerData(addr);
+  if (!player) { window.location.href = 'mint.html'; return; }
+
+  const tierName  = player.tierName;
+  const cards     = ALL_CARDS[tierName];
+  const card      = { ...cards[player.cardIndex % cards.length], score: player.progress };
+  const correct   = player.correctPicks;
+  const threshold = player.threshold || 55;
+  const nextTier  = TIER_NAMES[player.tier + 1] || 'LEGENDARY';
+  const pct       = Math.min(100, Math.round(correct / threshold * 100));
+  const pool      = parseFloat(player.prizePool).toFixed(2);
+  const minted    = player.totalMinted;
+
+  // render card
+  document.getElementById('card-wrap').innerHTML = makeSVG(card, tierName);
+
+  // tier badge
+  document.getElementById('tier-name').textContent = tierName;
+  document.querySelector('.tier-rank').textContent = `TIER ${player.tier + 1} OF 5`;
+  document.querySelectorAll('.tier-dot').forEach((d, i) => {
+    d.classList.toggle('filled', i <= player.tier);
+  });
+
+  // progress
+  if (tierName === 'LEGENDARY') {
+    document.querySelector('.progress-card').innerHTML = `
+      <div class="section-label">STATUS</div>
+      <div class="next-tier" style="margin-top:8px;font-size:22px">★ <span>LEGENDARY</span></div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,0.3);margin-top:12px">YOU ARE ELIGIBLE TO CLAIM THE PRIZE POOL</div>`;
+  } else {
+    document.querySelector('.next-tier').innerHTML = `${tierName} → <span>${nextTier}</span>`;
+    document.getElementById('correct-count').textContent = correct;
+    document.querySelector('.progress-count span').textContent = ` / ${threshold} correct`;
+    document.querySelector('.bar-labels').innerHTML = `<span>0</span><span>${Math.round(threshold/2)}</span><span>${threshold} → ${nextTier}</span>`;
+    setTimeout(() => { document.getElementById('bar-fill').style.width = pct + '%'; }, 400);
+  }
+
+  // stats
+  document.getElementById('stat-correct').textContent = correct;
+
+  const winRate = threshold ? Math.round(correct / threshold * 100) : 100;
+  document.getElementById('stat-winrate').innerHTML = `${winRate}<span style="font-size:20px;color:rgba(255,255,255,0.4)">%</span>`;
+
+  // chain stats (prize pool, minted, legendary)
+  GLYPH.getChainStats().then(stats => {
+    document.getElementById('pool-amount').textContent = stats.prizePool + ' USDT';
+    document.getElementById('pool-minted').textContent = stats.totalMinted;
+    document.getElementById('stat-minted').textContent = stats.totalMinted;
+    document.getElementById('legendary-count').textContent = `★ ${stats.legendaryCount} LEGENDARY`;
+  }).catch(() => {});
+
+  // rank from leaderboard
+  GLYPH.getLeaderboard().then(players => {
+    const idx = players.findIndex(p => p.id.toLowerCase() === addr.toLowerCase());
+    if (idx !== -1) {
+      document.getElementById('stat-rank').textContent = '#' + (idx + 1);
+      document.getElementById('stat-rank-sub').textContent = `OF ${players.length} PLAYERS`;
+    } else {
+      document.getElementById('stat-rank').textContent = '#—';
+      document.getElementById('stat-rank-sub').textContent = `OF ${players.length} PLAYERS`;
+    }
+  }).catch(() => {
+    document.getElementById('stat-rank-sub').textContent = 'SUBGRAPH UNAVAILABLE';
+  });
+
+  // upgrade button if threshold met
+  if (correct >= threshold && tierName !== 'LEGENDARY') {
+    const upgradeBtn = document.createElement('button');
+    upgradeBtn.className = 'predict-btn';
+    upgradeBtn.style.background = 'linear-gradient(135deg,rgba(99,102,241,0.3),rgba(139,92,246,0.3))';
+    upgradeBtn.textContent = `UPGRADE TO ${nextTier} →`;
+    upgradeBtn.onclick = async () => {
+      upgradeBtn.disabled = true;
+      upgradeBtn.textContent = 'UPGRADING...';
+      try {
+        await GLYPH.upgradeCard();
+        window.location.reload();
+      } catch(e) {
+        alert('Upgrade failed: ' + (e.reason || e.message));
+        upgradeBtn.disabled = false;
+        upgradeBtn.textContent = `UPGRADE TO ${nextTier} →`;
+      }
+    };
+    document.querySelector('.stats-col').appendChild(upgradeBtn);
+  }
+}
+init();
+
+// render card
+function makeSVG(card, tierName = 'COMMON') {
+  const c = {
+    color: '#94a3b8', shimA: 'rgba(148,163,184,0.06)', shimB: 'rgba(203,213,225,0.1)',
+    shimDur: '6s', glowOuter: 'rgba(100,116,139,0.25)', glowTight: 'rgba(148,163,184,0.55)',
+    border: 'rgba(148,163,184,0.55)', chipStroke: 'rgba(148,163,184,0.3)',
+    divider: 'rgba(148,163,184,0.12)', trackStroke: 'rgba(148,163,184,0.15)',
+    prog0: '#475569', prog1: '#94a3b8', prog2: '#e2e8f0', ovrColor: '#cbd5e1',
+    glowDur: '5s', pColors: ['#94a3b8','#cbd5e1'], pCount: 4,
+  };
+  const id = card.id;
+  const fillW = Math.round(card.score / 100 * 468);
+  const tipEnd = 16 + fillW;
+
+  let parts = '<g clip-path="url(#clip-' + id + ')">';
+  for (let i = 0; i < c.pCount; i++) {
+    const cx = (20 + Math.random()*460).toFixed(0), cy = (430+Math.random()*50).toFixed(0);
+    const r = (1+Math.random()*1.5).toFixed(1), dur = (2+Math.random()*2.5).toFixed(1);
+    const beg = (Math.random()*7).toFixed(1), dx = ((Math.random()-.5)*20).toFixed(0);
+    const dy = (80+Math.random()*60).toFixed(0), op = (0.5+Math.random()*0.5).toFixed(2);
+    parts += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${c.pColors[0]}" opacity="0"><animate attributeName="opacity" values="0;${op};0" dur="${dur}s" begin="${beg}s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0,0;${dx},-${dy}" dur="${dur}s" begin="${beg}s" repeatCount="indefinite"/></circle>`;
+  }
+  parts += '</g>';
+
+  return `<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+<defs>
+  <clipPath id="clip-${id}"><rect width="500" height="500"/></clipPath>
+  <linearGradient id="shim-${id}" gradientUnits="userSpaceOnUse" x1="-250" y1="500" x2="250" y2="0">
+    <stop offset="0%" stop-color="rgba(0,0,0,0)"/><stop offset="44%" stop-color="${c.shimA}"/>
+    <stop offset="50%" stop-color="${c.shimB}"/><stop offset="56%" stop-color="${c.shimA}"/>
+    <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    <animateTransform attributeName="gradientTransform" type="translate" values="750,0;-750,0" dur="${c.shimDur}" repeatCount="indefinite"/>
+  </linearGradient>
+  <linearGradient id="ov-${id}" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="rgba(5,5,16,0)"/><stop offset="45%" stop-color="rgba(5,5,16,0.72)"/>
+    <stop offset="100%" stop-color="rgba(5,5,16,0.97)"/>
+  </linearGradient>
+  <linearGradient id="pg-${id}" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="${c.prog0}"/><stop offset="70%" stop-color="${c.prog1}"/>
+    <stop offset="100%" stop-color="${c.prog2}"/>
+  </linearGradient>
+  <filter id="bg-${id}" x="-40%" y="-40%" width="180%" height="180%">
+    <feGaussianBlur in="SourceGraphic"><animate attributeName="stdDeviation" values="10;22;10" dur="${c.glowDur}" repeatCount="indefinite"/></feGaussianBlur>
+  </filter>
+  <filter id="sp-${id}" x="-60%" y="-60%" width="220%" height="220%">
+    <feGaussianBlur in="SourceGraphic"><animate attributeName="stdDeviation" values="18;36;18" dur="${c.glowDur}" repeatCount="indefinite"/></feGaussianBlur>
+  </filter>
+</defs>
+<image href="${card.img}" x="0" y="0" width="500" height="500" preserveAspectRatio="xMidYMid slice" clip-path="url(#clip-${id})"/>
+<rect x="0" y="0" width="500" height="500" fill="url(#shim-${id})" clip-path="url(#clip-${id})"/>
+${parts}
+<rect x="0" y="270" width="500" height="230" fill="url(#ov-${id})" clip-path="url(#clip-${id})"/>
+<text x="16" y="356" font-family="'Bebas Neue',sans-serif" font-size="38" fill="#ffffff" letter-spacing="2">${card.name}</text>
+<line x1="16" y1="368" x2="484" y2="368" stroke="${c.divider}" stroke-width="1"/>
+<text x="16" y="384" font-family="'DM Mono',monospace" font-size="8" fill="rgba(255,255,255,0.6)" letter-spacing="2">PREDICTION SCORE</text>
+<text x="484" y="384" font-family="'DM Mono',monospace" font-size="8" fill="${c.color}" text-anchor="end">${card.score} / 100</text>
+<rect x="16" y="390" width="468" height="8" fill="rgba(255,255,255,0.07)" stroke="${c.trackStroke}" stroke-width="1"/>
+<rect x="16" y="390" width="${fillW}" height="8" fill="url(#pg-${id})"/>
+<text x="16" y="412" font-family="'DM Mono',monospace" font-size="7" fill="rgba(255,255,255,0.4)" letter-spacing="1">ROOKIE</text>
+<text x="484" y="412" font-family="'DM Mono',monospace" font-size="7" fill="rgba(255,255,255,0.4)" text-anchor="end" letter-spacing="1">ORACLE</text>
+<line x1="16" y1="424" x2="484" y2="424" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+<text x="16" y="440" font-family="'DM Mono',monospace" font-size="8" fill="rgba(255,255,255,0.55)" letter-spacing="1">FIFA WC WINS</text>
+<text x="16" y="462" font-family="'Bebas Neue',sans-serif" font-size="24" fill="${c.color}">${card.wc}</text>
+<text x="484" y="440" font-family="'DM Mono',monospace" font-size="8" fill="rgba(255,255,255,0.55)" letter-spacing="1" text-anchor="end">TEAM OVR</text>
+<text x="484" y="462" font-family="'Bebas Neue',sans-serif" font-size="24" fill="${c.ovrColor}" text-anchor="end">${card.ovr}</text>
+<text x="484" y="492" font-family="'DM Mono',monospace" font-size="6.5" fill="rgba(255,255,255,0.18)" text-anchor="end" letter-spacing="1">ERC-721 · ${card.token}</text>
+<rect x="374" y="12" width="112" height="18" rx="4" fill="rgba(0,0,0,0.65)" stroke="${c.chipStroke}" stroke-width="1"/>
+<text x="430" y="25" font-family="'DM Mono',monospace" font-size="8.5" fill="${c.color}" text-anchor="middle" letter-spacing="2">${tierName}</text>
+<rect x="388" y="36" width="98" height="18" rx="4" fill="rgba(0,0,0,0.6)"/>
+<text x="437" y="49" font-family="'DM Sans',sans-serif" font-size="10" font-weight="600" fill="#ffffff" text-anchor="middle">${card.nation}</text>
+<rect x="1" y="1" width="498" height="498" fill="none" stroke="${c.glowOuter}" stroke-width="8" filter="url(#sp-${id})">
+  <animate attributeName="stroke-opacity" values="0.3;0.55;0.3" dur="${c.glowDur}" repeatCount="indefinite"/>
+</rect>
+<rect x="1" y="1" width="498" height="498" fill="none" stroke="${c.glowTight}" stroke-width="4" filter="url(#bg-${id})">
+  <animate attributeName="stroke-opacity" values="0.65;1;0.65" dur="${c.glowDur}" repeatCount="indefinite"/>
+</rect>
+<rect x="1" y="1" width="498" height="498" fill="none" stroke="${c.border}" stroke-width="2">
+  <animate attributeName="stroke-opacity" values="0.75;1;0.75" dur="${c.glowDur}" repeatCount="indefinite"/>
+</rect>
+</svg>`;
+}
+
+</script>
+</body>
+</html>
