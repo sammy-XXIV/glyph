@@ -382,12 +382,12 @@ body::before {
       <div class="pool-left">
         <div class="section-label">PRIZE POOL</div>
         <div class="pool-amount" id="pool-amount">—</div>
-        <div class="pool-sub">USDT Â· SPLIT BETWEEN LEGENDARY HOLDERS</div>
+        <div class="pool-sub">USDT · SPLIT BETWEEN LEGENDARY HOLDERS</div>
       </div>
       <div class="pool-right">
         <div class="minted-count" id="pool-minted">—</div>
         <div class="minted-label">MINTED</div>
-        <div class="legendary-count" id="legendary-count">â˜… — LEGENDARY</div>
+        <div class="legendary-count" id="legendary-count">★ — LEGENDARY</div>
       </div>
     </div>
 
@@ -480,10 +480,10 @@ const FLAG_CODES = {
 };
 
 const OPEN_MATCHES = [
-  { home:'USA',         away:'Mexico',    time:'11 Jun Â· 19:00', group:'GROUP A Â· MD1' },
-  { home:'Canada',      away:'Panama',    time:'11 Jun Â· 22:00', group:'GROUP A Â· MD1' },
-  { home:'Argentina',   away:'Uruguay',   time:'12 Jun Â· 16:00', group:'GROUP C Â· MD1' },
-  { home:'Brazil',      away:'Colombia',  time:'12 Jun Â· 19:00', group:'GROUP B Â· MD1' },
+  { home:'USA',         away:'Mexico',    time:'11 Jun · 19:00', group:'GROUP A · MD1' },
+  { home:'Canada',      away:'Panama',    time:'11 Jun · 22:00', group:'GROUP A · MD1' },
+  { home:'Argentina',   away:'Uruguay',   time:'12 Jun · 16:00', group:'GROUP C · MD1' },
+  { home:'Brazil',      away:'Colombia',  time:'12 Jun · 19:00', group:'GROUP B · MD1' },
 ];
 
 function populateNextMatch() {
@@ -506,10 +506,10 @@ populateNextMatch();
 // â”€â”€ Demo state sync â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const DEMO_SERVER  = 'https://glyph-demo-production.up.railway.app';
 const DEMO_MATCHES = [
-  { id:1,  home:'USA',       away:'Mexico',    group:'GROUP A Â· MD1' },
-  { id:2,  home:'Canada',    away:'Panama',    group:'GROUP A Â· MD1' },
-  { id:14, home:'Paraguay',  away:'Venezuela', group:'GROUP C Â· MD1' },
-  { id:20, home:'Senegal',   away:'Mali',      group:'GROUP D Â· MD1' },
+  { id:1,  home:'USA',       away:'Mexico',    group:'GROUP A · MD1' },
+  { id:2,  home:'Canada',    away:'Panama',    group:'GROUP A · MD1' },
+  { id:14, home:'Paraguay',  away:'Venezuela', group:'GROUP C · MD1' },
+  { id:20, home:'Senegal',   away:'Mali',      group:'GROUP D · MD1' },
 ];
 function getMatch(id) { return DEMO_MATCHES.find(m => m.id === id); }
 function fmt(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
@@ -540,7 +540,7 @@ function applyDemoState(s) {
   if (phase === 'live') {
     document.getElementById('nm-section-label').textContent = 'LIVE NOW';
     document.getElementById('nm-time').textContent = fmt(secondsLeft) + ' remaining';
-    tag.textContent = 'âš¡ LIVE';
+    tag.textContent = '⚡ LIVE';
     tag.style.cssText = 'color:#fff;background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.4)';
   } else if (phase === 'break') {
     document.getElementById('nm-section-label').textContent = 'NEXT MATCH TO PREDICT';
@@ -612,7 +612,7 @@ async function init() {
     document.getElementById('pool-amount').textContent = stats.prizePool + ' USDT';
     document.getElementById('pool-minted').textContent = stats.totalMinted;
     document.getElementById('stat-minted').textContent = stats.totalMinted;
-    document.getElementById('legendary-count').textContent = `â˜… ${stats.legendaryCount} LEGENDARY`;
+    document.getElementById('legendary-count').textContent = `★ ${stats.legendaryCount} LEGENDARY`;
   }).catch(() => {});
 
   const addr = await GLYPH.getWallet();
@@ -645,7 +645,7 @@ async function init() {
   if (tierName === 'LEGENDARY') {
     document.querySelector('.progress-card').innerHTML = `
       <div class="section-label">STATUS</div>
-      <div class="next-tier" style="margin-top:8px;font-size:22px">â˜… <span>LEGENDARY</span></div>
+      <div class="next-tier" style="margin-top:8px;font-size:22px">★ <span>LEGENDARY</span></div>
       <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,0.3);margin-top:12px">YOU ARE ELIGIBLE TO CLAIM THE PRIZE POOL</div>`;
   } else {
     document.querySelector('.next-tier').innerHTML = `${tierName} → <span>${nextTier}</span>`;
@@ -666,7 +666,7 @@ async function init() {
     document.getElementById('pool-amount').textContent = stats.prizePool + ' USDT';
     document.getElementById('pool-minted').textContent = stats.totalMinted;
     document.getElementById('stat-minted').textContent = stats.totalMinted;
-    document.getElementById('legendary-count').textContent = `â˜… ${stats.legendaryCount} LEGENDARY`;
+    document.getElementById('legendary-count').textContent = `★ ${stats.legendaryCount} LEGENDARY`;
   }).catch(() => {});
 
   // rank from leaderboard
@@ -774,7 +774,7 @@ ${parts}
 <text x="16" y="462" font-family="'Bebas Neue',sans-serif" font-size="24" fill="${c.color}">${card.wc}</text>
 <text x="484" y="440" font-family="'DM Mono',monospace" font-size="8" fill="rgba(255,255,255,0.55)" letter-spacing="1" text-anchor="end">TEAM OVR</text>
 <text x="484" y="462" font-family="'Bebas Neue',sans-serif" font-size="24" fill="${c.ovrColor}" text-anchor="end">${card.ovr}</text>
-<text x="484" y="492" font-family="'DM Mono',monospace" font-size="6.5" fill="rgba(255,255,255,0.18)" text-anchor="end" letter-spacing="1">ERC-721 Â· ${card.token}</text>
+<text x="484" y="492" font-family="'DM Mono',monospace" font-size="6.5" fill="rgba(255,255,255,0.18)" text-anchor="end" letter-spacing="1">ERC-721 · ${card.token}</text>
 <rect x="374" y="12" width="112" height="18" rx="4" fill="rgba(0,0,0,0.65)" stroke="${c.chipStroke}" stroke-width="1"/>
 <text x="430" y="25" font-family="'DM Mono',monospace" font-size="8.5" fill="${c.color}" text-anchor="middle" letter-spacing="2">${tierName}</text>
 <rect x="388" y="36" width="98" height="18" rx="4" fill="rgba(0,0,0,0.6)"/>
