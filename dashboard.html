@@ -508,8 +508,12 @@ const DEMO_SERVER  = 'https://glyph-demo-production.up.railway.app';
 const DEMO_MATCHES = [
   { id:1,  home:'USA',       away:'Mexico',    group:'GROUP A · MD1' },
   { id:2,  home:'Canada',    away:'Panama',    group:'GROUP A · MD1' },
+  { id:7,  home:'Brazil',    away:'Colombia',  group:'GROUP B · MD1' },
+  { id:13, home:'Argentina', away:'Uruguay',   group:'GROUP C · MD1' },
   { id:14, home:'Paraguay',  away:'Venezuela', group:'GROUP C · MD1' },
+  { id:19, home:'France',    away:'Morocco',   group:'GROUP D · MD1' },
   { id:20, home:'Senegal',   away:'Mali',      group:'GROUP D · MD1' },
+  { id:9,  home:'Brazil',    away:'Ecuador',   group:'GROUP B · MD2' },
 ];
 function getMatch(id) { return DEMO_MATCHES.find(m => m.id === id); }
 function fmt(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }

@@ -508,7 +508,7 @@ body::before {
 <script src="nav.js"></script>
 <script>
 // ── Demo match sequence (in order) ────────────────────────────────────────
-const DEMO_MATCH_IDS = [1, 2, 14, 20];
+const DEMO_MATCH_IDS = [1, 2, 7, 13, 14, 19, 20, 9];
 
 const MATCHES = [
   // ── GROUP A ──────────────────────────────────────────────────────────────
@@ -679,6 +679,7 @@ const userPicks = {};
 const pending   = {};
 let demoState   = { phase:'idle', matchId:null, secondsLeft:0, nextMatchId:null, scored:[] };
 let _walletAddr = null;
+let _demoPaused = false;
 
 function _picksKey()   { return _walletAddr ? 'glyph_picks_'   + _walletAddr : null; }
 function _pendingKey() { return _walletAddr ? 'glyph_pending_' + _walletAddr : null; }
@@ -707,7 +708,7 @@ function fmt(s) { return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s
 
 // ── Local tick — smooth 1-second countdown between server polls ────────────
 setInterval(() => {
-  if (demoState.secondsLeft > 0) {
+  if (!_demoPaused && demoState.secondsLeft > 0) {
     demoState.secondsLeft = Math.max(0, demoState.secondsLeft - 1);
     renderLive();
   }
@@ -941,6 +942,7 @@ async function syncDemoButtons() {
   try {
     const res  = await fetch(`${DEMO_SERVER}/status`);
     const { running, paused } = await res.json();
+    _demoPaused = paused;
     document.getElementById('btn-start').disabled  = running;
     document.getElementById('btn-pause').disabled  = !running || paused;
     document.getElementById('btn-pause').style.display  = !paused ? 'inline-flex' : 'none';
