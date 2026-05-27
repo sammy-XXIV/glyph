@@ -13,9 +13,9 @@ import readline from 'readline';
 
 const __dirname  = dirname(fileURLToPath(import.meta.url));
 
-const CA         = '0x75dA5e7b6a51f9F7711Fe3F40201fEd72d7827aE';
+const CA         = '0xbb3AC0CBB5B8164Db2047b3cB26927e7e43B7Bb5';
 const USDT_CA    = '0x9e29b3AaDa05Bf2D2c827Af80Bd28Dc0b9b4FB0c';
-const GRAPH      = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.8';
+const GRAPH      = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.9';
 const BOT_KEYS   = [
   '0x583dc5b9dc11530013bd427b8831aca5bbaddc3e4ce74fc0ad943dadcd461878',
   '0x1a55a9daad0d9fc46ce8bdaa33df0f2f734cd3a6e8a223f0bb9bbd4c470f7177',

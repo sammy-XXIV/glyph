@@ -1,6 +1,6 @@
-﻿specVersion: 0.0.5
+specVersion: 0.0.5
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum
     name: Glyph
@@ -20,7 +20,7 @@ dataSources:
         - PrizeClaim
       abis:
         - name: Glyph
-          file: ./abis/Glyph.json
+          file: Glyph\Glyph.json
       eventHandlers:
         - event: Minted(indexed address,uint256,uint8,uint8)
           handler: handleMinted
@@ -32,7 +32,4 @@ dataSources:
           handler: handlePickScored
         - event: PrizeClaimed(indexed address,uint256)
           handler: handlePrizeClaimed
-      file: ./src/mapping.ts
-
-
-
+      file: Glyph\Glyph.wasm

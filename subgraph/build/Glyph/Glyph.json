@@ -1,0 +1,117 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "player",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "name": "tier",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "name": "cardIndex",
+        "type": "uint8"
+      }
+    ],
+    "name": "Minted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "player",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "burnedId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "name": "newId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "name": "newTier",
+        "type": "uint8"
+      }
+    ],
+    "name": "Upgraded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "player",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "matchId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "name": "pick",
+        "type": "uint8"
+      }
+    ],
+    "name": "Predicted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "player",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "matchId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "name": "correct",
+        "type": "bool"
+      }
+    ],
+    "name": "PickScored",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "player",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "PrizeClaimed",
+    "type": "event"
+  }
+]
