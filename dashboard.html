@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GLYPH — Dashboard</title>
+<title>GLYPH â€” Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="nav.css">
 <style>
@@ -25,7 +25,7 @@ body::before {
 }
 
 
-/* ── MAIN LAYOUT ── */
+/* â”€â”€ MAIN LAYOUT â”€â”€ */
 .main {
   position: relative; z-index: 1;
   max-width: 1200px; margin: 0 auto;
@@ -35,7 +35,7 @@ body::before {
   gap: 28px;
 }
 
-/* ── LEFT: card column ── */
+/* â”€â”€ LEFT: card column â”€â”€ */
 .card-col {
   display: flex; flex-direction: column; gap: 16px;
 }
@@ -75,7 +75,7 @@ body::before {
 }
 .tier-dot.filled { background: #94a3b8; }
 
-/* ── RIGHT: stats column ── */
+/* â”€â”€ RIGHT: stats column â”€â”€ */
 .stats-col {
   display: flex; flex-direction: column; gap: 20px;
 }
@@ -293,7 +293,7 @@ body::before {
     <a href="leaderboard.html">LEADERBOARD</a>
     <a href="gallery.html">GALLERY</a>
   </div>
-  <span class="nav-wallet" id="wallet-display">—</span>
+  <span class="nav-wallet" id="wallet-display">â€”</span>
   <button class="nav-burger" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
@@ -303,7 +303,7 @@ body::before {
   <a href="predictions.html">PREDICT</a>
   <a href="leaderboard.html">LEADERBOARD</a>
   <a href="gallery.html">GALLERY</a>
-  <div class="drawer-wallet" id="drawer-wallet-display">—</div>
+  <div class="drawer-wallet" id="drawer-wallet-display">â€”</div>
 </div>
 
 <div class="main">
@@ -336,7 +336,7 @@ body::before {
       <div class="progress-header">
         <div>
           <div class="section-label">PROGRESS TO NEXT TIER</div>
-          <div class="next-tier">COMMON → <span>UNCOMMON</span></div>
+          <div class="next-tier">COMMON â†’ <span>UNCOMMON</span></div>
         </div>
         <div class="progress-count">
           <strong id="correct-count">3</strong>
@@ -349,7 +349,7 @@ body::before {
       <div class="bar-labels">
         <span>0</span>
         <span>5</span>
-        <span>10 → UNCOMMON</span>
+        <span>10 â†’ UNCOMMON</span>
       </div>
     </div>
 
@@ -362,17 +362,17 @@ body::before {
       </div>
       <div class="stat-box">
         <div class="s-label">WIN RATE</div>
-        <div class="s-value" id="stat-winrate">—<span style="font-size:20px;color:rgba(255,255,255,0.4)">%</span></div>
+        <div class="s-value" id="stat-winrate">â€”<span style="font-size:20px;color:rgba(255,255,255,0.4)">%</span></div>
         <div class="s-sub">TOWARD NEXT TIER</div>
       </div>
       <div class="stat-box">
         <div class="s-label">TOTAL MINTED</div>
-        <div class="s-value" id="stat-minted">—</div>
+        <div class="s-value" id="stat-minted">â€”</div>
         <div class="s-sub">PLAYERS</div>
       </div>
       <div class="stat-box grey">
         <div class="s-label">CURRENT RANK</div>
-        <div class="s-value" id="stat-rank">#—</div>
+        <div class="s-value" id="stat-rank">#â€”</div>
         <div class="s-sub" id="stat-rank-sub">LOADING...</div>
       </div>
     </div>
@@ -381,13 +381,13 @@ body::before {
     <div class="pool-card">
       <div class="pool-left">
         <div class="section-label">PRIZE POOL</div>
-        <div class="pool-amount" id="pool-amount">—</div>
-        <div class="pool-sub">USDT · SPLIT BETWEEN LEGENDARY HOLDERS</div>
+        <div class="pool-amount" id="pool-amount">â€”</div>
+        <div class="pool-sub">USDT Â· SPLIT BETWEEN LEGENDARY HOLDERS</div>
       </div>
       <div class="pool-right">
-        <div class="minted-count" id="pool-minted">—</div>
+        <div class="minted-count" id="pool-minted">â€”</div>
         <div class="minted-label">MINTED</div>
-        <div class="legendary-count" id="legendary-count">★ — LEGENDARY</div>
+        <div class="legendary-count" id="legendary-count">â˜… â€” LEGENDARY</div>
       </div>
     </div>
 
@@ -397,17 +397,17 @@ body::before {
       <div class="match-teaser">
         <div class="match-team">
           <img id="nm-home-flag" style="width:36px;height:27px;object-fit:cover;border-radius:3px" src="" alt="">
-          <div class="name" id="nm-home">—</div>
+          <div class="name" id="nm-home">â€”</div>
         </div>
         <div class="match-vs">VS</div>
         <div class="match-team">
           <img id="nm-away-flag" style="width:36px;height:27px;object-fit:cover;border-radius:3px" src="" alt="">
-          <div class="name" id="nm-away">—</div>
+          <div class="name" id="nm-away">â€”</div>
         </div>
         <div style="flex:0 0 auto; padding-left:24px; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
           <div class="match-meta">
-            <div class="kick-time" id="nm-time">—</div>
-            <div class="match-label" id="nm-label">—</div>
+            <div class="kick-time" id="nm-time">â€”</div>
+            <div class="match-label" id="nm-label">â€”</div>
           </div>
           <span class="predict-tag" id="nm-status-tag">OPEN</span>
         </div>
@@ -416,7 +416,7 @@ body::before {
 
     <!-- predict CTA -->
     <button class="predict-btn" onclick="window.location.href='predictions.html'">
-      MAKE PREDICTIONS →
+      MAKE PREDICTIONS â†’
     </button>
 
   </div>
@@ -427,43 +427,43 @@ body::before {
 <script src="nav.js"></script>
 <script>
 const TIER_NAMES = ['COMMON','UNCOMMON','RARE','EPIC','LEGENDARY'];
-const THRESHOLDS = [10, 20, 35, 55];
+const THRESHOLDS = [2, 4, 6, 8];
 
 const ALL_CARDS = {
   COMMON: [
-    { id:'nigeria',   name:'NIGERIA',      nation:'Nigeria 🇳🇬',      img:'assets/nigeria.png',   wc:0, ovr:70, token:'#0021' },
-    { id:'costarica', name:'COSTA RICA',   nation:'Costa Rica 🇨🇷',   img:'assets/costarica.png', wc:0, ovr:68, token:'#0022' },
-    { id:'saudi',     name:'SAUDI ARABIA', nation:'Saudi Arabia 🇸🇦',  img:'assets/saudi.png',     wc:0, ovr:67, token:'#0023' },
-    { id:'cameroon',  name:'CAMEROON',     nation:'Cameroon 🇨🇲',     img:'assets/cameroon.png',  wc:0, ovr:69, token:'#0024' },
-    { id:'ghana',     name:'GHANA',        nation:'Ghana 🇬🇭',        img:'assets/ghana.png',     wc:0, ovr:68, token:'#0025' },
+    { id:'nigeria',   name:'NIGERIA',      nation:'Nigeria ðŸ‡³ðŸ‡¬',      img:'assets/nigeria.png',   wc:0, ovr:70, token:'#0021' },
+    { id:'costarica', name:'COSTA RICA',   nation:'Costa Rica ðŸ‡¨ðŸ‡·',   img:'assets/costarica.png', wc:0, ovr:68, token:'#0022' },
+    { id:'saudi',     name:'SAUDI ARABIA', nation:'Saudi Arabia ðŸ‡¸ðŸ‡¦',  img:'assets/saudi.png',     wc:0, ovr:67, token:'#0023' },
+    { id:'cameroon',  name:'CAMEROON',     nation:'Cameroon ðŸ‡¨ðŸ‡²',     img:'assets/cameroon.png',  wc:0, ovr:69, token:'#0024' },
+    { id:'ghana',     name:'GHANA',        nation:'Ghana ðŸ‡¬ðŸ‡­',        img:'assets/ghana.png',     wc:0, ovr:68, token:'#0025' },
   ],
   UNCOMMON: [
-    { id:'mexico',      name:'MEXICO',      nation:'Mexico 🇲🇽',      img:'assets/mexico.png',      wc:0, ovr:74, token:'#0016' },
-    { id:'colombia',    name:'COLOMBIA',    nation:'Colombia 🇨🇴',    img:'assets/colombia.png',    wc:0, ovr:73, token:'#0017' },
-    { id:'morocco',     name:'MOROCCO',     nation:'Morocco 🇲🇦',     img:'assets/morocco.png',     wc:0, ovr:75, token:'#0018' },
-    { id:'switzerland', name:'SWITZERLAND', nation:'Switzerland 🇨🇭', img:'assets/switzerland.png', wc:0, ovr:72, token:'#0019' },
-    { id:'denmark',     name:'DENMARK',     nation:'Denmark 🇩🇰',     img:'assets/denmark.png',     wc:0, ovr:71, token:'#0020' },
+    { id:'mexico',      name:'MEXICO',      nation:'Mexico ðŸ‡²ðŸ‡½',      img:'assets/mexico.png',      wc:0, ovr:74, token:'#0016' },
+    { id:'colombia',    name:'COLOMBIA',    nation:'Colombia ðŸ‡¨ðŸ‡´',    img:'assets/colombia.png',    wc:0, ovr:73, token:'#0017' },
+    { id:'morocco',     name:'MOROCCO',     nation:'Morocco ðŸ‡²ðŸ‡¦',     img:'assets/morocco.png',     wc:0, ovr:75, token:'#0018' },
+    { id:'switzerland', name:'SWITZERLAND', nation:'Switzerland ðŸ‡¨ðŸ‡­', img:'assets/switzerland.png', wc:0, ovr:72, token:'#0019' },
+    { id:'denmark',     name:'DENMARK',     nation:'Denmark ðŸ‡©ðŸ‡°',     img:'assets/denmark.png',     wc:0, ovr:71, token:'#0020' },
   ],
   RARE: [
-    { id:'japan',    name:'JAPAN',    nation:'Japan 🇯🇵',    img:'assets/japan.png',    wc:0, ovr:78, token:'#0014' },
-    { id:'senegal',  name:'SENEGAL',  nation:'Senegal 🇸🇳',  img:'assets/senegal.png',  wc:0, ovr:77, token:'#0015' },
-    { id:'uruguay',  name:'URUGUAY',  nation:'Uruguay 🇺🇾',  img:'assets/uruguay.png',  wc:2, ovr:80, token:'#0012' },
-    { id:'usa',      name:'USA',      nation:'USA 🇺🇸',      img:'assets/usa.png',      wc:0, ovr:76, token:'#0013' },
-    { id:'croatia',  name:'CROATIA',  nation:'Croatia 🇭🇷',  img:'assets/croatia.png',  wc:0, ovr:82, token:'#0011' },
+    { id:'japan',    name:'JAPAN',    nation:'Japan ðŸ‡¯ðŸ‡µ',    img:'assets/japan.png',    wc:0, ovr:78, token:'#0014' },
+    { id:'senegal',  name:'SENEGAL',  nation:'Senegal ðŸ‡¸ðŸ‡³',  img:'assets/senegal.png',  wc:0, ovr:77, token:'#0015' },
+    { id:'uruguay',  name:'URUGUAY',  nation:'Uruguay ðŸ‡ºðŸ‡¾',  img:'assets/uruguay.png',  wc:2, ovr:80, token:'#0012' },
+    { id:'usa',      name:'USA',      nation:'USA ðŸ‡ºðŸ‡¸',      img:'assets/usa.png',      wc:0, ovr:76, token:'#0013' },
+    { id:'croatia',  name:'CROATIA',  nation:'Croatia ðŸ‡­ðŸ‡·',  img:'assets/croatia.png',  wc:0, ovr:82, token:'#0011' },
   ],
   EPIC: [
-    { id:'germany',     name:'GERMANY',     nation:'Germany 🇩🇪',     img:'assets/germany.jpg',     wc:4, ovr:85, token:'#0008' },
-    { id:'belgium',     name:'BELGIUM',     nation:'Belgium 🇧🇪',     img:'assets/belgium.jpg',     wc:0, ovr:84, token:'#0009' },
-    { id:'netherlands', name:'NETHERLANDS', nation:'Netherlands 🇳🇱', img:'assets/netherlands.jpg', wc:0, ovr:85, token:'#0010' },
-    { id:'italy',       name:'ITALY',       nation:'Italy 🇮🇹',       img:'assets/italy.jpg',       wc:4, ovr:86, token:'#0006' },
-    { id:'portugal',    name:'PORTUGAL',    nation:'Portugal 🇵🇹',    img:'assets/portugal.jpg',    wc:0, ovr:87, token:'#0007' },
+    { id:'germany',     name:'GERMANY',     nation:'Germany ðŸ‡©ðŸ‡ª',     img:'assets/germany.jpg',     wc:4, ovr:85, token:'#0008' },
+    { id:'belgium',     name:'BELGIUM',     nation:'Belgium ðŸ‡§ðŸ‡ª',     img:'assets/belgium.jpg',     wc:0, ovr:84, token:'#0009' },
+    { id:'netherlands', name:'NETHERLANDS', nation:'Netherlands ðŸ‡³ðŸ‡±', img:'assets/netherlands.jpg', wc:0, ovr:85, token:'#0010' },
+    { id:'italy',       name:'ITALY',       nation:'Italy ðŸ‡®ðŸ‡¹',       img:'assets/italy.jpg',       wc:4, ovr:86, token:'#0006' },
+    { id:'portugal',    name:'PORTUGAL',    nation:'Portugal ðŸ‡µðŸ‡¹',    img:'assets/portugal.jpg',    wc:0, ovr:87, token:'#0007' },
   ],
   LEGENDARY: [
-    { id:'france',    name:'FRANCE',    nation:'France 🇫🇷',    img:'assets/player.jpg',    wc:2, ovr:91, token:'#0001' },
-    { id:'brazil',    name:'BRAZIL',    nation:'Brazil 🇧🇷',    img:'assets/brazil.jpg',    wc:5, ovr:89, token:'#0002' },
-    { id:'argentina', name:'ARGENTINA', nation:'Argentina 🇦🇷', img:'assets/argentina.jpg', wc:3, ovr:92, token:'#0004' },
-    { id:'england',   name:'ENGLAND',   nation:'England 🏴󠁧󠁢󠁥󠁮󠁧󠁿',   img:'assets/england.jpg',   wc:1, ovr:88, token:'#0003' },
-    { id:'spain',     name:'SPAIN',     nation:'Spain 🇪🇸',     img:'assets/spain.png',     wc:1, ovr:90, token:'#0005' },
+    { id:'france',    name:'FRANCE',    nation:'France ðŸ‡«ðŸ‡·',    img:'assets/player.jpg',    wc:2, ovr:91, token:'#0001' },
+    { id:'brazil',    name:'BRAZIL',    nation:'Brazil ðŸ‡§ðŸ‡·',    img:'assets/brazil.jpg',    wc:5, ovr:89, token:'#0002' },
+    { id:'argentina', name:'ARGENTINA', nation:'Argentina ðŸ‡¦ðŸ‡·', img:'assets/argentina.jpg', wc:3, ovr:92, token:'#0004' },
+    { id:'england',   name:'ENGLAND',   nation:'England ðŸ´ó §ó ¢ó ¥ó ®ó §ó ¿',   img:'assets/england.jpg',   wc:1, ovr:88, token:'#0003' },
+    { id:'spain',     name:'SPAIN',     nation:'Spain ðŸ‡ªðŸ‡¸',     img:'assets/spain.png',     wc:1, ovr:90, token:'#0005' },
   ],
 };
 
@@ -480,10 +480,10 @@ const FLAG_CODES = {
 };
 
 const OPEN_MATCHES = [
-  { home:'USA',         away:'Mexico',    time:'11 Jun · 19:00', group:'GROUP A · MD1' },
-  { home:'Canada',      away:'Panama',    time:'11 Jun · 22:00', group:'GROUP A · MD1' },
-  { home:'Argentina',   away:'Uruguay',   time:'12 Jun · 16:00', group:'GROUP C · MD1' },
-  { home:'Brazil',      away:'Colombia',  time:'12 Jun · 19:00', group:'GROUP B · MD1' },
+  { home:'USA',         away:'Mexico',    time:'11 Jun Â· 19:00', group:'GROUP A Â· MD1' },
+  { home:'Canada',      away:'Panama',    time:'11 Jun Â· 22:00', group:'GROUP A Â· MD1' },
+  { home:'Argentina',   away:'Uruguay',   time:'12 Jun Â· 16:00', group:'GROUP C Â· MD1' },
+  { home:'Brazil',      away:'Colombia',  time:'12 Jun Â· 19:00', group:'GROUP B Â· MD1' },
 ];
 
 function populateNextMatch() {
@@ -503,13 +503,13 @@ function populateNextMatch() {
 }
 populateNextMatch();
 
-// ── Demo state sync ────────────────────────────────────────────────────────
+// â”€â”€ Demo state sync â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const DEMO_SERVER  = 'https://glyph-demo-production.up.railway.app';
 const DEMO_MATCHES = [
-  { id:1,  home:'USA',       away:'Mexico',    group:'GROUP A · MD1' },
-  { id:2,  home:'Canada',    away:'Panama',    group:'GROUP A · MD1' },
-  { id:14, home:'Paraguay',  away:'Venezuela', group:'GROUP C · MD1' },
-  { id:20, home:'Senegal',   away:'Mali',      group:'GROUP D · MD1' },
+  { id:1,  home:'USA',       away:'Mexico',    group:'GROUP A Â· MD1' },
+  { id:2,  home:'Canada',    away:'Panama',    group:'GROUP A Â· MD1' },
+  { id:14, home:'Paraguay',  away:'Venezuela', group:'GROUP C Â· MD1' },
+  { id:20, home:'Senegal',   away:'Mali',      group:'GROUP D Â· MD1' },
 ];
 function getMatch(id) { return DEMO_MATCHES.find(m => m.id === id); }
 function fmt(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
@@ -540,7 +540,7 @@ function applyDemoState(s) {
   if (phase === 'live') {
     document.getElementById('nm-section-label').textContent = 'LIVE NOW';
     document.getElementById('nm-time').textContent = fmt(secondsLeft) + ' remaining';
-    tag.textContent = '⚡ LIVE';
+    tag.textContent = 'âš¡ LIVE';
     tag.style.cssText = 'color:#fff;background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.4)';
   } else if (phase === 'break') {
     document.getElementById('nm-section-label').textContent = 'NEXT MATCH TO PREDICT';
@@ -572,7 +572,7 @@ async function refreshProgressBar() {
     const nextTier  = TIER_NAMES[player.tier + 1] || 'LEGENDARY';
     document.getElementById('correct-count').textContent = correct;
     document.querySelector('.progress-count span').textContent = ` / ${threshold} correct`;
-    document.querySelector('.bar-labels').innerHTML = `<span>0</span><span>${Math.round(threshold/2)}</span><span>${threshold} → ${nextTier}</span>`;
+    document.querySelector('.bar-labels').innerHTML = `<span>0</span><span>${Math.round(threshold/2)}</span><span>${threshold} â†’ ${nextTier}</span>`;
     document.getElementById('bar-fill').style.width = pct + '%';
     document.getElementById('stat-correct').textContent = correct;
   } catch {}
@@ -608,7 +608,7 @@ async function init() {
     document.getElementById('pool-amount').textContent = stats.prizePool + ' USDT';
     document.getElementById('pool-minted').textContent = stats.totalMinted;
     document.getElementById('stat-minted').textContent = stats.totalMinted;
-    document.getElementById('legendary-count').textContent = `★ ${stats.legendaryCount} LEGENDARY`;
+    document.getElementById('legendary-count').textContent = `â˜… ${stats.legendaryCount} LEGENDARY`;
   }).catch(() => {});
 
   const addr = await GLYPH.getWallet();
@@ -641,13 +641,13 @@ async function init() {
   if (tierName === 'LEGENDARY') {
     document.querySelector('.progress-card').innerHTML = `
       <div class="section-label">STATUS</div>
-      <div class="next-tier" style="margin-top:8px;font-size:22px">★ <span>LEGENDARY</span></div>
+      <div class="next-tier" style="margin-top:8px;font-size:22px">â˜… <span>LEGENDARY</span></div>
       <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,0.3);margin-top:12px">YOU ARE ELIGIBLE TO CLAIM THE PRIZE POOL</div>`;
   } else {
-    document.querySelector('.next-tier').innerHTML = `${tierName} → <span>${nextTier}</span>`;
+    document.querySelector('.next-tier').innerHTML = `${tierName} â†’ <span>${nextTier}</span>`;
     document.getElementById('correct-count').textContent = correct;
     document.querySelector('.progress-count span').textContent = ` / ${threshold} correct`;
-    document.querySelector('.bar-labels').innerHTML = `<span>0</span><span>${Math.round(threshold/2)}</span><span>${threshold} → ${nextTier}</span>`;
+    document.querySelector('.bar-labels').innerHTML = `<span>0</span><span>${Math.round(threshold/2)}</span><span>${threshold} â†’ ${nextTier}</span>`;
     setTimeout(() => { document.getElementById('bar-fill').style.width = pct + '%'; }, 400);
   }
 
@@ -662,7 +662,7 @@ async function init() {
     document.getElementById('pool-amount').textContent = stats.prizePool + ' USDT';
     document.getElementById('pool-minted').textContent = stats.totalMinted;
     document.getElementById('stat-minted').textContent = stats.totalMinted;
-    document.getElementById('legendary-count').textContent = `★ ${stats.legendaryCount} LEGENDARY`;
+    document.getElementById('legendary-count').textContent = `â˜… ${stats.legendaryCount} LEGENDARY`;
   }).catch(() => {});
 
   // rank from leaderboard
@@ -672,7 +672,7 @@ async function init() {
       document.getElementById('stat-rank').textContent = '#' + (idx + 1);
       document.getElementById('stat-rank-sub').textContent = `OF ${players.length} PLAYERS`;
     } else {
-      document.getElementById('stat-rank').textContent = '#—';
+      document.getElementById('stat-rank').textContent = '#â€”';
       document.getElementById('stat-rank-sub').textContent = `OF ${players.length} PLAYERS`;
     }
   }).catch(() => {
@@ -684,7 +684,7 @@ async function init() {
     const upgradeBtn = document.createElement('button');
     upgradeBtn.className = 'predict-btn';
     upgradeBtn.style.background = 'linear-gradient(135deg,rgba(99,102,241,0.3),rgba(139,92,246,0.3))';
-    upgradeBtn.textContent = `UPGRADE TO ${nextTier} →`;
+    upgradeBtn.textContent = `UPGRADE TO ${nextTier} â†’`;
     upgradeBtn.onclick = async () => {
       upgradeBtn.disabled = true;
       upgradeBtn.textContent = 'UPGRADING...';
@@ -694,7 +694,7 @@ async function init() {
       } catch(e) {
         alert('Upgrade failed: ' + (e.reason || e.message));
         upgradeBtn.disabled = false;
-        upgradeBtn.textContent = `UPGRADE TO ${nextTier} →`;
+        upgradeBtn.textContent = `UPGRADE TO ${nextTier} â†’`;
       }
     };
     document.querySelector('.stats-col').appendChild(upgradeBtn);
@@ -767,7 +767,7 @@ ${parts}
 <text x="16" y="462" font-family="'Bebas Neue',sans-serif" font-size="24" fill="${c.color}">${card.wc}</text>
 <text x="484" y="440" font-family="'DM Mono',monospace" font-size="8" fill="rgba(255,255,255,0.55)" letter-spacing="1" text-anchor="end">TEAM OVR</text>
 <text x="484" y="462" font-family="'Bebas Neue',sans-serif" font-size="24" fill="${c.ovrColor}" text-anchor="end">${card.ovr}</text>
-<text x="484" y="492" font-family="'DM Mono',monospace" font-size="6.5" fill="rgba(255,255,255,0.18)" text-anchor="end" letter-spacing="1">ERC-721 · ${card.token}</text>
+<text x="484" y="492" font-family="'DM Mono',monospace" font-size="6.5" fill="rgba(255,255,255,0.18)" text-anchor="end" letter-spacing="1">ERC-721 Â· ${card.token}</text>
 <rect x="374" y="12" width="112" height="18" rx="4" fill="rgba(0,0,0,0.65)" stroke="${c.chipStroke}" stroke-width="1"/>
 <text x="430" y="25" font-family="'DM Mono',monospace" font-size="8.5" fill="${c.color}" text-anchor="middle" letter-spacing="2">${tierName}</text>
 <rect x="388" y="36" width="98" height="18" rx="4" fill="rgba(0,0,0,0.6)"/>
@@ -787,3 +787,4 @@ ${parts}
 </script>
 </body>
 </html>
+

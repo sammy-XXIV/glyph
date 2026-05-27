@@ -6,9 +6,9 @@ dataSources:
     name: Glyph
     network: xlayer-sepolia
     source:
-      address: "0x95D4d4b9fD838Edf6acb71721f2Df1d4966aE088"
+      address: "0x75dA5e7b6a51f9F7711Fe3F40201fEd72d7827aE"
       abi: Glyph
-      startBlock: 31435500
+      startBlock: 31438300
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -33,4 +33,6 @@ dataSources:
         - event: PrizeClaimed(indexed address,uint256)
           handler: handlePrizeClaimed
       file: ./src/mapping.ts
+
+
 

@@ -13,9 +13,9 @@ import readline from 'readline';
 
 const __dirname  = dirname(fileURLToPath(import.meta.url));
 
-const CA         = '0x95D4d4b9fD838Edf6acb71721f2Df1d4966aE088';
+const CA         = '0x75dA5e7b6a51f9F7711Fe3F40201fEd72d7827aE';
 const USDT_CA    = '0x9e29b3AaDa05Bf2D2c827Af80Bd28Dc0b9b4FB0c';
-const GRAPH      = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.7';
+const GRAPH      = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.8';
 const BOT_KEYS   = [
   '0x583dc5b9dc11530013bd427b8831aca5bbaddc3e4ce74fc0ad943dadcd461878',
   '0x1a55a9daad0d9fc46ce8bdaa33df0f2f734cd3a6e8a223f0bb9bbd4c470f7177',
@@ -25,15 +25,19 @@ const BOTS_FILE  = join(__dirname, 'bots.json');
 const STATE_FILE = join(__dirname, '..', 'state.json');
 
 const DEMO_MATCHES = [
-  { id:1,  home:'USA',       away:'Mexico',    group:'GROUP A Â· MD1', forceResult:'home' },
-  { id:2,  home:'Canada',    away:'Panama',    group:'GROUP A Â· MD1', forceResult:'home' },
-  { id:14, home:'Paraguay',  away:'Venezuela', group:'GROUP C Â· MD1', forceResult:'home' },
-  { id:20, home:'Senegal',   away:'Mali',      group:'GROUP D Â· MD1', forceResult:'home' },
+  { id:1,  home:'USA',       away:'Mexico',    group:'GROUP A · MD1', forceResult:'home' },
+  { id:2,  home:'Canada',    away:'Panama',    group:'GROUP A · MD1', forceResult:'home' },
+  { id:7,  home:'Brazil',    away:'Colombia',  group:'GROUP B · MD1', forceResult:'home' },
+  { id:13, home:'Argentina', away:'Uruguay',   group:'GROUP C · MD1', forceResult:'home' },
+  { id:14, home:'Paraguay',  away:'Venezuela', group:'GROUP C · MD1', forceResult:'home' },
+  { id:19, home:'France',    away:'Morocco',   group:'GROUP D · MD1', forceResult:'home' },
+  { id:20, home:'Senegal',   away:'Mali',      group:'GROUP D · MD1', forceResult:'home' },
+  { id:9,  home:'Brazil',    away:'Ecuador',   group:'GROUP B · MD2', forceResult:'home' },
 ];
 
 const PICK_LABELS = ['HOME WIN', 'DRAW', 'AWAY WIN'];
 const TIER_NAMES  = ['COMMON', 'UNCOMMON', 'RARE', 'EPIC', 'LEGENDARY'];
-const THRESHOLDS  = [10, 20, 35, 55];
+const THRESHOLDS  = [2, 4, 6, 8];
 
 const ABI = [
   'function mint() external',
@@ -509,6 +513,10 @@ Glyph Demo Simulator
 } else {
   cmds[cmd]().catch(e => { console.error('âŒ', e.message); process.exit(1); });
 }
+
+
+
+
 
 
 

@@ -15,7 +15,7 @@ contract Glyph is ERC721, Ownable, ReentrancyGuard {
     uint8 public constant EPIC      = 3;
     uint8 public constant LEGENDARY = 4;
 
-    uint8[4] public THRESHOLDS = [10, 20, 35, 55];
+    uint8[4] public THRESHOLDS = [2, 4, 6, 8];
 
     // ── NFT state ──────────────────────────────────────────────────────────
     uint256 public nextTokenId = 1;

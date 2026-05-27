@@ -2,7 +2,7 @@
 
 const GLYPH = (() => {
 
-  const CONTRACT_ADDRESS = '0x95D4d4b9fD838Edf6acb71721f2Df1d4966aE088';
+  const CONTRACT_ADDRESS = '0x75dA5e7b6a51f9F7711Fe3F40201fEd72d7827aE';
   const USDT_ADDRESS    = '0x9e29b3AaDa05Bf2D2c827Af80Bd28Dc0b9b4FB0c';
   const XLAYER_TESTNET = {
     chainId: '0x7A0',
@@ -12,7 +12,7 @@ const GLYPH = (() => {
     blockExplorerUrls: ['https://www.oklink.com/xlayer-test'],
   };
 
-  const GRAPH_URL = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.7';
+  const GRAPH_URL = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.8';
   const MINT_PRICE = BigInt('500000'); // 0.5 USDT (6 decimals)
   const USDT_ABI = [
     'function approve(address spender, uint256 amount) external returns (bool)',
@@ -38,7 +38,7 @@ const GLYPH = (() => {
   ];
 
   const TIER_NAMES = ['COMMON', 'UNCOMMON', 'RARE', 'EPIC', 'LEGENDARY'];
-  const THRESHOLDS = [10, 20, 35, 55];
+  const THRESHOLDS = [2, 4, 6, 8];
 
   let provider = null;
   let signer   = null;
@@ -301,5 +301,8 @@ const GLYPH = (() => {
     TIER_NAMES, THRESHOLDS,
   };
 })();
+
+
+
 
 

@@ -5,7 +5,7 @@ async function main() {
   const provider = new ethers.JsonRpcProvider('https://testrpc.xlayer.tech/terigon');
   const signer = new ethers.Wallet(process.env.DEPLOYER_PRIVATE_KEY, provider);
   const contract = new ethers.Contract(
-    '0x95D4d4b9fD838Edf6acb71721f2Df1d4966aE088',
+    '0x75dA5e7b6a51f9F7711Fe3F40201fEd72d7827aE',
     ['function setBaseImageUrl(string) external'],
     signer
   );
@@ -14,4 +14,5 @@ async function main() {
   console.log('Done:', tx.hash);
 }
 main().catch(console.error);
+
 
