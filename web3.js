@@ -1,4 +1,4 @@
-﻿// Glyph â€” shared Web3 module
+﻿// Glyph — shared Web3 module
 
 const GLYPH = (() => {
 
@@ -124,7 +124,7 @@ const GLYPH = (() => {
 
   function _updateNavWallet(addr) {
     const short = addr.slice(0, 6) + '...' + addr.slice(-4);
-    // Only update the drawer â€” nav.js owns wallet-display and manages its dropdown
+    // Only update the drawer — nav.js owns wallet-display and manages its dropdown
     const drawer = document.getElementById('drawer-wallet-display');
     if (drawer) drawer.textContent = short;
     // For wallet-display, update only the text node to preserve the dropdown child

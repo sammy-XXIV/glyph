@@ -1,5 +1,5 @@
 ﻿// Glyph Cloudflare Worker
-// Routes: / â†’ chain stats | /fixtures â†’ WC2026 fixtures | /nft/:id â†’ metadata | /nft/:id.svg â†’ SVG card
+// Routes: / → chain stats | /fixtures → WC2026 fixtures | /nft/:id → metadata | /nft/:id.svg → SVG card
 
 const RPC      = 'https://testrpc.xlayer.tech/terigon';
 const CONTRACT = '0x75dA5e7b6a51f9F7711Fe3F40201fEd72d7827aE';
@@ -16,35 +16,35 @@ const THRESHOLDS = [10, 20, 35, 55];
 
 const CARDS = [
   // COMMON (tier 0)
-  { id:'nigeria',     name:'NIGERIA',      nation:'Nigeria',      flag:'ðŸ‡³ðŸ‡¬', img:'nigeria.png',      wc:0, ovr:70 },
-  { id:'costarica',   name:'COSTA RICA',   nation:'Costa Rica',   flag:'ðŸ‡¨ðŸ‡·', img:'costarica.png',    wc:0, ovr:68 },
-  { id:'saudi',       name:'SAUDI ARABIA', nation:'Saudi Arabia', flag:'ðŸ‡¸ðŸ‡¦', img:'saudi.png',        wc:0, ovr:67 },
-  { id:'cameroon',    name:'CAMEROON',     nation:'Cameroon',     flag:'ðŸ‡¨ðŸ‡²', img:'cameroon.png',     wc:0, ovr:69 },
-  { id:'ghana',       name:'GHANA',        nation:'Ghana',        flag:'ðŸ‡¬ðŸ‡­', img:'ghana.png',        wc:0, ovr:68 },
+  { id:'nigeria',     name:'NIGERIA',      nation:'Nigeria',      flag:'🇳🇬', img:'nigeria.png',      wc:0, ovr:70 },
+  { id:'costarica',   name:'COSTA RICA',   nation:'Costa Rica',   flag:'🇨🇷', img:'costarica.png',    wc:0, ovr:68 },
+  { id:'saudi',       name:'SAUDI ARABIA', nation:'Saudi Arabia', flag:'🇸🇦', img:'saudi.png',        wc:0, ovr:67 },
+  { id:'cameroon',    name:'CAMEROON',     nation:'Cameroon',     flag:'🇨🇲', img:'cameroon.png',     wc:0, ovr:69 },
+  { id:'ghana',       name:'GHANA',        nation:'Ghana',        flag:'🇬🇭', img:'ghana.png',        wc:0, ovr:68 },
   // UNCOMMON (tier 1)
-  { id:'mexico',      name:'MEXICO',       nation:'Mexico',       flag:'ðŸ‡²ðŸ‡½', img:'mexico.png',       wc:0, ovr:74 },
-  { id:'colombia',    name:'COLOMBIA',     nation:'Colombia',     flag:'ðŸ‡¨ðŸ‡´', img:'colombia.png',     wc:0, ovr:73 },
-  { id:'morocco',     name:'MOROCCO',      nation:'Morocco',      flag:'ðŸ‡²ðŸ‡¦', img:'morocco.png',      wc:0, ovr:75 },
-  { id:'switzerland', name:'SWITZERLAND',  nation:'Switzerland',  flag:'ðŸ‡¨ðŸ‡­', img:'switzerland.png',  wc:0, ovr:72 },
-  { id:'denmark',     name:'DENMARK',      nation:'Denmark',      flag:'ðŸ‡©ðŸ‡°', img:'denmark.png',      wc:0, ovr:71 },
+  { id:'mexico',      name:'MEXICO',       nation:'Mexico',       flag:'🇲🇽', img:'mexico.png',       wc:0, ovr:74 },
+  { id:'colombia',    name:'COLOMBIA',     nation:'Colombia',     flag:'🇨🇴', img:'colombia.png',     wc:0, ovr:73 },
+  { id:'morocco',     name:'MOROCCO',      nation:'Morocco',      flag:'🇲🇦', img:'morocco.png',      wc:0, ovr:75 },
+  { id:'switzerland', name:'SWITZERLAND',  nation:'Switzerland',  flag:'🇨🇭', img:'switzerland.png',  wc:0, ovr:72 },
+  { id:'denmark',     name:'DENMARK',      nation:'Denmark',      flag:'🇩🇰', img:'denmark.png',      wc:0, ovr:71 },
   // RARE (tier 2)
-  { id:'japan',       name:'JAPAN',        nation:'Japan',        flag:'ðŸ‡¯ðŸ‡µ', img:'japan.png',        wc:0, ovr:78 },
-  { id:'senegal',     name:'SENEGAL',      nation:'Senegal',      flag:'ðŸ‡¸ðŸ‡³', img:'senegal.png',      wc:0, ovr:77 },
-  { id:'uruguay',     name:'URUGUAY',      nation:'Uruguay',      flag:'ðŸ‡ºðŸ‡¾', img:'uruguay.png',      wc:2, ovr:80 },
-  { id:'usa',         name:'USA',          nation:'USA',          flag:'ðŸ‡ºðŸ‡¸', img:'usa.png',          wc:0, ovr:76 },
-  { id:'croatia',     name:'CROATIA',      nation:'Croatia',      flag:'ðŸ‡­ðŸ‡·', img:'croatia.png',      wc:0, ovr:82 },
+  { id:'japan',       name:'JAPAN',        nation:'Japan',        flag:'🇯🇵', img:'japan.png',        wc:0, ovr:78 },
+  { id:'senegal',     name:'SENEGAL',      nation:'Senegal',      flag:'🇸🇳', img:'senegal.png',      wc:0, ovr:77 },
+  { id:'uruguay',     name:'URUGUAY',      nation:'Uruguay',      flag:'🇺🇾', img:'uruguay.png',      wc:2, ovr:80 },
+  { id:'usa',         name:'USA',          nation:'USA',          flag:'🇺🇸', img:'usa.png',          wc:0, ovr:76 },
+  { id:'croatia',     name:'CROATIA',      nation:'Croatia',      flag:'🇭🇷', img:'croatia.png',      wc:0, ovr:82 },
   // EPIC (tier 3)
-  { id:'germany',     name:'GERMANY',      nation:'Germany',      flag:'ðŸ‡©ðŸ‡ª', img:'germany.jpg',      wc:4, ovr:85 },
-  { id:'belgium',     name:'BELGIUM',      nation:'Belgium',      flag:'ðŸ‡§ðŸ‡ª', img:'belgium.jpg',      wc:0, ovr:84 },
-  { id:'netherlands', name:'NETHERLANDS',  nation:'Netherlands',  flag:'ðŸ‡³ðŸ‡±', img:'netherlands.jpg',  wc:0, ovr:85 },
-  { id:'italy',       name:'ITALY',        nation:'Italy',        flag:'ðŸ‡®ðŸ‡¹', img:'italy.jpg',        wc:4, ovr:86 },
-  { id:'portugal',    name:'PORTUGAL',     nation:'Portugal',     flag:'ðŸ‡µðŸ‡¹', img:'portugal.jpg',     wc:0, ovr:87 },
+  { id:'germany',     name:'GERMANY',      nation:'Germany',      flag:'🇩🇪', img:'germany.jpg',      wc:4, ovr:85 },
+  { id:'belgium',     name:'BELGIUM',      nation:'Belgium',      flag:'🇧🇪', img:'belgium.jpg',      wc:0, ovr:84 },
+  { id:'netherlands', name:'NETHERLANDS',  nation:'Netherlands',  flag:'🇳🇱', img:'netherlands.jpg',  wc:0, ovr:85 },
+  { id:'italy',       name:'ITALY',        nation:'Italy',        flag:'🇮🇹', img:'italy.jpg',        wc:4, ovr:86 },
+  { id:'portugal',    name:'PORTUGAL',     nation:'Portugal',     flag:'🇵🇹', img:'portugal.jpg',     wc:0, ovr:87 },
   // LEGENDARY (tier 4)
-  { id:'france',      name:'FRANCE',       nation:'France',       flag:'ðŸ‡«ðŸ‡·', img:'player.jpg',       wc:2, ovr:91 },
-  { id:'brazil',      name:'BRAZIL',       nation:'Brazil',       flag:'ðŸ‡§ðŸ‡·', img:'brazil.jpg',       wc:5, ovr:89 },
-  { id:'argentina',   name:'ARGENTINA',    nation:'Argentina',    flag:'ðŸ‡¦ðŸ‡·', img:'argentina.jpg',    wc:3, ovr:92 },
+  { id:'france',      name:'FRANCE',       nation:'France',       flag:'🇫🇷', img:'player.jpg',       wc:2, ovr:91 },
+  { id:'brazil',      name:'BRAZIL',       nation:'Brazil',       flag:'🇧🇷', img:'brazil.jpg',       wc:5, ovr:89 },
+  { id:'argentina',   name:'ARGENTINA',    nation:'Argentina',    flag:'🇦🇷', img:'argentina.jpg',    wc:3, ovr:92 },
   { id:'england',     name:'ENGLAND',      nation:'England',      flag:'ðŸ´ó §ó ¢ó ¥ó ®ó §ó ¿', img:'england.jpg',     wc:1, ovr:88 },
-  { id:'spain',       name:'SPAIN',        nation:'Spain',        flag:'ðŸ‡ªðŸ‡¸', img:'spain.png',        wc:1, ovr:90 },
+  { id:'spain',       name:'SPAIN',        nation:'Spain',        flag:'🇪🇸', img:'spain.png',        wc:1, ovr:90 },
 ];
 
 function getCard(tier, cardIndex) {
@@ -127,7 +127,7 @@ function makeSVG(card, tierName, tokenId, score = 0) {
 <text x="16" y="462" font-family="'Bebas Neue',sans-serif" font-size="24" fill="${c.color}">${card.wc}</text>
 <text x="484" y="440" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.55)" text-anchor="end" letter-spacing="1">TEAM OVR</text>
 <text x="484" y="462" font-family="'Bebas Neue',sans-serif" font-size="24" fill="${c.color}" text-anchor="end">${card.ovr}</text>
-<text x="484" y="492" font-family="monospace" font-size="6.5" fill="rgba(255,255,255,0.18)" text-anchor="end" letter-spacing="1">ERC-721 Â· #${String(tokenId).padStart(4,'0')}</text>
+<text x="484" y="492" font-family="monospace" font-size="6.5" fill="rgba(255,255,255,0.18)" text-anchor="end" letter-spacing="1">ERC-721 · #${String(tokenId).padStart(4,'0')}</text>
 <rect x="374" y="12" width="112" height="18" rx="4" fill="rgba(0,0,0,0.65)" stroke="${c.color}" stroke-width="0.5" stroke-opacity="0.4"/>
 <text x="430" y="25" font-family="monospace" font-size="8.5" fill="${c.color}" text-anchor="middle" letter-spacing="2">${tierName}</text>
 <rect x="388" y="36" width="98" height="18" rx="4" fill="rgba(0,0,0,0.6)"/>
@@ -181,7 +181,7 @@ export default {
         const tierName = TIER_NAMES[tier];
         const threshold = THRESHOLDS[tier] || null;
         const metadata = {
-          name: `Glyph #${tokenId} â€” ${card.name}`,
+          name: `Glyph #${tokenId} — ${card.name}`,
           description: `A Glyph prediction card for FIFA World Cup 2026. Tier: ${tierName}.`,
           image: `${PNG_BASE}/glyph_${card.id}_${tierName.toLowerCase()}_1080p.png`,
           animation_url: `${BASE_URL}/nft/${tokenId}.svg`,
@@ -201,7 +201,7 @@ export default {
       }
     }
 
-    // / â€” chain stats
+    // / — chain stats
     try {
       const [pool, nextId, legendary] = await Promise.all([
         ethCall('0x719ce73e'),
