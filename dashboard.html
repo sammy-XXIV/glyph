@@ -578,10 +578,25 @@ async function refreshProgressBar() {
   } catch {}
 }
 
+let _dashDemoState = { phase:'idle', secondsLeft:0 };
+
+setInterval(() => {
+  if (_dashDemoState.secondsLeft > 0) {
+    _dashDemoState.secondsLeft = Math.max(0, _dashDemoState.secondsLeft - 1);
+    applyDemoState(_dashDemoState);
+  }
+}, 1000);
+
 async function pollDemoState() {
   try {
     const r = await fetch(DEMO_SERVER + '/state.json?t=' + Date.now());
-    applyDemoState(await r.json());
+    const s = await r.json();
+    if (s.ts && s.secondsLeft > 0) {
+      const elapsed = Math.floor((Date.now() - s.ts) / 1000);
+      s.secondsLeft = Math.max(0, s.secondsLeft - elapsed);
+    }
+    _dashDemoState = s;
+    applyDemoState(s);
   } catch {}
 }
 setInterval(pollDemoState, 2000);

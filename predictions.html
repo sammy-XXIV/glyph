@@ -680,13 +680,20 @@ let demoState   = { phase:'idle', matchId:null, secondsLeft:0, nextMatchId:null,
 function getMatch(id) { return MATCHES.find(m => m.id === id); }
 function fmt(s) { return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }
 
+// ── Local tick — smooth 1-second countdown between server polls ────────────
+setInterval(() => {
+  if (demoState.secondsLeft > 0) {
+    demoState.secondsLeft = Math.max(0, demoState.secondsLeft - 1);
+    renderLive();
+  }
+}, 1000);
+
 // ── Poll state.json ────────────────────────────────────────────────────────
 async function pollState() {
   try {
     const r = await fetch('https://glyph-demo-production.up.railway.app/state.json?t=' + Date.now());
     if (r.ok) {
       const s = await r.json();
-      // Adjust secondsLeft using the timestamp so the timer stays correct after a refresh
       if (s.ts && s.secondsLeft > 0) {
         const elapsed = Math.floor((Date.now() - s.ts) / 1000);
         s.secondsLeft = Math.max(0, s.secondsLeft - elapsed);
