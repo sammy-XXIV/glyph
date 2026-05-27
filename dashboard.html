@@ -514,6 +514,8 @@ const DEMO_MATCHES = [
 function getMatch(id) { return DEMO_MATCHES.find(m => m.id === id); }
 function fmt(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
 
+let _lastScoredMatchId = null;
+
 function applyDemoState(s) {
   if (s.ts && s.secondsLeft > 0) {
     const elapsed = Math.round((Date.now() - s.ts) / 1000);
@@ -550,7 +552,30 @@ function applyDemoState(s) {
     document.getElementById('nm-time').textContent = 'FULL TIME';
     tag.textContent = 'ENDED';
     tag.style.cssText = 'color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1)';
+    // refresh progress bar when a new match is scored
+    if (matchId !== _lastScoredMatchId) {
+      _lastScoredMatchId = matchId;
+      refreshProgressBar();
+    }
   }
+}
+
+async function refreshProgressBar() {
+  try {
+    const addr = await GLYPH.getWallet();
+    if (!addr) return;
+    const player = await GLYPH.getPlayerData(addr);
+    if (!player) return;
+    const correct   = player.correctPicks;
+    const threshold = player.threshold || 55;
+    const pct       = Math.min(100, Math.round(correct / threshold * 100));
+    const nextTier  = TIER_NAMES[player.tier + 1] || 'LEGENDARY';
+    document.getElementById('correct-count').textContent = correct;
+    document.querySelector('.progress-count span').textContent = ` / ${threshold} correct`;
+    document.querySelector('.bar-labels').innerHTML = `<span>0</span><span>${Math.round(threshold/2)}</span><span>${threshold} → ${nextTier}</span>`;
+    document.getElementById('bar-fill').style.width = pct + '%';
+    document.getElementById('stat-correct').textContent = correct;
+  } catch {}
 }
 
 async function pollDemoState() {
