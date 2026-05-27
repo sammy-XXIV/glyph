@@ -60,6 +60,16 @@ async function getProvider() {
   throw new Error('All XLayer RPCs failed');
 }
 
+// XLayer testnet caps eth_getLogs at 100 blocks per request
+async function queryFilterChunked(contract, filter, fromBlock, toBlock, chunkSize = 100) {
+  const results = [];
+  for (let b = fromBlock; b <= toBlock; b += chunkSize) {
+    const logs = await contract.queryFilter(filter, b, Math.min(b + chunkSize - 1, toBlock)).catch(() => []);
+    results.push(...logs);
+  }
+  return results;
+}
+
 async function graphQuery(query) {
   const res  = await fetch(GRAPH, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({query}) });
   const json = await res.json();
@@ -274,8 +284,9 @@ async function score() {
     // 1. Query chain events directly (reliable, no subgraph lag)
     let preds = [];
     try {
+      const latest = await provider.getBlockNumber();
       const filter = contract.filters.Predicted(null, m.id);
-      const logs   = await contract.queryFilter(filter, 31435500, 'latest');
+      const logs   = await queryFilterChunked(contract, filter, 31435500, latest);
       for (const log of logs) {
         preds.push({ player: log.args.player.toLowerCase(), pick: Number(log.args.pick) });
       }
