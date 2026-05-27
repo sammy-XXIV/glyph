@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GLYPH â€” Dashboard</title>
+<title>GLYPH — Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="nav.css">
 <style>
@@ -293,7 +293,7 @@ body::before {
     <a href="leaderboard.html">LEADERBOARD</a>
     <a href="gallery.html">GALLERY</a>
   </div>
-  <span class="nav-wallet" id="wallet-display">â€”</span>
+  <span class="nav-wallet" id="wallet-display">—</span>
   <button class="nav-burger" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
@@ -303,7 +303,7 @@ body::before {
   <a href="predictions.html">PREDICT</a>
   <a href="leaderboard.html">LEADERBOARD</a>
   <a href="gallery.html">GALLERY</a>
-  <div class="drawer-wallet" id="drawer-wallet-display">â€”</div>
+  <div class="drawer-wallet" id="drawer-wallet-display">—</div>
 </div>
 
 <div class="main">
@@ -362,17 +362,17 @@ body::before {
       </div>
       <div class="stat-box">
         <div class="s-label">WIN RATE</div>
-        <div class="s-value" id="stat-winrate">â€”<span style="font-size:20px;color:rgba(255,255,255,0.4)">%</span></div>
+        <div class="s-value" id="stat-winrate">—<span style="font-size:20px;color:rgba(255,255,255,0.4)">%</span></div>
         <div class="s-sub">TOWARD NEXT TIER</div>
       </div>
       <div class="stat-box">
         <div class="s-label">TOTAL MINTED</div>
-        <div class="s-value" id="stat-minted">â€”</div>
+        <div class="s-value" id="stat-minted">—</div>
         <div class="s-sub">PLAYERS</div>
       </div>
       <div class="stat-box grey">
         <div class="s-label">CURRENT RANK</div>
-        <div class="s-value" id="stat-rank">#â€”</div>
+        <div class="s-value" id="stat-rank">#—</div>
         <div class="s-sub" id="stat-rank-sub">LOADING...</div>
       </div>
     </div>
@@ -381,13 +381,13 @@ body::before {
     <div class="pool-card">
       <div class="pool-left">
         <div class="section-label">PRIZE POOL</div>
-        <div class="pool-amount" id="pool-amount">â€”</div>
+        <div class="pool-amount" id="pool-amount">—</div>
         <div class="pool-sub">USDT Â· SPLIT BETWEEN LEGENDARY HOLDERS</div>
       </div>
       <div class="pool-right">
-        <div class="minted-count" id="pool-minted">â€”</div>
+        <div class="minted-count" id="pool-minted">—</div>
         <div class="minted-label">MINTED</div>
-        <div class="legendary-count" id="legendary-count">â˜… â€” LEGENDARY</div>
+        <div class="legendary-count" id="legendary-count">â˜… — LEGENDARY</div>
       </div>
     </div>
 
@@ -397,17 +397,17 @@ body::before {
       <div class="match-teaser">
         <div class="match-team">
           <img id="nm-home-flag" style="width:36px;height:27px;object-fit:cover;border-radius:3px" src="" alt="">
-          <div class="name" id="nm-home">â€”</div>
+          <div class="name" id="nm-home">—</div>
         </div>
         <div class="match-vs">VS</div>
         <div class="match-team">
           <img id="nm-away-flag" style="width:36px;height:27px;object-fit:cover;border-radius:3px" src="" alt="">
-          <div class="name" id="nm-away">â€”</div>
+          <div class="name" id="nm-away">—</div>
         </div>
         <div style="flex:0 0 auto; padding-left:24px; display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
           <div class="match-meta">
-            <div class="kick-time" id="nm-time">â€”</div>
-            <div class="match-label" id="nm-label">â€”</div>
+            <div class="kick-time" id="nm-time">—</div>
+            <div class="match-label" id="nm-label">—</div>
           </div>
           <span class="predict-tag" id="nm-status-tag">OPEN</span>
         </div>
@@ -676,7 +676,7 @@ async function init() {
       document.getElementById('stat-rank').textContent = '#' + (idx + 1);
       document.getElementById('stat-rank-sub').textContent = `OF ${players.length} PLAYERS`;
     } else {
-      document.getElementById('stat-rank').textContent = '#â€”';
+      document.getElementById('stat-rank').textContent = '#—';
       document.getElementById('stat-rank-sub').textContent = `OF ${players.length} PLAYERS`;
     }
   }).catch(() => {
