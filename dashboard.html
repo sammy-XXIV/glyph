@@ -571,8 +571,8 @@ async function refreshProgressBar() {
     const player = await GLYPH.getPlayerData(addr);
     if (!player) return;
     const correct   = player.correctPicks;
-    const threshold = player.threshold;
-    if (!threshold) return; // LEGENDARY — no progress bar
+    const threshold = player.threshold || THRESHOLDS[player.tier] || 2;
+    if (player.tierName === 'LEGENDARY') return;
     const pct       = Math.min(100, Math.round(correct / threshold * 100));
     const nextTier  = TIER_NAMES[player.tier + 1] || 'LEGENDARY';
     document.getElementById('correct-count').textContent = correct;
@@ -629,7 +629,7 @@ async function init() {
   const cards     = ALL_CARDS[tierName];
   const card      = { ...cards[player.cardIndex % cards.length], score: player.progress };
   const correct   = player.correctPicks;
-  const threshold = player.threshold || 55;
+  const threshold = player.threshold || THRESHOLDS[player.tier] || 2;
   const nextTier  = TIER_NAMES[player.tier + 1] || 'LEGENDARY';
   const pct       = Math.min(100, Math.round(correct / threshold * 100));
   const pool      = parseFloat(player.prizePool).toFixed(2);
