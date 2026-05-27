@@ -7,7 +7,11 @@
 
 import { ethers } from 'ethers';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import readline from 'readline';
+
+const __dirname  = dirname(fileURLToPath(import.meta.url));
 
 const CA         = '0x6d69a00107Ed9d487904700a00E31e657dA8a392';
 const USDT_CA    = '0x9e29b3AaDa05Bf2D2c827Af80Bd28Dc0b9b4FB0c';
@@ -17,8 +21,8 @@ const BOT_KEYS   = [
   '0x1a55a9daad0d9fc46ce8bdaa33df0f2f734cd3a6e8a223f0bb9bbd4c470f7177',
   '0xca1f9afcbb361936933a0442464811b7bdebceb37986e47b25fabc647a905e06',
 ];
-const BOTS_FILE  = './bots.json';
-const STATE_FILE = '../state.json';
+const BOTS_FILE  = join(__dirname, 'bots.json');
+const STATE_FILE = join(__dirname, '..', 'state.json');
 
 const DEMO_MATCHES = [
   { id:1,  home:'USA',       away:'Mexico',    group:'GROUP A · MD1', forceResult:'home' },
@@ -165,12 +169,12 @@ async function score() {
   const playerKey   = process.env.PLAYER_KEY; // optional — enables auto-upgrade for you
   if (!ownerKey)   { console.error('❌  Set OWNER_KEY env var'); process.exit(1); }
   if (!playerAddr) { console.error('❌  Set PLAYER=<your-wallet> env var'); process.exit(1); }
-  if (!existsSync(BOTS_FILE)) { console.error('❌  Run setup first'); process.exit(1); }
 
-  const state    = JSON.parse(readFileSync(BOTS_FILE));
   const provider = await getProvider();
   const owner    = new ethers.Wallet(ownerKey, provider);
   const contract = new ethers.Contract(CA, ABI, owner);
+
+  const botWallets = BOT_KEYS.map(k => new ethers.Wallet(k, provider));
 
   // Build signer map: address → wallet (for upgrade calls)
   const signers = {};
@@ -178,8 +182,8 @@ async function score() {
     const pw = new ethers.Wallet(playerKey, provider);
     signers[pw.address.toLowerCase()] = pw;
   }
-  for (const bot of state.bots) {
-    signers[bot.address.toLowerCase()] = new ethers.Wallet(bot.privateKey, provider);
+  for (const bot of botWallets) {
+    signers[bot.address.toLowerCase()] = bot;
   }
 
   // Track who has already been upgraded this session
@@ -237,7 +241,7 @@ async function score() {
     // Bot 2 mirrors bot 1 only on match 0 (correct once), picks wrong otherwise
     // Bot 3 does not predict
     if (!state.botPicks) state.botPicks = {};
-    const [bot1, bot2] = state.bots;
+    const [bot1, bot2] = botWallets;
     const bot1Pick = Math.floor(Math.random() * 3);
     const bot2Pick = i === 0 ? bot1Pick : (bot1Pick + 1) % 3;
     const botsToPredict = [
@@ -278,7 +282,7 @@ async function score() {
 
     if (!preds.length) {
       // fallback: subgraph unavailable — use picks we just submitted (bots only)
-      for (const bot of state.bots) {
+      for (const bot of botWallets) {
         const pick = state.botPicks?.[bot.address]?.[m.id];
         if (pick !== undefined) preds.push({ player: bot.address.toLowerCase(), pick });
       }
@@ -353,7 +357,7 @@ async function score() {
     else console.log('  —  No pick found for this match');
 
     // Auto-upgrade bots + player if threshold hit
-    for (const bot of state.bots) {
+    for (const bot of botWallets) {
       await tryUpgrade(bot.address.toLowerCase(), bot.address.slice(0, 10) + '...');
     }
     await tryUpgrade(playerAddr, 'YOUR CARD');
@@ -461,10 +465,7 @@ async function status() {
 
   const addrs = [];
   if (playerAddr) addrs.push({ addr: playerAddr.toLowerCase(), tag: 'YOU  ' });
-  if (existsSync(BOTS_FILE)) {
-    const state = JSON.parse(readFileSync(BOTS_FILE));
-    state.bots.forEach((b, i) => addrs.push({ addr: b.address.toLowerCase(), tag: `BOT ${i+1}` }));
-  }
+  BOT_KEYS.map(k => new ethers.Wallet(k)).forEach((b, i) => addrs.push({ addr: b.address.toLowerCase(), tag: `BOT ${i+1}` }));
   if (!addrs.length) { console.log('Set PLAYER=<address> or run setup first.'); return; }
 
   console.log('\n── PLAYER STATUS ───────────────────────────────────────');
