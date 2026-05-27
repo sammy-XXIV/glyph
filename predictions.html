@@ -681,8 +681,9 @@ let demoState   = { phase:'idle', matchId:null, secondsLeft:0, nextMatchId:null,
 let _walletAddr = null;
 let _demoPaused = false;
 
-function _picksKey()   { return _walletAddr ? 'glyph_picks_'   + _walletAddr : null; }
-function _pendingKey() { return _walletAddr ? 'glyph_pending_' + _walletAddr : null; }
+const _CONTRACT = '0xbb3AC0CBB5B8164Db2047b3cB26927e7e43B7Bb5';
+function _picksKey()   { return _walletAddr ? 'glyph_picks_'   + _CONTRACT + '_' + _walletAddr : null; }
+function _pendingKey() { return _walletAddr ? 'glyph_pending_' + _CONTRACT + '_' + _walletAddr : null; }
 
 function savePicks() {
   const k = _picksKey(); if (!k) return;
