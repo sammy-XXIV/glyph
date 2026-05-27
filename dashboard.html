@@ -567,7 +567,8 @@ async function refreshProgressBar() {
     const player = await GLYPH.getPlayerData(addr);
     if (!player) return;
     const correct   = player.correctPicks;
-    const threshold = player.threshold || 55;
+    const threshold = player.threshold;
+    if (!threshold) return; // LEGENDARY — no progress bar
     const pct       = Math.min(100, Math.round(correct / threshold * 100));
     const nextTier  = TIER_NAMES[player.tier + 1] || 'LEGENDARY';
     document.getElementById('correct-count').textContent = correct;
@@ -601,6 +602,9 @@ async function pollDemoState() {
 }
 setInterval(pollDemoState, 2000);
 pollDemoState();
+
+// Poll correctPicks from chain every 10s — independent of demo state
+setInterval(refreshProgressBar, 10000);
 
 async function init() {
   // load chain stats immediately, no wallet needed
@@ -678,6 +682,9 @@ async function init() {
   }).catch(() => {
     document.getElementById('stat-rank-sub').textContent = 'SUBGRAPH UNAVAILABLE';
   });
+
+  // re-sync bar from chain after initial render
+  setTimeout(refreshProgressBar, 1500);
 
   // upgrade button if threshold met
   if (correct >= threshold && tierName !== 'LEGENDARY') {
