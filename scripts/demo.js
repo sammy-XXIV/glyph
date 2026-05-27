@@ -271,39 +271,38 @@ async function score() {
     }
     process.stdout.write('\r' + ' '.repeat(40) + '\r');
 
-    // Fetch all predictions from The Graph (or fall back)
+    // 1. Query chain events directly (reliable, no subgraph lag)
     let preds = [];
+    try {
+      const filter = contract.filters.Predicted(null, m.id);
+      const logs   = await contract.queryFilter(filter, 31435500, 'latest');
+      for (const log of logs) {
+        preds.push({ player: log.args.player.toLowerCase(), pick: Number(log.args.pick) });
+      }
+      console.log(`  chain events: ${preds.length} pick(s) for match ${m.id}`);
+    } catch(e) {
+      console.log(`  chain query failed: ${e.shortMessage || e.message}`);
+    }
+
+    // 2. Supplement with subgraph (catches any the chain query missed)
     try {
       const data = await graphQuery(`{
         predictions(where: { matchId: "${m.id}" }, first: 1000) { player pick }
       }`);
-      preds = data.predictions || [];
+      for (const p of (data.predictions || [])) {
+        if (!preds.some(x => x.player === p.player.toLowerCase())) {
+          preds.push({ player: p.player.toLowerCase(), pick: Number(p.pick) });
+        }
+      }
     } catch {}
 
-    if (!preds.length) {
-      // fallback: subgraph unavailable â€” use picks we just submitted (bots only)
-      for (const bot of botWallets) {
-        const pick = botPicks?.[bot.address]?.[m.id];
-        if (pick !== undefined) preds.push({ player: bot.address.toLowerCase(), pick });
+    // 3. Fill bot picks from memory if still missing
+    for (const bot of botWallets) {
+      const pick = botPicks?.[bot.address]?.[m.id];
+      if (pick !== undefined && !preds.some(x => x.player === bot.address.toLowerCase())) {
+        preds.push({ player: bot.address.toLowerCase(), pick });
       }
     }
-
-    // Chain fallback: if player's pick is missing from subgraph, query event logs
-    const playerInPreds = preds.some(p => p.player.toLowerCase() === playerAddr);
-    if (!playerInPreds) {
-      try {
-        const filter = contract.filters.Predicted(playerAddr);
-        const logs = await contract.queryFilter(filter);
-        const log = logs.find(l => Number(l.args.matchId) === m.id);
-        if (log) {
-          preds.push({ player: playerAddr, pick: Number(log.args.pick) });
-          console.log(`  â„¹ï¸  Loaded your pick from chain events (subgraph lag)`);
-        }
-      } catch(e) {
-        console.log(`  âš ï¸  Could not query chain events: ${e.shortMessage || e.message}`);
-      }
-    }
-
     // Use forceResult if set on the match, otherwise follow bot 1's pick
     const bot1Addr = bot1.address.toLowerCase();
     const bot1Pred = preds.find(p => p.player.toLowerCase() === bot1Addr)
@@ -499,6 +498,7 @@ Glyph Demo Simulator
 } else {
   cmds[cmd]().catch(e => { console.error('âŒ', e.message); process.exit(1); });
 }
+
 
 
 

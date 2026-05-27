@@ -676,6 +676,29 @@ function flagImg(name) {
 const userPicks = {};
 const pending   = {};
 let demoState   = { phase:'idle', matchId:null, secondsLeft:0, nextMatchId:null, scored:[] };
+let _walletAddr = null;
+
+function _picksKey()   { return _walletAddr ? 'glyph_picks_'   + _walletAddr : null; }
+function _pendingKey() { return _walletAddr ? 'glyph_pending_' + _walletAddr : null; }
+
+function savePicks() {
+  const k = _picksKey(); if (!k) return;
+  try { localStorage.setItem(k, JSON.stringify(userPicks)); } catch {}
+}
+function savePending() {
+  const k = _pendingKey(); if (!k) return;
+  try { localStorage.setItem(k, JSON.stringify(pending)); } catch {}
+}
+function loadFromStorage() {
+  try {
+    const p = JSON.parse(localStorage.getItem(_picksKey()) || '{}');
+    Object.entries(p).forEach(([k, v]) => { userPicks[Number(k)] = v; });
+  } catch {}
+  try {
+    const p = JSON.parse(localStorage.getItem(_pendingKey()) || '{}');
+    Object.entries(p).forEach(([k, v]) => { pending[Number(k)] = v; });
+  } catch {}
+}
 
 function getMatch(id) { return MATCHES.find(m => m.id === id); }
 function fmt(s) { return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }
@@ -708,6 +731,7 @@ async function pollState() {
 function pick(matchId, choice) {
   if (pending[matchId] === choice) delete pending[matchId];
   else pending[matchId] = choice;
+  savePending();
   updateSubmitBar();
   renderLive();
 }
@@ -729,6 +753,8 @@ async function submitPicks() {
     }
     Object.assign(userPicks, pending);
     Object.keys(pending).forEach(k => delete pending[k]);
+    savePicks();
+    savePending();
     updateSubmitBar();
     renderLive();
     btn.textContent = 'SAVED ✓';
@@ -922,25 +948,30 @@ async function syncDemoButtons() {
 // ── Init ───────────────────────────────────────────────────────────────────
 async function init() {
   const addr = await GLYPH.getWallet();
+  _walletAddr = addr;
 
-  // Show demo controls if wallet connected
   if (addr) {
+    // Load from localStorage immediately (no network wait)
+    loadFromStorage();
+    updateSubmitBar();
+
     document.getElementById('demo-controls').style.display = 'flex';
     syncDemoButtons();
     setInterval(syncDemoButtons, 5000);
-  }
 
-  // Load any saved on-chain picks from subgraph
-  if (addr) {
+    // Merge on-chain picks from subgraph (fills in anything missing from storage)
     try {
       const preds = await GLYPH.getMyPredictions(addr);
       preds.forEach(p => {
         userPicks[Number(p.matchId)] = ['home','draw','away'][Number(p.pick)];
+        delete pending[Number(p.matchId)]; // confirmed on-chain, remove from pending
       });
+      savePicks();
+      savePending();
     } catch(_) {}
   }
   await pollState();
-  setInterval(pollState, 1000);
+  setInterval(pollState, 2000);
 }
 
 init();
