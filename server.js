@@ -11,6 +11,7 @@ const DEMO_SCRIPT = path.join(__dirname, 'scripts', 'demo.js');
 
 let demoProcess = null;
 let demoRunning = false;
+let demoPaused  = false;
 
 // In-memory state (Railway has ephemeral filesystem)
 let currentState = { phase: 'idle', matchId: null, secondsLeft: 0, nextMatchId: null, scored: [], ts: 0 };
@@ -41,11 +42,29 @@ function startDemo(playerAddr) {
 
 function stopDemo() {
   if (!demoRunning || !demoProcess) return { ok: false, message: 'No demo running' };
+  if (demoPaused) demoProcess.kill('SIGCONT');
   demoProcess.kill('SIGTERM');
   demoRunning = false;
+  demoPaused  = false;
   demoProcess = null;
   resetState();
   return { ok: true, message: 'Demo stopped' };
+}
+
+function pauseDemo() {
+  if (!demoRunning || !demoProcess) return { ok: false, message: 'No demo running' };
+  if (demoPaused) return { ok: false, message: 'Already paused' };
+  demoProcess.kill('SIGSTOP');
+  demoPaused = true;
+  return { ok: true, message: 'Demo paused' };
+}
+
+function resumeDemo() {
+  if (!demoRunning || !demoProcess) return { ok: false, message: 'No demo running' };
+  if (!demoPaused) return { ok: false, message: 'Not paused' };
+  demoProcess.kill('SIGCONT');
+  demoPaused = false;
+  return { ok: true, message: 'Demo resumed' };
 }
 
 const server = http.createServer((req, res) => {
@@ -76,9 +95,23 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'POST' && pathname === '/pause') {
+    const result = pauseDemo();
+    res.writeHead(result.ok ? 200 : 409, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(result));
+    return;
+  }
+
+  if (req.method === 'POST' && pathname === '/resume') {
+    const result = resumeDemo();
+    res.writeHead(result.ok ? 200 : 409, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(result));
+    return;
+  }
+
   if (pathname === '/status') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ running: demoRunning }));
+    res.end(JSON.stringify({ running: demoRunning, paused: demoPaused }));
     return;
   }
 

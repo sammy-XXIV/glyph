@@ -480,8 +480,10 @@ body::before {
 
   <!-- Demo controls -->
   <div class="demo-controls" id="demo-controls" style="display:none">
-    <button class="demo-btn start" id="btn-start" onclick="triggerDemo('start')">▶ START DEMO</button>
-    <button class="demo-btn stop"  id="btn-stop"  onclick="triggerDemo('stop')" disabled>■ STOP DEMO</button>
+    <button class="demo-btn start"  id="btn-start"  onclick="triggerDemo('start')">▶ START DEMO</button>
+    <button class="demo-btn stop"   id="btn-pause"  onclick="triggerDemo('pause')"  disabled>⏸ PAUSE</button>
+    <button class="demo-btn start"  id="btn-resume" onclick="triggerDemo('resume')" disabled style="display:none">▶ RESUME</button>
+    <button class="demo-btn stop"   id="btn-stop"   onclick="triggerDemo('stop')"   disabled>■ STOP</button>
   </div>
 
   <!-- Submit bar (shown when pending picks exist) -->
@@ -938,10 +940,13 @@ async function triggerDemo(action) {
 async function syncDemoButtons() {
   try {
     const res  = await fetch(`${DEMO_SERVER}/status`);
-    const data = await res.json();
-    const running = data.running;
-    document.getElementById('btn-start').disabled = running;
-    document.getElementById('btn-stop').disabled  = !running;
+    const { running, paused } = await res.json();
+    document.getElementById('btn-start').disabled  = running;
+    document.getElementById('btn-pause').disabled  = !running || paused;
+    document.getElementById('btn-pause').style.display  = !paused ? 'inline-flex' : 'none';
+    document.getElementById('btn-resume').disabled = !running || !paused;
+    document.getElementById('btn-resume').style.display = paused  ? 'inline-flex' : 'none';
+    document.getElementById('btn-stop').disabled   = !running;
   } catch {}
 }
 
