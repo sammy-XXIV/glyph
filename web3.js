@@ -1,8 +1,8 @@
-// Glyph — shared Web3 module
+﻿// Glyph â€” shared Web3 module
 
 const GLYPH = (() => {
 
-  const CONTRACT_ADDRESS = '0x6d69a00107Ed9d487904700a00E31e657dA8a392';
+  const CONTRACT_ADDRESS = '0x95D4d4b9fD838Edf6acb71721f2Df1d4966aE088';
   const USDT_ADDRESS    = '0x9e29b3AaDa05Bf2D2c827Af80Bd28Dc0b9b4FB0c';
   const XLAYER_TESTNET = {
     chainId: '0x7A0',
@@ -12,7 +12,7 @@ const GLYPH = (() => {
     blockExplorerUrls: ['https://www.oklink.com/xlayer-test'],
   };
 
-  const GRAPH_URL = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.6';
+  const GRAPH_URL = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.7';
   const MINT_PRICE = BigInt('500000'); // 0.5 USDT (6 decimals)
   const USDT_ABI = [
     'function approve(address spender, uint256 amount) external returns (bool)',
@@ -45,7 +45,7 @@ const GLYPH = (() => {
   let contract = null;
   let wallet   = null;
 
-  // ── Detect any injected wallet (MetaMask, OKX, Rabby, etc) ───────────────
+  // â”€â”€ Detect any injected wallet (MetaMask, OKX, Rabby, etc) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   function getEthereum() {
     if (window.ethereum) return window.ethereum;
     // EIP-6963: check providers array
@@ -57,7 +57,7 @@ const GLYPH = (() => {
     provider = new ethers.BrowserProvider(eth);
   }
 
-  // ── Connect ───────────────────────────────────────────────────────────────
+  // â”€â”€ Connect â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async function connect() {
     const eth = getEthereum();
     if (!eth) {
@@ -107,7 +107,7 @@ const GLYPH = (() => {
     return wallet;
   }
 
-  // ── Get already-connected wallet (no popup) ───────────────────────────────
+  // â”€â”€ Get already-connected wallet (no popup) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async function getWallet() {
     if (wallet) return wallet;
     const eth = getEthereum();
@@ -124,7 +124,7 @@ const GLYPH = (() => {
 
   function _updateNavWallet(addr) {
     const short = addr.slice(0, 6) + '...' + addr.slice(-4);
-    // Only update the drawer — nav.js owns wallet-display and manages its dropdown
+    // Only update the drawer â€” nav.js owns wallet-display and manages its dropdown
     const drawer = document.getElementById('drawer-wallet-display');
     if (drawer) drawer.textContent = short;
     // For wallet-display, update only the text node to preserve the dropdown child
@@ -135,7 +135,7 @@ const GLYPH = (() => {
     }
   }
 
-  // ── Contract writes ───────────────────────────────────────────────────────
+  // â”€â”€ Contract writes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async function _ensureContract() {
     if (contract) return;
     const addr = await getWallet();
@@ -194,7 +194,7 @@ const GLYPH = (() => {
     return tx.wait();
   }
 
-  // ── Contract reads ────────────────────────────────────────────────────────
+  // â”€â”€ Contract reads â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async function getPlayerData(addr) {
     const eth = getEthereum();
     if (!eth) return null;
@@ -241,7 +241,7 @@ const GLYPH = (() => {
     };
   }
 
-  // ── The Graph ─────────────────────────────────────────────────────────────
+  // â”€â”€ The Graph â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async function graphQuery(query) {
     const res = await fetch(GRAPH_URL, {
       method: 'POST',
@@ -301,3 +301,5 @@ const GLYPH = (() => {
     TIER_NAMES, THRESHOLDS,
   };
 })();
+
+

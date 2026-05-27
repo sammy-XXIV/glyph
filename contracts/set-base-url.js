@@ -1,11 +1,11 @@
-require('dotenv').config();
+﻿require('dotenv').config();
 const { ethers } = require('ethers');
 
 async function main() {
   const provider = new ethers.JsonRpcProvider('https://testrpc.xlayer.tech/terigon');
   const signer = new ethers.Wallet(process.env.DEPLOYER_PRIVATE_KEY, provider);
   const contract = new ethers.Contract(
-    '0x6d69a00107Ed9d487904700a00E31e657dA8a392',
+    '0x95D4d4b9fD838Edf6acb71721f2Df1d4966aE088',
     ['function setBaseImageUrl(string) external'],
     signer
   );
@@ -14,3 +14,4 @@ async function main() {
   console.log('Done:', tx.hash);
 }
 main().catch(console.error);
+

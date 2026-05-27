@@ -1,9 +1,9 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 // Glyph demo simulator
 // Usage:
-//   OWNER_KEY=0x... node demo.js setup               → generate bots, fund, mint, predict
-//   OWNER_KEY=0x... PLAYER=0x... node demo.js score  → run tournament match by match
-//   OWNER_KEY=0x... PLAYER=0x... node demo.js status → show progress bars
+//   OWNER_KEY=0x... node demo.js setup               â†’ generate bots, fund, mint, predict
+//   OWNER_KEY=0x... PLAYER=0x... node demo.js score  â†’ run tournament match by match
+//   OWNER_KEY=0x... PLAYER=0x... node demo.js status â†’ show progress bars
 
 import { ethers } from 'ethers';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
@@ -13,9 +13,9 @@ import readline from 'readline';
 
 const __dirname  = dirname(fileURLToPath(import.meta.url));
 
-const CA         = '0x6d69a00107Ed9d487904700a00E31e657dA8a392';
+const CA         = '0x95D4d4b9fD838Edf6acb71721f2Df1d4966aE088';
 const USDT_CA    = '0x9e29b3AaDa05Bf2D2c827Af80Bd28Dc0b9b4FB0c';
-const GRAPH      = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.6';
+const GRAPH      = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.7';
 const BOT_KEYS   = [
   '0x583dc5b9dc11530013bd427b8831aca5bbaddc3e4ce74fc0ad943dadcd461878',
   '0x1a55a9daad0d9fc46ce8bdaa33df0f2f734cd3a6e8a223f0bb9bbd4c470f7177',
@@ -25,10 +25,10 @@ const BOTS_FILE  = join(__dirname, 'bots.json');
 const STATE_FILE = join(__dirname, '..', 'state.json');
 
 const DEMO_MATCHES = [
-  { id:1,  home:'USA',       away:'Mexico',    group:'GROUP A · MD1', forceResult:'home' },
-  { id:2,  home:'Canada',    away:'Panama',    group:'GROUP A · MD1' },
-  { id:14, home:'Paraguay',  away:'Venezuela', group:'GROUP C · MD1' },
-  { id:20, home:'Senegal',   away:'Mali',      group:'GROUP D · MD1' },
+  { id:1,  home:'USA',       away:'Mexico',    group:'GROUP A Â· MD1', forceResult:'home' },
+  { id:2,  home:'Canada',    away:'Panama',    group:'GROUP A Â· MD1', forceResult:'home' },
+  { id:14, home:'Paraguay',  away:'Venezuela', group:'GROUP C Â· MD1', forceResult:'home' },
+  { id:20, home:'Senegal',   away:'Mali',      group:'GROUP D Â· MD1', forceResult:'home' },
 ];
 
 const PICK_LABELS = ['HOME WIN', 'DRAW', 'AWAY WIN'];
@@ -87,10 +87,10 @@ function prompt(q) {
 function cls() { process.stdout.write('\x1Bc'); }
 
 function bar(correct, threshold) {
-  if (!threshold) return '██████████ LEGENDARY';
+  if (!threshold) return 'â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ LEGENDARY';
   const pct  = Math.min(1, correct / threshold);
   const fill = Math.round(pct * 20);
-  return '█'.repeat(fill) + '░'.repeat(20 - fill) + ` ${correct}/${threshold}`;
+  return 'â–ˆ'.repeat(fill) + 'â–‘'.repeat(20 - fill) + ` ${correct}/${threshold}`;
 }
 
 function randomScore(forceWinner = null) {
@@ -104,10 +104,10 @@ function randomScore(forceWinner = null) {
   return { h, a, winner, code: ['home','draw','away'].indexOf(winner) };
 }
 
-// ── SETUP ─────────────────────────────────────────────────────────────────
+// â”€â”€ SETUP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function setup() {
   const ownerKey = process.env.OWNER_KEY;
-  if (!ownerKey) { console.error('❌  Set OWNER_KEY env var'); process.exit(1); }
+  if (!ownerKey) { console.error('âŒ  Set OWNER_KEY env var'); process.exit(1); }
 
   const provider = await getProvider();
   const owner    = new ethers.Wallet(ownerKey, provider);
@@ -115,12 +115,12 @@ async function setup() {
 
   const contractOwner = await contract.owner();
   if (contractOwner.toLowerCase() !== owner.address.toLowerCase()) {
-    console.error(`❌  ${owner.address} is not the contract owner`);
+    console.error(`âŒ  ${owner.address} is not the contract owner`);
     process.exit(1);
   }
 
   const bal = await provider.getBalance(owner.address);
-  console.log(`\n✓ Owner: ${owner.address}`);
+  console.log(`\nâœ“ Owner: ${owner.address}`);
   console.log(`  Balance: ${ethers.formatEther(bal)} OKB\n`);
 
   const bots = BOT_KEYS.map(k => new ethers.Wallet(k, provider));
@@ -132,12 +132,12 @@ async function setup() {
   for (const bot of bots) {
     const tokenId = await contract.playerToken(bot.address);
     if (tokenId > 0n) {
-      console.log(`  ↷ ${bot.address.slice(0, 10)}... already minted token #${tokenId}`);
+      console.log(`  â†· ${bot.address.slice(0, 10)}... already minted token #${tokenId}`);
       continue;
     }
     const usdt = new ethers.Contract(USDT_CA, USDT_ABI, bot);
     const bal  = await usdt.balanceOf(bot.address);
-    if (bal < MINT_PRICE) { console.log(`  ✗ ${bot.address.slice(0, 10)}... insufficient USDT`); continue; }
+    if (bal < MINT_PRICE) { console.log(`  âœ— ${bot.address.slice(0, 10)}... insufficient USDT`); continue; }
     const allowance = await usdt.allowance(bot.address, CA);
     if (allowance < MINT_PRICE) {
       const approveTx = await usdt.approve(CA, MINT_PRICE);
@@ -147,7 +147,7 @@ async function setup() {
     const tx = await bc.mint();
     await tx.wait();
     const newToken = await contract.playerToken(bot.address);
-    console.log(`  ✓ ${bot.address.slice(0, 10)}... → token #${newToken}`);
+    console.log(`  âœ“ ${bot.address.slice(0, 10)}... â†’ token #${newToken}`);
     await sleep(1000);
   }
 
@@ -155,20 +155,20 @@ async function setup() {
     bots: bots.map(b => ({ address: b.address, privateKey: b.privateKey })),
   }, null, 2));
 
-  console.log('\n✓ Setup complete! bots.json saved.');
-  console.log('\n── NEXT STEPS ───────────────────────────────────────────────');
-  console.log('1. Open the site → mint your NFT → make your predictions');
+  console.log('\nâœ“ Setup complete! bots.json saved.');
+  console.log('\nâ”€â”€ NEXT STEPS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€');
+  console.log('1. Open the site â†’ mint your NFT â†’ make your predictions');
   console.log('\n2. Then run the tournament (bots predict each match live):');
   console.log('   OWNER_KEY=... PLAYER=<your-address> node demo.js score');
 }
 
-// ── SCORE ─────────────────────────────────────────────────────────────────
+// â”€â”€ SCORE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function score() {
   const ownerKey    = process.env.OWNER_KEY;
   const playerAddr  = process.env.PLAYER?.toLowerCase();
-  const playerKey   = process.env.PLAYER_KEY; // optional — enables auto-upgrade for you
-  if (!ownerKey)   { console.error('❌  Set OWNER_KEY env var'); process.exit(1); }
-  if (!playerAddr) { console.error('❌  Set PLAYER=<your-wallet> env var'); process.exit(1); }
+  const playerKey   = process.env.PLAYER_KEY; // optional â€” enables auto-upgrade for you
+  if (!ownerKey)   { console.error('âŒ  Set OWNER_KEY env var'); process.exit(1); }
+  if (!playerAddr) { console.error('âŒ  Set PLAYER=<your-wallet> env var'); process.exit(1); }
 
   const provider = await getProvider();
   const owner    = new ethers.Wallet(ownerKey, provider);
@@ -176,7 +176,7 @@ async function score() {
 
   const botWallets = BOT_KEYS.map(k => new ethers.Wallet(k, provider));
 
-  // Build signer map: address → wallet (for upgrade calls)
+  // Build signer map: address â†’ wallet (for upgrade calls)
   const signers = {};
   if (playerKey) {
     const pw = new ethers.Wallet(playerKey, provider);
@@ -200,15 +200,15 @@ async function score() {
     const signer = signers[addr];
     if (!signer) return; // no key available
     upgraded.add(addr);
-    console.log(`\n  ⬆️  UPGRADE: ${label} hit ${picks}/${threshold} — upgrading card...`);
+    console.log(`\n  â¬†ï¸  UPGRADE: ${label} hit ${picks}/${threshold} â€” upgrading card...`);
     try {
       const c = new ethers.Contract(CA, ABI, signer);
       const tx = await c.upgrade();
       await tx.wait();
       const newTier = Number(await contract.tier(await contract.playerToken(addr)));
-      console.log(`  ✓  ${label} is now ${TIER_NAMES[newTier]}!\n`);
+      console.log(`  âœ“  ${label} is now ${TIER_NAMES[newTier]}!\n`);
     } catch(e) {
-      console.log(`  ⚠️  Upgrade failed (already upgraded?): ${e.shortMessage || e.message}\n`);
+      console.log(`  âš ï¸  Upgrade failed (already upgraded?): ${e.shortMessage || e.message}\n`);
     }
   }
 
@@ -219,9 +219,9 @@ async function score() {
 
   // Initial 2-minute countdown before the first match
   const first = DEMO_MATCHES[0];
-  console.log(`\n  ⏳  First match starting in 2 minutes: ${first.home.toUpperCase()} vs ${first.away.toUpperCase()}\n`);
+  console.log(`\n  â³  First match starting in 2 minutes: ${first.home.toUpperCase()} vs ${first.away.toUpperCase()}\n`);
   for (let s = 120; s > 0; s--) {
-    process.stdout.write(`\r  ⏳  Match starts in ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}   `);
+    process.stdout.write(`\r  â³  Match starts in ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}   `);
     writeState({ phase:'break', secondsLeft:s, nextMatchId:first.id });
     await sleep(1000);
   }
@@ -232,13 +232,13 @@ async function score() {
     const next = DEMO_MATCHES[i + 1];
 
     cls();
-    console.log('⚽  GLYPH WC 2026 — LIVE SIMULATION\n');
-    console.log(`${'─'.repeat(52)}`);
-    console.log(`  ${m.group} · MATCHDAY 1`);
+    console.log('âš½  GLYPH WC 2026 â€” LIVE SIMULATION\n');
+    console.log(`${'â”€'.repeat(52)}`);
+    console.log(`  ${m.group} Â· MATCHDAY 1`);
     console.log(`  ${m.home.toUpperCase()}  vs  ${m.away.toUpperCase()}`);
-    console.log(`${'─'.repeat(52)}\n`);
+    console.log(`${'â”€'.repeat(52)}\n`);
 
-    // Bot 1 picks randomly — result will be forced to match it (always correct)
+    // Bot 1 picks randomly â€” result will be forced to match it (always correct)
     // Bot 2 mirrors bot 1 only on match 0 (correct once), picks wrong otherwise
     // Bot 3 does not predict
     const [bot1, bot2] = botWallets;
@@ -258,14 +258,14 @@ async function score() {
         await tx.wait();
         process.stdout.write('.');
       } catch(e) {
-        process.stdout.write('⚠');
+        process.stdout.write('âš ');
       }
     }
-    console.log(' ✓\n');
+    console.log(' âœ“\n');
 
-    console.log('  ● MATCH IN PROGRESS...\n');
+    console.log('  â— MATCH IN PROGRESS...\n');
     for (let s = 120; s > 0; s--) {
-      process.stdout.write(`\r  ⏱  ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')} remaining   `);
+      process.stdout.write(`\r  â±  ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')} remaining   `);
       writeState({ phase:'live', matchId:m.id, secondsLeft:s });
       await sleep(1000);
     }
@@ -281,7 +281,7 @@ async function score() {
     } catch {}
 
     if (!preds.length) {
-      // fallback: subgraph unavailable — use picks we just submitted (bots only)
+      // fallback: subgraph unavailable â€” use picks we just submitted (bots only)
       for (const bot of botWallets) {
         const pick = botPicks?.[bot.address]?.[m.id];
         if (pick !== undefined) preds.push({ player: bot.address.toLowerCase(), pick });
@@ -297,10 +297,10 @@ async function score() {
         const log = logs.find(l => Number(l.args.matchId) === m.id);
         if (log) {
           preds.push({ player: playerAddr, pick: Number(log.args.pick) });
-          console.log(`  ℹ️  Loaded your pick from chain events (subgraph lag)`);
+          console.log(`  â„¹ï¸  Loaded your pick from chain events (subgraph lag)`);
         }
       } catch(e) {
-        console.log(`  ⚠️  Could not query chain events: ${e.shortMessage || e.message}`);
+        console.log(`  âš ï¸  Could not query chain events: ${e.shortMessage || e.message}`);
       }
     }
 
@@ -345,16 +345,16 @@ async function score() {
 
     // Show result
     cls();
-    console.log('⚽  GLYPH WC 2026 — LIVE SIMULATION\n');
-    console.log(`${'─'.repeat(52)}`);
-    console.log(`  ${m.group} · MATCHDAY 1`);
+    console.log('âš½  GLYPH WC 2026 â€” LIVE SIMULATION\n');
+    console.log(`${'â”€'.repeat(52)}`);
+    console.log(`  ${m.group} Â· MATCHDAY 1`);
     console.log(`  ${m.home.toUpperCase()}  vs  ${m.away.toUpperCase()}`);
-    console.log(`${'─'.repeat(52)}`);
-    console.log(`\n  ⬛  FULL TIME:  ${resultLabel}\n`);
+    console.log(`${'â”€'.repeat(52)}`);
+    console.log(`\n  â¬›  FULL TIME:  ${resultLabel}\n`);
 
-    if (playerHit === true)  console.log('  ★  YOUR PICK WAS CORRECT! +1 to your progress bar');
-    else if (playerHit === false) console.log(`  ✗  Your pick: ${PICK_LABELS[playerPick]} — wrong`);
-    else console.log('  —  No pick found for this match');
+    if (playerHit === true)  console.log('  â˜…  YOUR PICK WAS CORRECT! +1 to your progress bar');
+    else if (playerHit === false) console.log(`  âœ—  Your pick: ${PICK_LABELS[playerPick]} â€” wrong`);
+    else console.log('  â€”  No pick found for this match');
 
     // Auto-upgrade bots + player if threshold hit
     for (const bot of botWallets) {
@@ -369,22 +369,22 @@ async function score() {
     if (tierId > 0n) { tierNum = Number(await contract.tier(tierId)); threshold = THRESHOLDS[tierNum] ?? null; }
 
     console.log('\n  YOUR PROGRESS:');
-    console.log(`  ${TIER_NAMES[tierNum]} → ${TIER_NAMES[Math.min(4, tierNum + 1)]}`);
+    console.log(`  ${TIER_NAMES[tierNum]} â†’ ${TIER_NAMES[Math.min(4, tierNum + 1)]}`);
     console.log(`  ${bar(Number(onChain), threshold)}\n`);
 
     if (next) {
       // 15-second result display window before break countdown starts
       for (let s = 15; s > 0; s--) {
-        process.stdout.write(`\r  📊  Results showing on site in ${s}s...   `);
+        process.stdout.write(`\r  ðŸ“Š  Results showing on site in ${s}s...   `);
         await sleep(1000);
       }
       process.stdout.write('\r' + ' '.repeat(50) + '\r');
 
-      console.log(`\n${'─'.repeat(52)}`);
-      console.log(`  NEXT UP: ${next.group} · ${next.home.toUpperCase()} vs ${next.away.toUpperCase()}`);
-      console.log(`${'─'.repeat(52)}\n`);
+      console.log(`\n${'â”€'.repeat(52)}`);
+      console.log(`  NEXT UP: ${next.group} Â· ${next.home.toUpperCase()} vs ${next.away.toUpperCase()}`);
+      console.log(`${'â”€'.repeat(52)}\n`);
       for (let s = 120; s > 0; s--) {
-        process.stdout.write(`\r  ⏳  Next match in ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}   `);
+        process.stdout.write(`\r  â³  Next match in ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}   `);
         writeState({ phase:'break', secondsLeft:s, nextMatchId:next.id });
         await sleep(1000);
       }
@@ -395,19 +395,19 @@ async function score() {
 
   // Final scoreboard
   cls();
-  console.log('⚽  GLYPH WC 2026 — SIMULATION COMPLETE\n');
-  console.log(`${'─'.repeat(52)}`);
+  console.log('âš½  GLYPH WC 2026 â€” SIMULATION COMPLETE\n');
+  console.log(`${'â”€'.repeat(52)}`);
   console.log('  MATCH RESULTS RECAP');
-  console.log(`${'─'.repeat(52)}`);
+  console.log(`${'â”€'.repeat(52)}`);
   for (const r of results) {
-    const pickTag = r.playerHit === true ? '✓' : r.playerHit === false ? '✗' : '—';
+    const pickTag = r.playerHit === true ? 'âœ“' : r.playerHit === false ? 'âœ—' : 'â€”';
     const score   = `${r.h}-${r.a}`;
     console.log(`  [${pickTag}] ${r.m.group} MD1  ${r.m.home} ${score} ${r.m.away}`);
   }
 
-  console.log(`\n${'─'.repeat(52)}`);
+  console.log(`\n${'â”€'.repeat(52)}`);
   console.log('  YOUR FINAL STATS');
-  console.log(`${'─'.repeat(52)}`);
+  console.log(`${'â”€'.repeat(52)}`);
 
   const onChain = await contract.correctPicks(playerAddr);
   const tierId  = await contract.playerToken(playerAddr);
@@ -419,45 +419,45 @@ async function score() {
   console.log(`  Progress: ${bar(Number(onChain), threshold)}`);
 
   if (upgraded.has(playerAddr)) {
-    console.log(`\n  🏆  Card upgraded during the tournament! Check the dashboard.\n`);
+    console.log(`\n  ðŸ†  Card upgraded during the tournament! Check the dashboard.\n`);
   } else if (threshold && Number(onChain) >= threshold) {
-    console.log(`\n  🏆  UPGRADE READY! Run: PLAYER_KEY=0x... node demo.js upgrade\n`);
+    console.log(`\n  ðŸ†  UPGRADE READY! Run: PLAYER_KEY=0x... node demo.js upgrade\n`);
   } else {
     console.log(`\n  Open the dashboard to see your progress bar.\n`);
   }
 }
 
-// ── UPGRADE ───────────────────────────────────────────────────────────────
+// â”€â”€ UPGRADE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function upgrade() {
   const playerKey = process.env.PLAYER_KEY;
-  if (!playerKey) { console.error('❌  Set PLAYER_KEY=0x... env var'); process.exit(1); }
+  if (!playerKey) { console.error('âŒ  Set PLAYER_KEY=0x... env var'); process.exit(1); }
   const provider = await getProvider();
   const wallet   = new ethers.Wallet(playerKey, provider);
   const contract = new ethers.Contract(CA, ABI, wallet);
   const tokenId  = await contract.playerToken(wallet.address);
-  if (tokenId === 0n) { console.error('❌  No card found for this wallet'); process.exit(1); }
+  if (tokenId === 0n) { console.error('âŒ  No card found for this wallet'); process.exit(1); }
   const tierNum   = Number(await contract.tier(tokenId));
   const picks     = Number(await contract.correctPicks(wallet.address));
   const threshold = THRESHOLDS[tierNum];
   console.log(`\n  Card: token #${tokenId}  Tier: ${TIER_NAMES[tierNum]}  Correct picks: ${picks}`);
-  if (!threshold) { console.log('  Already LEGENDARY — nothing to upgrade.'); return; }
+  if (!threshold) { console.log('  Already LEGENDARY â€” nothing to upgrade.'); return; }
   if (picks < threshold) {
     console.log(`  Need ${threshold - picks} more correct picks to upgrade. (${picks}/${threshold})`);
     return;
   }
-  console.log(`  Upgrading ${TIER_NAMES[tierNum]} → ${TIER_NAMES[tierNum + 1]}...`);
+  console.log(`  Upgrading ${TIER_NAMES[tierNum]} â†’ ${TIER_NAMES[tierNum + 1]}...`);
   const tx = await contract.upgrade();
   await tx.wait();
   const newToken = await contract.playerToken(wallet.address);
   const newTier  = Number(await contract.tier(newToken));
-  console.log(`  ✓ Upgraded! New tier: ${TIER_NAMES[newTier]}\n`);
+  console.log(`  âœ“ Upgraded! New tier: ${TIER_NAMES[newTier]}\n`);
 }
 
-// ── STATUS ────────────────────────────────────────────────────────────────
+// â”€â”€ STATUS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function status() {
   const ownerKey   = process.env.OWNER_KEY;
   const playerAddr = process.env.PLAYER;
-  if (!ownerKey) { console.error('❌  Set OWNER_KEY env var'); process.exit(1); }
+  if (!ownerKey) { console.error('âŒ  Set OWNER_KEY env var'); process.exit(1); }
 
   const provider = await getProvider();
   const owner    = new ethers.Wallet(ownerKey, provider);
@@ -468,10 +468,10 @@ async function status() {
   BOT_KEYS.map(k => new ethers.Wallet(k)).forEach((b, i) => addrs.push({ addr: b.address.toLowerCase(), tag: `BOT ${i+1}` }));
   if (!addrs.length) { console.log('Set PLAYER=<address> or run setup first.'); return; }
 
-  console.log('\n── PLAYER STATUS ───────────────────────────────────────');
+  console.log('\nâ”€â”€ PLAYER STATUS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€');
   for (const { addr, tag } of addrs) {
     const tokenId = await contract.playerToken(addr);
-    if (tokenId === 0n) { console.log(`  [${tag}] ${addr.slice(0,10)}... — no card`); continue; }
+    if (tokenId === 0n) { console.log(`  [${tag}] ${addr.slice(0,10)}... â€” no card`); continue; }
     const tierNum   = Number(await contract.tier(tokenId));
     const picks     = Number(await contract.correctPicks(addr));
     const threshold = THRESHOLDS[tierNum] ?? null;
@@ -480,7 +480,7 @@ async function status() {
   console.log('');
 }
 
-// ── MAIN ──────────────────────────────────────────────────────────────────
+// â”€â”€ MAIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const cmd = process.argv[2];
 const cmds = { setup, score, status, upgrade };
 if (!cmds[cmd]) {
@@ -494,8 +494,10 @@ Glyph Demo Simulator
 
   OWNER_KEY=0x...    private key of contract owner (required)
   PLAYER=0x...       your wallet address (score/status)
-  PLAYER_KEY=0x...   your private key — enables auto-upgrade mid-demo
+  PLAYER_KEY=0x...   your private key â€” enables auto-upgrade mid-demo
 `);
 } else {
-  cmds[cmd]().catch(e => { console.error('❌', e.message); process.exit(1); });
+  cmds[cmd]().catch(e => { console.error('âŒ', e.message); process.exit(1); });
 }
+
+

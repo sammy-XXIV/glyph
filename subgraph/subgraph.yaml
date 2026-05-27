@@ -1,4 +1,4 @@
-specVersion: 0.0.5
+﻿specVersion: 0.0.5
 schema:
   file: ./schema.graphql
 dataSources:
@@ -6,9 +6,9 @@ dataSources:
     name: Glyph
     network: xlayer-sepolia
     source:
-      address: "0x6d69a00107Ed9d487904700a00E31e657dA8a392"
+      address: "0x95D4d4b9fD838Edf6acb71721f2Df1d4966aE088"
       abi: Glyph
-      startBlock: 0
+      startBlock: 31435500
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -33,3 +33,4 @@ dataSources:
         - event: PrizeClaimed(indexed address,uint256)
           handler: handlePrizeClaimed
       file: ./src/mapping.ts
+
