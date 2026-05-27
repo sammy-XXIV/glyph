@@ -336,7 +336,7 @@ body::before {
       <div class="progress-header">
         <div>
           <div class="section-label">PROGRESS TO NEXT TIER</div>
-          <div class="next-tier">COMMON â†’ <span>UNCOMMON</span></div>
+          <div class="next-tier">COMMON → <span>UNCOMMON</span></div>
         </div>
         <div class="progress-count">
           <strong id="correct-count">3</strong>
@@ -349,7 +349,7 @@ body::before {
       <div class="bar-labels">
         <span>0</span>
         <span>5</span>
-        <span>10 â†’ UNCOMMON</span>
+        <span>10 → UNCOMMON</span>
       </div>
     </div>
 
@@ -416,7 +416,7 @@ body::before {
 
     <!-- predict CTA -->
     <button class="predict-btn" onclick="window.location.href='predictions.html'">
-      MAKE PREDICTIONS â†’
+      MAKE PREDICTIONS →
     </button>
 
   </div>
@@ -573,7 +573,7 @@ async function refreshProgressBar() {
     const nextTier  = TIER_NAMES[player.tier + 1] || 'LEGENDARY';
     document.getElementById('correct-count').textContent = correct;
     document.querySelector('.progress-count span').textContent = ` / ${threshold} correct`;
-    document.querySelector('.bar-labels').innerHTML = `<span>0</span><span>${Math.round(threshold/2)}</span><span>${threshold} â†’ ${nextTier}</span>`;
+    document.querySelector('.bar-labels').innerHTML = `<span>0</span><span>${Math.round(threshold/2)}</span><span>${threshold} → ${nextTier}</span>`;
     document.getElementById('bar-fill').style.width = pct + '%';
     document.getElementById('stat-correct').textContent = correct;
   } catch {}
@@ -648,10 +648,10 @@ async function init() {
       <div class="next-tier" style="margin-top:8px;font-size:22px">â˜… <span>LEGENDARY</span></div>
       <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,0.3);margin-top:12px">YOU ARE ELIGIBLE TO CLAIM THE PRIZE POOL</div>`;
   } else {
-    document.querySelector('.next-tier').innerHTML = `${tierName} â†’ <span>${nextTier}</span>`;
+    document.querySelector('.next-tier').innerHTML = `${tierName} → <span>${nextTier}</span>`;
     document.getElementById('correct-count').textContent = correct;
     document.querySelector('.progress-count span').textContent = ` / ${threshold} correct`;
-    document.querySelector('.bar-labels').innerHTML = `<span>0</span><span>${Math.round(threshold/2)}</span><span>${threshold} â†’ ${nextTier}</span>`;
+    document.querySelector('.bar-labels').innerHTML = `<span>0</span><span>${Math.round(threshold/2)}</span><span>${threshold} → ${nextTier}</span>`;
     setTimeout(() => { document.getElementById('bar-fill').style.width = pct + '%'; }, 400);
   }
 
@@ -691,7 +691,7 @@ async function init() {
     const upgradeBtn = document.createElement('button');
     upgradeBtn.className = 'predict-btn';
     upgradeBtn.style.background = 'linear-gradient(135deg,rgba(99,102,241,0.3),rgba(139,92,246,0.3))';
-    upgradeBtn.textContent = `UPGRADE TO ${nextTier} â†’`;
+    upgradeBtn.textContent = `UPGRADE TO ${nextTier} →`;
     upgradeBtn.onclick = async () => {
       upgradeBtn.disabled = true;
       upgradeBtn.textContent = 'UPGRADING...';
@@ -701,7 +701,7 @@ async function init() {
       } catch(e) {
         alert('Upgrade failed: ' + (e.reason || e.message));
         upgradeBtn.disabled = false;
-        upgradeBtn.textContent = `UPGRADE TO ${nextTier} â†’`;
+        upgradeBtn.textContent = `UPGRADE TO ${nextTier} →`;
       }
     };
     document.querySelector('.stats-col').appendChild(upgradeBtn);
