@@ -214,7 +214,8 @@ async function score() {
 
   let playerCorrect = 0;
   let playerTotal   = 0;
-  const results = [];
+  const results   = [];
+  const botPicks  = {};
 
   // Initial 2-minute countdown before the first match
   const first = DEMO_MATCHES[0];
@@ -240,7 +241,6 @@ async function score() {
     // Bot 1 picks randomly — result will be forced to match it (always correct)
     // Bot 2 mirrors bot 1 only on match 0 (correct once), picks wrong otherwise
     // Bot 3 does not predict
-    if (!state.botPicks) state.botPicks = {};
     const [bot1, bot2] = botWallets;
     const bot1Pick = Math.floor(Math.random() * 3);
     const bot2Pick = i === 0 ? bot1Pick : (bot1Pick + 1) % 3;
@@ -250,8 +250,8 @@ async function score() {
     ];
     process.stdout.write('  Bots placing picks... ');
     for (const { bot, pick } of botsToPredict) {
-      if (!state.botPicks[bot.address]) state.botPicks[bot.address] = {};
-      state.botPicks[bot.address][m.id] = pick;
+      if (!botPicks[bot.address]) botPicks[bot.address] = {};
+      botPicks[bot.address][m.id] = pick;
       try {
         const bc = new ethers.Contract(CA, ABI, new ethers.Wallet(bot.privateKey, provider));
         const tx = await bc.predict(m.id, pick);
@@ -283,7 +283,7 @@ async function score() {
     if (!preds.length) {
       // fallback: subgraph unavailable — use picks we just submitted (bots only)
       for (const bot of botWallets) {
-        const pick = state.botPicks?.[bot.address]?.[m.id];
+        const pick = botPicks?.[bot.address]?.[m.id];
         if (pick !== undefined) preds.push({ player: bot.address.toLowerCase(), pick });
       }
     }
