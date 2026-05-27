@@ -393,7 +393,7 @@ body::before {
 
     <!-- upcoming match -->
     <div id="next-match-section" style="display:none">
-      <div class="section-label" style="margin-bottom:10px">NEXT MATCH TO PREDICT</div>
+      <div class="section-label" style="margin-bottom:10px" id="nm-section-label">NEXT MATCH TO PREDICT</div>
       <div class="match-teaser">
         <div class="match-team">
           <img id="nm-home-flag" style="width:36px;height:27px;object-fit:cover;border-radius:3px" src="" alt="">
@@ -409,7 +409,7 @@ body::before {
             <div class="kick-time" id="nm-time">—</div>
             <div class="match-label" id="nm-label">—</div>
           </div>
-          <span class="predict-tag">OPEN</span>
+          <span class="predict-tag" id="nm-status-tag">OPEN</span>
         </div>
       </div>
     </div>
@@ -496,9 +496,71 @@ function populateNextMatch() {
   document.getElementById('nm-away').textContent = m.away.toUpperCase();
   document.getElementById('nm-time').textContent = m.time + ' UTC';
   document.getElementById('nm-label').textContent = m.group;
+  document.getElementById('nm-section-label').textContent = 'NEXT MATCH TO PREDICT';
+  document.getElementById('nm-status-tag').textContent = 'OPEN';
+  document.getElementById('nm-status-tag').style.cssText = '';
   document.getElementById('next-match-section').style.display = 'block';
 }
 populateNextMatch();
+
+// ── Demo state sync ────────────────────────────────────────────────────────
+const DEMO_SERVER  = 'https://glyph-demo-production.up.railway.app';
+const DEMO_MATCHES = [
+  { id:1,  home:'USA',       away:'Mexico',    group:'GROUP A · MD1' },
+  { id:2,  home:'Canada',    away:'Panama',    group:'GROUP A · MD1' },
+  { id:14, home:'Paraguay',  away:'Venezuela', group:'GROUP C · MD1' },
+  { id:20, home:'Senegal',   away:'Mali',      group:'GROUP D · MD1' },
+];
+function getMatch(id) { return DEMO_MATCHES.find(m => m.id === id); }
+function fmt(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+function applyDemoState(s) {
+  if (s.ts && s.secondsLeft > 0) {
+    const elapsed = Math.round((Date.now() - s.ts) / 1000);
+    s.secondsLeft = Math.max(0, s.secondsLeft - elapsed);
+  }
+  const { phase, matchId, secondsLeft, nextMatchId } = s;
+  let m = null;
+  if (phase === 'live' || phase === 'scored') m = getMatch(matchId);
+  else if (phase === 'break') m = getMatch(nextMatchId);
+  if (!m || !phase || phase === 'idle' || phase === 'done') { populateNextMatch(); return; }
+
+  const hCode = FLAG_CODES[m.home];
+  const aCode = FLAG_CODES[m.away];
+  document.getElementById('nm-home-flag').src = hCode ? `https://flagcdn.com/40x30/${hCode}.png` : '';
+  document.getElementById('nm-away-flag').src = aCode ? `https://flagcdn.com/40x30/${aCode}.png` : '';
+  document.getElementById('nm-home').textContent = m.home.toUpperCase();
+  document.getElementById('nm-away').textContent = m.away.toUpperCase();
+  document.getElementById('nm-label').textContent = m.group;
+  document.getElementById('next-match-section').style.display = 'block';
+
+  const tag = document.getElementById('nm-status-tag');
+  if (phase === 'live') {
+    document.getElementById('nm-section-label').textContent = 'LIVE NOW';
+    document.getElementById('nm-time').textContent = fmt(secondsLeft) + ' remaining';
+    tag.textContent = '⚡ LIVE';
+    tag.style.cssText = 'color:#fff;background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.4)';
+  } else if (phase === 'break') {
+    document.getElementById('nm-section-label').textContent = 'NEXT MATCH TO PREDICT';
+    document.getElementById('nm-time').textContent = 'In ' + fmt(secondsLeft);
+    tag.textContent = 'OPEN';
+    tag.style.cssText = '';
+  } else if (phase === 'scored') {
+    document.getElementById('nm-section-label').textContent = 'RESULT IN';
+    document.getElementById('nm-time').textContent = 'FULL TIME';
+    tag.textContent = 'ENDED';
+    tag.style.cssText = 'color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1)';
+  }
+}
+
+async function pollDemoState() {
+  try {
+    const r = await fetch(DEMO_SERVER + '/state.json?t=' + Date.now());
+    applyDemoState(await r.json());
+  } catch {}
+}
+setInterval(pollDemoState, 2000);
+pollDemoState();
 
 async function init() {
   // load chain stats immediately, no wallet needed
