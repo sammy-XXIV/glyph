@@ -217,10 +217,10 @@ async function score() {
   const results   = [];
   const botPicks  = {};
 
-  // Initial 2-minute countdown before the first match
+  // Initial 1-minute countdown before the first match
   const first = DEMO_MATCHES[0];
-  console.log(`\n  â³  First match starting in 2 minutes: ${first.home.toUpperCase()} vs ${first.away.toUpperCase()}\n`);
-  for (let s = 120; s > 0; s--) {
+  console.log(`\n  â³  First match starting in 1 minute: ${first.home.toUpperCase()} vs ${first.away.toUpperCase()}\n`);
+  for (let s = 60; s > 0; s--) {
     process.stdout.write(`\r  â³  Match starts in ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}   `);
     writeState({ phase:'break', secondsLeft:s, nextMatchId:first.id });
     await sleep(1000);
@@ -264,7 +264,7 @@ async function score() {
     console.log(' âœ“\n');
 
     console.log('  â— MATCH IN PROGRESS...\n');
-    for (let s = 120; s > 0; s--) {
+    for (let s = 60; s > 0; s--) {
       process.stdout.write(`\r  â±  ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')} remaining   `);
       writeState({ phase:'live', matchId:m.id, secondsLeft:s });
       await sleep(1000);
@@ -383,7 +383,7 @@ async function score() {
       console.log(`\n${'â”€'.repeat(52)}`);
       console.log(`  NEXT UP: ${next.group} Â· ${next.home.toUpperCase()} vs ${next.away.toUpperCase()}`);
       console.log(`${'â”€'.repeat(52)}\n`);
-      for (let s = 120; s > 0; s--) {
+      for (let s = 60; s > 0; s--) {
         process.stdout.write(`\r  â³  Next match in ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}   `);
         writeState({ phase:'break', secondsLeft:s, nextMatchId:next.id });
         await sleep(1000);
@@ -499,5 +499,6 @@ Glyph Demo Simulator
 } else {
   cmds[cmd]().catch(e => { console.error('âŒ', e.message); process.exit(1); });
 }
+
 
 
