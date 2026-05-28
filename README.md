@@ -17,7 +17,7 @@ Glyph is an on-chain NFT prediction game built around the 2026 FIFA World Cup. M
 1. **Mint** — Pay 0.5 USDT to receive a random Common card (one of 5 designs)
 2. **Predict** — Pick Home Win / Draw / Away Win for each match before it kicks off
 3. **Score** — Correct picks fill your progress bar
-4. **Upgrade** — Hit the threshold → burn your card → mint the next tier
+4. **Upgrade** — Hit the threshold → keep your old card and mint the next tier
 5. **Claim** — Legendary holders split the entire prize pool equally at tournament end
 
 ### Tier thresholds
