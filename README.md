@@ -20,14 +20,7 @@ Glyph is an on-chain NFT prediction game built around the 2026 FIFA World Cup. M
 4. **Upgrade** — Hit the threshold → keep your old card and mint the next tier
 5. **Claim** — Legendary holders split the entire prize pool equally at tournament end
 
-### Tier thresholds
-
-| Tier | Correct picks needed |
-|------|----------------------|
-| Common → Uncommon | 2 |
-| Uncommon → Rare | 4 |
-| Rare → Epic | 6 |
-| Epic → Legendary | 8 |
+> Tier thresholds and mint pricing are configured for mainnet at launch.
 
 ---
 
@@ -35,7 +28,7 @@ Glyph is an on-chain NFT prediction game built around the 2026 FIFA World Cup. M
 
 | Layer | Stack |
 |-------|-------|
-| Smart contract | Solidity (ERC-721 + ERC-20), deployed on XLayer testnet |
+| Smart contract | Solidity (ERC-721 + ERC-20), deployed on XLayer |
 | Frontend | Vanilla HTML / CSS / JS — no framework |
 | Pick storage | Supabase (instant saves) + on-chain events (fallback) |
 | NFT metadata | Cloudflare Worker serving JSON + SVG |
