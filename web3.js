@@ -225,7 +225,7 @@ const GLYPH = (() => {
   }
 
   async function getChainStats() {
-    const RPCS = ['https://testrpc.xlayer.tech/terigon', 'https://xlayertestrpc.okx.com', 'https://testrpc.xlayer.tech'];
+    const RPCS = ['https://testrpc.xlayer.tech/terigon', 'https://testrpc.xlayer.tech'];
     let rpc;
     for (const url of RPCS) {
       try { rpc = new ethers.JsonRpcProvider(url); await rpc.getBlockNumber(); break; } catch { rpc = null; }
@@ -283,7 +283,7 @@ const GLYPH = (() => {
   }
 
   async function getLeaderboardChain(addresses) {
-    const RPCS = ['https://testrpc.xlayer.tech/terigon', 'https://xlayertestrpc.okx.com', 'https://testrpc.xlayer.tech'];
+    const RPCS = ['https://testrpc.xlayer.tech/terigon', 'https://testrpc.xlayer.tech'];
     let rpc;
     for (const url of RPCS) {
       try { rpc = new ethers.JsonRpcProvider(url); await rpc.getBlockNumber(); break; } catch { rpc = null; }

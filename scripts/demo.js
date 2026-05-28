@@ -88,7 +88,7 @@ const USDT_ABI = [
 const MINT_PRICE = BigInt('500000'); // 0.5 USDT (6 decimals)
 
 async function getProvider() {
-  for (const url of ['https://testrpc.xlayer.tech/terigon', 'https://xlayertestrpc.okx.com', 'https://testrpc.xlayer.tech']) {
+  for (const url of ['https://testrpc.xlayer.tech/terigon', 'https://testrpc.xlayer.tech']) {
     try { const p = new ethers.JsonRpcProvider(url); await p.getBlockNumber(); return p; } catch {}
   }
   throw new Error('All XLayer RPCs failed');
