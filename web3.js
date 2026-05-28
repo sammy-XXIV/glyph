@@ -12,7 +12,7 @@ const GLYPH = (() => {
     blockExplorerUrls: ['https://www.oklink.com/xlayer-test'],
   };
 
-  const GRAPH_URL = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.10';
+  const GRAPH_URL = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.11';
   const MINT_PRICE = BigInt('500000'); // 0.5 USDT (6 decimals)
   const USDT_ABI = [
     'function approve(address spender, uint256 amount) external returns (bool)',
