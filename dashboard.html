@@ -745,6 +745,12 @@ async function init() {
 }
 
 async function claimPrizeNow() {
+  const FIFA_END = new Date('2026-07-19T23:59:59Z').getTime();
+  const now = Date.now();
+  if (now < FIFA_END) {
+    alert('Prize pool available after FIFA World Cup ends on July 19, 2026');
+    return;
+  }
   const btn = event.target;
   btn.disabled = true;
   btn.textContent = 'CLAIMING...';
