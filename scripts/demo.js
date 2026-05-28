@@ -25,14 +25,41 @@ const BOTS_FILE  = join(__dirname, 'bots.json');
 const STATE_FILE = join(__dirname, '..', 'state.json');
 
 const DEMO_MATCHES = [
-  { id:1,  home:'USA',       away:'Mexico',    group:'GROUP A · MD1', forceResult:'home' },
-  { id:2,  home:'Canada',    away:'Panama',    group:'GROUP A · MD1', forceResult:'home' },
-  { id:7,  home:'Brazil',    away:'Colombia',  group:'GROUP B · MD1', forceResult:'home' },
-  { id:13, home:'Argentina', away:'Uruguay',   group:'GROUP C · MD1', forceResult:'home' },
-  { id:14, home:'Paraguay',  away:'Venezuela', group:'GROUP C · MD1', forceResult:'home' },
-  { id:19, home:'France',    away:'Morocco',   group:'GROUP D · MD1', forceResult:'home' },
-  { id:20, home:'Senegal',   away:'Mali',      group:'GROUP D · MD1', forceResult:'home' },
-  { id:9,  home:'Brazil',    away:'Ecuador',   group:'GROUP B · MD2', forceResult:'home' },
+  // GROUP A
+  { id:1,  home:'USA',         away:'Mexico',      group:'GROUP A · MD1', forceResult:'home' },
+  { id:2,  home:'Canada',      away:'Panama',      group:'GROUP A · MD1', forceResult:'home' },
+  { id:3,  home:'USA',         away:'Canada',      group:'GROUP A · MD2', forceResult:'home' },
+  { id:4,  home:'Mexico',      away:'Panama',      group:'GROUP A · MD2', forceResult:'home' },
+  { id:5,  home:'Mexico',      away:'Canada',      group:'GROUP A · MD3', forceResult:'home' },
+  { id:6,  home:'Panama',      away:'USA',         group:'GROUP A · MD3', forceResult:'home' },
+  // GROUP B
+  { id:7,  home:'Brazil',      away:'Colombia',    group:'GROUP B · MD1', forceResult:'home' },
+  { id:8,  home:'Ecuador',     away:'Bolivia',     group:'GROUP B · MD1', forceResult:'home' },
+  { id:9,  home:'Brazil',      away:'Ecuador',     group:'GROUP B · MD2', forceResult:'home' },
+  { id:10, home:'Colombia',    away:'Bolivia',     group:'GROUP B · MD2', forceResult:'home' },
+  { id:11, home:'Colombia',    away:'Ecuador',     group:'GROUP B · MD3', forceResult:'home' },
+  { id:12, home:'Bolivia',     away:'Brazil',      group:'GROUP B · MD3', forceResult:'home' },
+  // GROUP C
+  { id:13, home:'Argentina',   away:'Uruguay',     group:'GROUP C · MD1', forceResult:'home' },
+  { id:14, home:'Paraguay',    away:'Venezuela',   group:'GROUP C · MD1', forceResult:'home' },
+  { id:15, home:'Argentina',   away:'Paraguay',    group:'GROUP C · MD2', forceResult:'home' },
+  { id:16, home:'Uruguay',     away:'Venezuela',   group:'GROUP C · MD2', forceResult:'home' },
+  { id:17, home:'Uruguay',     away:'Paraguay',    group:'GROUP C · MD3', forceResult:'home' },
+  { id:18, home:'Venezuela',   away:'Argentina',   group:'GROUP C · MD3', forceResult:'home' },
+  // GROUP D
+  { id:19, home:'France',      away:'Morocco',     group:'GROUP D · MD1', forceResult:'home' },
+  { id:20, home:'Senegal',     away:'Mali',        group:'GROUP D · MD1', forceResult:'home' },
+  { id:21, home:'France',      away:'Senegal',     group:'GROUP D · MD2', forceResult:'home' },
+  { id:22, home:'Morocco',     away:'Mali',        group:'GROUP D · MD2', forceResult:'home' },
+  { id:23, home:'Morocco',     away:'Senegal',     group:'GROUP D · MD3', forceResult:'home' },
+  { id:24, home:'Mali',        away:'France',      group:'GROUP D · MD3', forceResult:'home' },
+  // GROUP E
+  { id:25, home:'Spain',       away:'Japan',       group:'GROUP E · MD1', forceResult:'home' },
+  { id:26, home:'S. Korea',    away:'Iraq',        group:'GROUP E · MD1', forceResult:'home' },
+  { id:27, home:'Spain',       away:'S. Korea',    group:'GROUP E · MD2', forceResult:'home' },
+  { id:28, home:'Japan',       away:'Iraq',        group:'GROUP E · MD2', forceResult:'home' },
+  { id:29, home:'Japan',       away:'S. Korea',    group:'GROUP E · MD3', forceResult:'home' },
+  { id:30, home:'Iraq',        away:'Spain',       group:'GROUP E · MD3', forceResult:'home' },
 ];
 
 const PICK_LABELS = ['HOME WIN', 'DRAW', 'AWAY WIN'];

@@ -506,14 +506,41 @@ populateNextMatch();
 // â”€â”€ Demo state sync â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const DEMO_SERVER  = 'https://glyph-demo-production.up.railway.app';
 const DEMO_MATCHES = [
-  { id:1,  home:'USA',       away:'Mexico',    group:'GROUP A · MD1' },
-  { id:2,  home:'Canada',    away:'Panama',    group:'GROUP A · MD1' },
-  { id:7,  home:'Brazil',    away:'Colombia',  group:'GROUP B · MD1' },
-  { id:13, home:'Argentina', away:'Uruguay',   group:'GROUP C · MD1' },
-  { id:14, home:'Paraguay',  away:'Venezuela', group:'GROUP C · MD1' },
-  { id:19, home:'France',    away:'Morocco',   group:'GROUP D · MD1' },
-  { id:20, home:'Senegal',   away:'Mali',      group:'GROUP D · MD1' },
-  { id:9,  home:'Brazil',    away:'Ecuador',   group:'GROUP B · MD2' },
+  // GROUP A
+  { id:1,  home:'USA',         away:'Mexico',      group:'GROUP A · MD1' },
+  { id:2,  home:'Canada',      away:'Panama',      group:'GROUP A · MD1' },
+  { id:3,  home:'USA',         away:'Canada',      group:'GROUP A · MD2' },
+  { id:4,  home:'Mexico',      away:'Panama',      group:'GROUP A · MD2' },
+  { id:5,  home:'Mexico',      away:'Canada',      group:'GROUP A · MD3' },
+  { id:6,  home:'Panama',      away:'USA',         group:'GROUP A · MD3' },
+  // GROUP B
+  { id:7,  home:'Brazil',      away:'Colombia',    group:'GROUP B · MD1' },
+  { id:8,  home:'Ecuador',     away:'Bolivia',     group:'GROUP B · MD1' },
+  { id:9,  home:'Brazil',      away:'Ecuador',     group:'GROUP B · MD2' },
+  { id:10, home:'Colombia',    away:'Bolivia',     group:'GROUP B · MD2' },
+  { id:11, home:'Colombia',    away:'Ecuador',     group:'GROUP B · MD3' },
+  { id:12, home:'Bolivia',     away:'Brazil',      group:'GROUP B · MD3' },
+  // GROUP C
+  { id:13, home:'Argentina',   away:'Uruguay',     group:'GROUP C · MD1' },
+  { id:14, home:'Paraguay',    away:'Venezuela',   group:'GROUP C · MD1' },
+  { id:15, home:'Argentina',   away:'Paraguay',    group:'GROUP C · MD2' },
+  { id:16, home:'Uruguay',     away:'Venezuela',   group:'GROUP C · MD2' },
+  { id:17, home:'Uruguay',     away:'Paraguay',    group:'GROUP C · MD3' },
+  { id:18, home:'Venezuela',   away:'Argentina',   group:'GROUP C · MD3' },
+  // GROUP D
+  { id:19, home:'France',      away:'Morocco',     group:'GROUP D · MD1' },
+  { id:20, home:'Senegal',     away:'Mali',        group:'GROUP D · MD1' },
+  { id:21, home:'France',      away:'Senegal',     group:'GROUP D · MD2' },
+  { id:22, home:'Morocco',     away:'Mali',        group:'GROUP D · MD2' },
+  { id:23, home:'Morocco',     away:'Senegal',     group:'GROUP D · MD3' },
+  { id:24, home:'Mali',        away:'France',      group:'GROUP D · MD3' },
+  // GROUP E
+  { id:25, home:'Spain',       away:'Japan',       group:'GROUP E · MD1' },
+  { id:26, home:'S. Korea',    away:'Iraq',        group:'GROUP E · MD1' },
+  { id:27, home:'Spain',       away:'S. Korea',    group:'GROUP E · MD2' },
+  { id:28, home:'Japan',       away:'Iraq',        group:'GROUP E · MD2' },
+  { id:29, home:'Japan',       away:'S. Korea',    group:'GROUP E · MD3' },
+  { id:30, home:'Iraq',        away:'Spain',       group:'GROUP E · MD3' },
 ];
 function getMatch(id) { return DEMO_MATCHES.find(m => m.id === id); }
 function fmt(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
