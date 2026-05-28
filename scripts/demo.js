@@ -13,7 +13,7 @@ import readline from 'readline';
 
 const __dirname  = dirname(fileURLToPath(import.meta.url));
 
-const CA         = '0x8f52019264A0EB2Edb8b01383c24Bbb6ed6920eC';
+const CA         = '0x9d7aC55b39A05A16d4409a841e652c906F209195';
 const BREAK_SECS  = Number(process.env.BREAK_SECS)  || 60;
 const MATCH_SECS  = Number(process.env.MATCH_SECS)  || 60;
 const RESULT_SECS = Number(process.env.RESULT_SECS) || 15;
@@ -375,7 +375,7 @@ async function score() {
     try {
       const latest = await provider.getBlockNumber();
       const filter = contract.filters.Predicted(null, m.id);
-      const logs   = await queryFilterChunked(contract, filter, Math.max(31512514, latest - 2000), latest);
+      const logs   = await queryFilterChunked(contract, filter, Math.max(31519000, latest - 2000), latest);
       for (const log of logs) {
         preds.push({ player: log.args.player.toLowerCase(), pick: Number(log.args.pick) });
       }
