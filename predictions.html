@@ -504,7 +504,7 @@ body::before {
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
-<script src="web3.js?v=5"></script>
+<script src="web3.js?v=6"></script>
 <script src="nav.js"></script>
 <script>
 // ── Demo match sequence (in order) ────────────────────────────────────────
@@ -681,7 +681,7 @@ let demoState   = { phase:'idle', matchId:null, secondsLeft:0, nextMatchId:null,
 let _walletAddr = null;
 let _demoPaused = false;
 
-const _CONTRACT = '0xDe211cd9E2C1A29ec4A3E1905f0EDa8641A484b6';
+const _CONTRACT = '0x5dd98E1e55475252E4e6527cdb8182377160300b';
 function _picksKey()   { return _walletAddr ? 'glyph_picks_'   + _CONTRACT + '_' + _walletAddr : null; }
 function _pendingKey() { return _walletAddr ? 'glyph_pending_' + _CONTRACT + '_' + _walletAddr : null; }
 

@@ -6,9 +6,9 @@ dataSources:
     name: Glyph
     network: xlayer-sepolia
     source:
-      address: "0xDe211cd9E2C1A29ec4A3E1905f0EDa8641A484b6"
+      address: "0x5dd98E1e55475252E4e6527cdb8182377160300b"
       abi: Glyph
-      startBlock: 31523000
+      startBlock: 31524000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

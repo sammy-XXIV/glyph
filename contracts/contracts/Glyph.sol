@@ -86,13 +86,11 @@ contract Glyph is ERC721, Ownable, ReentrancyGuard {
         require(correctPicks[msg.sender] >= THRESHOLDS[currentTier], "Not enough correct picks");
 
         correctPicks[msg.sender] = 0;
-        uint256 burned = tokenId;
-        _burn(tokenId);
         playerToken[msg.sender] = 0;
 
         uint8 newTier = currentTier + 1;
-        uint256 newId = _mintCard(msg.sender, newTier, burned);
-        emit Upgraded(msg.sender, burned, newId, newTier);
+        uint256 newId = _mintCard(msg.sender, newTier, tokenId);
+        emit Upgraded(msg.sender, tokenId, newId, newTier);
     }
 
     // ── Predictions ────────────────────────────────────────────────────────
