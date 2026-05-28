@@ -2,7 +2,7 @@
 // Routes: / → chain stats | /fixtures → WC2026 fixtures | /nft/:id → metadata | /nft/:id.svg → SVG card
 
 const RPC      = 'https://testrpc.xlayer.tech/terigon';
-const CONTRACT = '0x9d7aC55b39A05A16d4409a841e652c906F209195';
+const CONTRACT = '0xDe211cd9E2C1A29ec4A3E1905f0EDa8641A484b6';
 const BASE_URL = 'https://lucky-credit-3f16.samsonsamuel531.workers.dev';
 const IMG_BASE = 'https://sammy-xxiv.github.io/glyph/assets';
 const PNG_BASE = 'https://raw.githubusercontent.com/sammy-XXIV/glyph/main/assets/cards';

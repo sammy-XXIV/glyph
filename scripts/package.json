@@ -1,0 +1,7 @@
+{
+  "name": "glyph-demo",
+  "type": "module",
+  "dependencies": {
+    "ethers": "^6.9.0"
+  }
+}

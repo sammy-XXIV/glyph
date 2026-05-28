@@ -2,7 +2,7 @@
 
 const GLYPH = (() => {
 
-  const CONTRACT_ADDRESS = '0x9d7aC55b39A05A16d4409a841e652c906F209195';
+  const CONTRACT_ADDRESS = '0xDe211cd9E2C1A29ec4A3E1905f0EDa8641A484b6';
   const USDT_ADDRESS    = '0x9e29b3AaDa05Bf2D2c827Af80Bd28Dc0b9b4FB0c';
   const XLAYER_TESTNET = {
     chainId: '0x7A0',
@@ -12,7 +12,7 @@ const GLYPH = (() => {
     blockExplorerUrls: ['https://www.oklink.com/xlayer-test'],
   };
 
-  const GRAPH_URL = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.11';
+  const GRAPH_URL = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.12';
   const MINT_PRICE = BigInt('500000'); // 0.5 USDT (6 decimals)
   const USDT_ABI = [
     'function approve(address spender, uint256 amount) external returns (bool)',

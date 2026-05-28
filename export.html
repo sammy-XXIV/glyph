@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLYPH — Export</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #050510;
+  color: #fff;
+  font-family: 'DM Mono', monospace;
+  padding: 24px 16px 60px;
+  min-height: 100dvh;
+}
+h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: 6px;
+  color: #FFD700;
+  margin-bottom: 6px;
+}
+.sub {
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 1px;
+  margin-bottom: 28px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+}
+.card-export { display: flex; flex-direction: column; gap: 10px; }
+canvas { width: 100%; display: block; }
+.label {
+  font-size: 10px; letter-spacing: 2px;
+  color: rgba(255,255,255,0.5);
+}
+.label span {
+  float: right; font-size: 9px;
+  padding: 2px 7px; border-radius: 10px;
+}
+.label span.leg      { background: rgba(255,215,0,0.15);   color: #FFD700;  border: 1px solid rgba(255,215,0,0.3); }
+.label span.epic     { background: rgba(192,132,252,0.15); color: #c084fc;  border: 1px solid rgba(192,132,252,0.3); }
+.label span.rare     { background: rgba(77,159,255,0.15);  color: #4d9fff;  border: 1px solid rgba(77,159,255,0.3); }
+.label span.uncommon { background: rgba(74,222,128,0.15);  color: #4ade80;  border: 1px solid rgba(74,222,128,0.3); }
+.label span.common   { background: rgba(148,163,184,0.15); color: #94a3b8;  border: 1px solid rgba(148,163,184,0.3); }
+.btn-row { display: flex; gap: 8px; }
+.btn {
+  flex: 1; padding: 9px; border-radius: 8px; border: none;
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  letter-spacing: 2px; cursor: pointer; transition: opacity 0.2s;
+}
+.btn:active { opacity: 0.7; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn.leg      { background: rgba(255,215,0,0.15);   color: #FFD700;  border: 1px solid rgba(255,215,0,0.4); }
+.btn.epic     { background: rgba(192,132,252,0.15); color: #c084fc;  border: 1px solid rgba(192,132,252,0.4); }
+.btn.rare     { background: rgba(77,159,255,0.15);  color: #4d9fff;  border: 1px solid rgba(77,159,255,0.4); }
+.btn.uncommon { background: rgba(74,222,128,0.15);  color: #4ade80;  border: 1px solid rgba(74,222,128,0.4); }
+.btn.common   { background: rgba(148,163,184,0.15); color: #94a3b8;  border: 1px solid rgba(148,163,184,0.4); }
+.status {
+  font-size: 9px; color: rgba(255,255,255,0.3);
+  letter-spacing: 1px; min-height: 14px; text-align: center;
+}
+</style>
+</head>
+<body>
+
+<h1>GLYPH EXPORT</h1>
+<p class="sub">1:1 · 1080P PNG · WEBM VIDEO</p>
+
+<div class="grid" id="grid"></div>
+
+<script>
+// 1:1 square at 1080px — layout mirrors svg-demo.html exactly
+const S = 1080;
+const sc = S / 500; // scale from SVG 500px coordinate space
+
+const TIER_COLORS = {
+  LEGENDARY: { border:'#FFD700', glow:'rgba(255,215,0,0.9)',   particle:'#FFD700' },
+  EPIC:      { border:'#c084fc', glow:'rgba(192,132,252,0.6)', particle:'#c084fc' },
+  RARE:      { border:'#4d9fff', glow:'rgba(77,159,255,0.6)',  particle:'#4d9fff' },
+  UNCOMMON:  { border:'#4ade80', glow:'rgba(74,222,128,0.6)',  particle:'#4ade80' },
+  COMMON:    { border:'#94a3b8', glow:'rgba(148,163,184,0.5)', particle:'#94a3b8' },
+};
+
+const PARTICLE_COUNT = { LEGENDARY:18, EPIC:14, RARE:10, UNCOMMON:8, COMMON:6 };
+
+const CARDS = [
+  // COMMON
+  { id:'nigeria',     name:'NIGERIA',      nation:'Nigeria',      flag:'🇳🇬', tier:'COMMON',    wc:0, ovr:70, img:'assets/nigeria.png'     },
+  { id:'costarica',   name:'COSTA RICA',   nation:'Costa Rica',   flag:'🇨🇷', tier:'COMMON',    wc:0, ovr:68, img:'assets/costarica.png'   },
+  { id:'saudi',       name:'SAUDI ARABIA', nation:'Saudi Arabia', flag:'🇸🇦', tier:'COMMON',    wc:0, ovr:67, img:'assets/saudi.png'       },
+  { id:'cameroon',    name:'CAMEROON',     nation:'Cameroon',     flag:'🇨🇲', tier:'COMMON',    wc:0, ovr:69, img:'assets/cameroon.png'    },
+  { id:'ghana',       name:'GHANA',        nation:'Ghana',        flag:'🇬🇭', tier:'COMMON',    wc:0, ovr:68, img:'assets/ghana.png'       },
+  // UNCOMMON
+  { id:'mexico',      name:'MEXICO',       nation:'Mexico',       flag:'🇲🇽', tier:'UNCOMMON',  wc:0, ovr:74, img:'assets/mexico.png'      },
+  { id:'colombia',    name:'COLOMBIA',     nation:'Colombia',     flag:'🇨🇴', tier:'UNCOMMON',  wc:0, ovr:73, img:'assets/colombia.png'    },
+  { id:'morocco',     name:'MOROCCO',      nation:'Morocco',      flag:'🇲🇦', tier:'UNCOMMON',  wc:0, ovr:75, img:'assets/morocco.png'     },
+  { id:'switzerland', name:'SWITZERLAND',  nation:'Switzerland',  flag:'🇨🇭', tier:'UNCOMMON',  wc:0, ovr:72, img:'assets/switzerland.png' },
+  { id:'denmark',     name:'DENMARK',      nation:'Denmark',      flag:'🇩🇰', tier:'UNCOMMON',  wc:0, ovr:71, img:'assets/denmark.png'     },
+  // RARE
+  { id:'japan',       name:'JAPAN',        nation:'Japan',        flag:'🇯🇵', tier:'RARE',      wc:0, ovr:78, img:'assets/japan.png'       },
+  { id:'senegal',     name:'SENEGAL',      nation:'Senegal',      flag:'🇸🇳', tier:'RARE',      wc:0, ovr:77, img:'assets/senegal.png'     },
+  { id:'uruguay',     name:'URUGUAY',      nation:'Uruguay',      flag:'🇺🇾', tier:'RARE',      wc:2, ovr:80, img:'assets/uruguay.png'     },
+  { id:'usa',         name:'USA',          nation:'USA',          flag:'🇺🇸', tier:'RARE',      wc:0, ovr:76, img:'assets/usa.png'         },
+  { id:'croatia',     name:'CROATIA',      nation:'Croatia',      flag:'🇭🇷', tier:'RARE',      wc:0, ovr:82, img:'assets/croatia.png'     },
+  // EPIC
+  { id:'germany',     name:'GERMANY',      nation:'Germany',      flag:'🇩🇪', tier:'EPIC',      wc:4, ovr:85, img:'assets/germany.jpg'     },
+  { id:'belgium',     name:'BELGIUM',      nation:'Belgium',      flag:'🇧🇪', tier:'EPIC',      wc:0, ovr:84, img:'assets/belgium.jpg'     },
+  { id:'netherlands', name:'NETHERLANDS',  nation:'Netherlands',  flag:'🇳🇱', tier:'EPIC',      wc:0, ovr:85, img:'assets/netherlands.jpg' },
+  { id:'italy',       name:'ITALY',        nation:'Italy',        flag:'🇮🇹', tier:'EPIC',      wc:4, ovr:86, img:'assets/italy.jpg'       },
+  { id:'portugal',    name:'PORTUGAL',     nation:'Portugal',     flag:'🇵🇹', tier:'EPIC',      wc:0, ovr:87, img:'assets/portugal.jpg'    },
+  // LEGENDARY
+  { id:'france',      name:'FRANCE',       nation:'France',       flag:'🇫🇷', tier:'LEGENDARY', wc:2, ovr:91, img:'assets/player.jpg'      },
+  { id:'brazil',      name:'BRAZIL',       nation:'Brazil',       flag:'🇧🇷', tier:'LEGENDARY', wc:5, ovr:89, img:'assets/brazil.jpg'      },
+  { id:'argentina',   name:'ARGENTINA',    nation:'Argentina',    flag:'🇦🇷', tier:'LEGENDARY', wc:3, ovr:92, img:'assets/argentina.jpg'   },
+  { id:'england',     name:'ENGLAND',      nation:'England',      flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', tier:'LEGENDARY', wc:1, ovr:88, img:'assets/england.jpg'     },
+  { id:'spain',       name:'SPAIN',        nation:'Spain',        flag:'🇪🇸', tier:'LEGENDARY', wc:1, ovr:90, img:'assets/spain.png'       },
+];
+
+const clsMap = { LEGENDARY:'leg', EPIC:'epic', RARE:'rare', UNCOMMON:'uncommon', COMMON:'common' };
+const grid = document.getElementById('grid');
+
+CARDS.forEach(card => {
+  const cls = clsMap[card.tier];
+  const colors = TIER_COLORS[card.tier];
+
+  const wrap = document.createElement('div');
+  wrap.className = 'card-export';
+
+  const lbl = document.createElement('div');
+  lbl.className = 'label';
+  lbl.innerHTML = `${card.name} <span class="${cls}">${card.tier}</span>`;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = S; canvas.height = S;
+
+  const btnRow = document.createElement('div');
+  btnRow.className = 'btn-row';
+
+  const btnPng = document.createElement('button');
+  btnPng.className = 'btn ' + cls;
+  btnPng.textContent = '⬇ PNG';
+
+  const btnVid = document.createElement('button');
+  btnVid.className = 'btn ' + cls;
+  btnVid.textContent = '⬇ VIDEO';
+
+  btnRow.append(btnPng, btnVid);
+
+  const status = document.createElement('div');
+  status.className = 'status';
+
+  wrap.append(lbl, canvas, btnRow, status);
+  grid.appendChild(wrap);
+
+  const imgEl = new Image();
+  imgEl.src = card.img;
+  imgEl.onload = () => {
+    const particles = makeParticles(colors.particle, PARTICLE_COUNT[card.tier]);
+    startPreview(canvas, card, colors, imgEl, particles);
+    btnPng.onclick = () => exportPng(canvas, card, colors, imgEl, btnPng, status);
+    btnVid.onclick = () => exportVideo(canvas, card, colors, imgEl, btnVid, status);
+  };
+  imgEl.onerror = () => { status.textContent = 'IMAGE NOT FOUND'; };
+});
+
+// ── Particles ──
+function makeParticles(color, count) {
+  return Array.from({ length: count }, () => ({
+    x: Math.random() * S,
+    y: S * 0.54 + Math.random() * (S * 0.35),
+    size: (1.5 + Math.random() * 2.5) * sc,
+    speed: (0.4 + Math.random() * 0.8) * sc,
+    dx: (Math.random() - 0.5) * 0.6 * sc,
+    alpha: 0, growing: true, color,
+  }));
+}
+
+function updateParticles(pts) {
+  pts.forEach(p => {
+    p.y -= p.speed; p.x += p.dx;
+    if (p.growing) { p.alpha = Math.min(1, p.alpha + 0.04); if (p.alpha >= 0.8) p.growing = false; }
+    else p.alpha -= 0.015;
+    if (p.alpha <= 0 || p.y < S * 0.1) {
+      p.x = Math.random() * S;
+      p.y = S * 0.54 + Math.random() * (S * 0.3);
+      p.alpha = 0; p.growing = true;
+    }
+  });
+}
+
+// ── Draw frame — mirrors svg-demo.html layout ──
+function drawFrame(ctx, card, colors, img, t, particles, forPng) {
+  // Jersey full bleed
+  ctx.drawImage(img, 0, 0, S, S);
+
+  // Shimmer (animated only)
+  if (!forPng) {
+    const shimX = ((t * 0.0010) % 1.8 - 0.3) * S * 1.5;
+    const shim = ctx.createLinearGradient(shimX - 80*sc, 0, shimX + 80*sc, 0);
+    shim.addColorStop(0,   'transparent');
+    shim.addColorStop(0.4, hexAlpha(colors.border, 0.18));
+    shim.addColorStop(0.5, hexAlpha(colors.border, 0.45));
+    shim.addColorStop(0.6, hexAlpha(colors.border, 0.18));
+    shim.addColorStop(1,   'transparent');
+    ctx.fillStyle = shim;
+    ctx.fillRect(0, 0, S, S);
+  }
+
+  // Particles (animated only)
+  if (!forPng) {
+    updateParticles(particles);
+    particles.forEach(p => {
+      ctx.globalAlpha = p.alpha * 0.75;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  // Bottom gradient overlay — starts at y=270 (54% of 500)
+  const overlayY = 270 * sc;
+  const overlay = ctx.createLinearGradient(0, overlayY, 0, S);
+  overlay.addColorStop(0,    'rgba(5,5,16,0)');
+  overlay.addColorStop(0.45, 'rgba(5,5,16,0.72)');
+  overlay.addColorStop(1,    'rgba(5,5,16,0.97)');
+  ctx.fillStyle = overlay;
+  ctx.fillRect(0, overlayY, S, S - overlayY);
+
+  // Nation name — y=356
+  ctx.font = `${38*sc}px "Bebas Neue", sans-serif`;
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'left';
+  ctx.fillText(card.name, 16*sc, 356*sc);
+
+  // Divider — y=368
+  ctx.strokeStyle = hexAlpha(colors.border, 0.15);
+  ctx.lineWidth = sc;
+  ctx.beginPath();
+  ctx.moveTo(16*sc, 368*sc); ctx.lineTo(484*sc, 368*sc);
+  ctx.stroke();
+
+  // WC WINS + TEAM OVR labels — y=440
+  ctx.font = `${8*sc}px "DM Mono", monospace`;
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.textAlign = 'left';
+  ctx.fillText('FIFA WC WINS', 16*sc, 440*sc);
+  ctx.textAlign = 'right';
+  ctx.fillText('TEAM OVR', 484*sc, 440*sc);
+
+  // Values — y=456
+  ctx.font = `${20*sc}px "Bebas Neue", sans-serif`;
+  ctx.fillStyle = colors.border;
+  ctx.textAlign = 'left';
+  ctx.fillText(card.wc, 16*sc, 456*sc);
+  ctx.fillStyle = '#4d9fff';
+  ctx.textAlign = 'right';
+  ctx.fillText(card.ovr, 484*sc, 456*sc);
+
+  // Token number — y=492
+  ctx.font = `${6.5*sc}px "DM Mono", monospace`;
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  ctx.textAlign = 'right';
+  ctx.fillText('ERC-721 · #—', 484*sc, 492*sc);
+
+  // ── Top-right chips ──
+  const chipRight = 486 * sc;
+
+  // Tier chip — y=12, h=18
+  ctx.font = `bold ${8.5*sc}px "DM Mono", monospace`;
+  const tw = ctx.measureText(card.tier).width + 20*sc;
+  roundRect(ctx, chipRight - tw, 12*sc, tw, 18*sc, 4*sc);
+  ctx.fillStyle = 'rgba(0,0,0,0.65)';
+  ctx.fill();
+  ctx.strokeStyle = hexAlpha(colors.border, 0.4);
+  ctx.lineWidth = sc;
+  ctx.stroke();
+  ctx.fillStyle = colors.border;
+  ctx.textAlign = 'center';
+  ctx.fillText(card.tier, chipRight - tw/2, 25*sc);
+
+  // Nation chip — y=36, h=18
+  const nationLabel = `${card.nation} ${card.flag}`;
+  ctx.font = `600 ${10*sc}px "DM Sans", sans-serif`;
+  const nw = ctx.measureText(nationLabel).width + 20*sc;
+  roundRect(ctx, chipRight - nw, 36*sc, nw, 18*sc, 4*sc);
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'center';
+  ctx.fillText(nationLabel, chipRight - nw/2, 49*sc);
+
+  // ── Border glow (matches svg-demo pulsing border) ──
+  const isLeg = card.tier === 'LEGENDARY';
+  const pulse = isLeg ? 0.6 + 0.4 * Math.sin(t * 0.003) : 0.5;
+
+  // Outer spread
+  ctx.save();
+  ctx.shadowColor = colors.glow;
+  ctx.shadowBlur = (isLeg ? 36*pulse : 18) * sc;
+  ctx.strokeStyle = hexAlpha(colors.border, 0.45);
+  ctx.lineWidth = 8*sc;
+  roundRect(ctx, 1, 1, S-2, S-2, 0);
+  ctx.stroke();
+  ctx.restore();
+
+  // Tight glow
+  ctx.save();
+  ctx.shadowColor = colors.glow;
+  ctx.shadowBlur = (isLeg ? 22*pulse : 10) * sc;
+  ctx.strokeStyle = hexAlpha(colors.border, forPng ? 0.9 : 0.65 + 0.35*pulse);
+  ctx.lineWidth = 4*sc;
+  roundRect(ctx, 1, 1, S-2, S-2, 0);
+  ctx.stroke();
+  ctx.restore();
+
+  // Crisp border on top
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = hexAlpha(colors.border, forPng ? 0.95 : 0.75 + 0.25*pulse);
+  ctx.lineWidth = 2*sc;
+  roundRect(ctx, 1, 1, S-2, S-2, 0);
+  ctx.stroke();
+}
+
+// ── Preview loop ──
+function startPreview(canvas, card, colors, img, particles) {
+  const ctx = canvas.getContext('2d');
+  let t = 0;
+  (function loop() {
+    drawFrame(ctx, card, colors, img, t, particles, false);
+    t += 16;
+    requestAnimationFrame(loop);
+  })();
+}
+
+// ── PNG export ──
+function exportPng(canvas, card, colors, img, btn, status) {
+  btn.disabled = true;
+  status.textContent = 'RENDERING...';
+  drawFrame(canvas.getContext('2d'), card, colors, img, 0, [], true);
+  canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `glyph_${card.id}_${card.tier.toLowerCase()}_1080p.png`;
+    a.click();
+    URL.revokeObjectURL(url);
+    btn.disabled = false;
+    status.textContent = 'PNG EXPORTED ✓';
+    setTimeout(() => status.textContent = '', 3000);
+  }, 'image/png');
+}
+
+// ── Video export ──
+function exportVideo(canvas, card, colors, img, btn, status) {
+  if (!window.MediaRecorder) { status.textContent = 'NOT SUPPORTED'; return; }
+  btn.disabled = true;
+  const duration = 4000;
+  const stream = canvas.captureStream(60);
+  const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm';
+  const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 8_000_000 });
+  const chunks = [];
+  rec.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+  rec.onstop = () => {
+    const blob = new Blob(chunks, { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `glyph_${card.id}_${card.tier.toLowerCase()}.webm`;
+    a.click();
+    URL.revokeObjectURL(url);
+    btn.disabled = false;
+    status.textContent = 'VIDEO EXPORTED ✓';
+    setTimeout(() => status.textContent = '', 3000);
+  };
+  let elapsed = 0;
+  const tick = setInterval(() => {
+    elapsed += 200;
+    status.textContent = `RECORDING... ${Math.round(elapsed/duration*100)}%`;
+    if (elapsed >= duration) clearInterval(tick);
+  }, 200);
+  rec.start();
+  setTimeout(() => rec.stop(), duration);
+}
+
+// ── Helpers ──
+function hexAlpha(hex, alpha) {
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r);
+  ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+}
+</script>
+</body>
+</html>

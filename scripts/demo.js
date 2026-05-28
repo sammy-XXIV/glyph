@@ -13,14 +13,14 @@ import readline from 'readline';
 
 const __dirname  = dirname(fileURLToPath(import.meta.url));
 
-const CA         = '0x9d7aC55b39A05A16d4409a841e652c906F209195';
+const CA         = '0xDe211cd9E2C1A29ec4A3E1905f0EDa8641A484b6';
 const BREAK_SECS  = Number(process.env.BREAK_SECS)  || 60;
 const MATCH_SECS  = Number(process.env.MATCH_SECS)  || 60;
 const RESULT_SECS = Number(process.env.RESULT_SECS) || 15;
 const SUPABASE_URL = 'https://epoflrlcaaupopwhozyz.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwb2ZscmxjYWF1cG9wd2hvenl6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjU5NDE5MywiZXhwIjoyMDkyMTcwMTkzfQ.4DQNv8TfB8okMvvQX5KoGPQSKYuOZLq9bY9qoI-KUXo';
 const USDT_CA    = '0x9e29b3AaDa05Bf2D2c827Af80Bd28Dc0b9b4FB0c';
-const GRAPH      = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.11';
+const GRAPH      = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.12';
 const BOT_KEYS   = [
   '0x583dc5b9dc11530013bd427b8831aca5bbaddc3e4ce74fc0ad943dadcd461878',
   '0x1a55a9daad0d9fc46ce8bdaa33df0f2f734cd3a6e8a223f0bb9bbd4c470f7177',
