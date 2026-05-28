@@ -14,6 +14,8 @@ import readline from 'readline';
 const __dirname  = dirname(fileURLToPath(import.meta.url));
 
 const CA         = '0xbb3AC0CBB5B8164Db2047b3cB26927e7e43B7Bb5';
+const SUPABASE_URL = 'https://epoflrlcaaupopwhozyz.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwb2ZscmxjYWF1cG9wd2hvenl6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjU5NDE5MywiZXhwIjoyMDkyMTcwMTkzfQ.4DQNv8TfB8okMvvQX5KoGPQSKYuOZLq9bY9qoI-KUXo';
 const USDT_CA    = '0x9e29b3AaDa05Bf2D2c827Af80Bd28Dc0b9b4FB0c';
 const GRAPH      = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.9';
 const BOT_KEYS   = [
@@ -74,6 +76,7 @@ const ABI = [
   'function playerToken(address) external view returns (uint256)',
   'function correctPicks(address) external view returns (uint8)',
   'function tier(uint256) external view returns (uint8)',
+  'function cardIndex(uint256) external view returns (uint8)',
   'function owner() external view returns (address)',
   'event Predicted(address indexed player, uint256 matchId, uint8 pick)',
 ];
@@ -109,6 +112,44 @@ async function graphQuery(query) {
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function upsertPlayers(contract, addresses) {
+  try {
+    const rows = await Promise.all(addresses.map(async addr => {
+      try {
+        const tokenId = await contract.playerToken(addr);
+        if (!tokenId || tokenId === 0n) return null;
+        const [tier, cardIndex, correctPicks] = await Promise.all([
+          contract.tier(tokenId),
+          contract.cardIndex(tokenId),
+          contract.correctPicks(addr),
+        ]);
+        return {
+          address:       addr.toLowerCase(),
+          token_id:      Number(tokenId),
+          tier:          Number(tier),
+          card_index:    Number(cardIndex),
+          correct_picks: Number(correctPicks),
+          updated_at:    new Date().toISOString(),
+        };
+      } catch { return null; }
+    }));
+    const valid = rows.filter(Boolean);
+    if (!valid.length) return;
+    await fetch(`${SUPABASE_URL}/rest/v1/players`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates',
+      },
+      body: JSON.stringify(valid),
+    });
+  } catch (e) {
+    console.log(`  ⚠  Supabase sync failed: ${e.message}`);
+  }
+}
 
 let _stateScored = [];
 function writeState(patch) {
@@ -363,6 +404,8 @@ async function score() {
       const picks   = preds.map(p => Number(p.pick));
       const tx = await contract.scorePickBatch(players, m.id, picks, code);
       await tx.wait();
+      // Sync updated state to Supabase leaderboard
+      await upsertPlayers(contract, players);
     }
 
     // Find player pick

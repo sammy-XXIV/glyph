@@ -254,13 +254,32 @@ const GLYPH = (() => {
     return json.data;
   }
 
+  const SUPABASE_URL  = 'https://epoflrlcaaupopwhozyz.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwb2ZscmxjYWF1cG9wd2hvenl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTQxOTMsImV4cCI6MjA5MjE3MDE5M30.gh0fmVy1vNTmf0bjiDbcWmZZBBwwFAYrYruglc0h03g';
+
   async function getLeaderboard() {
-    const data = await graphQuery(`{
-      players(first: 50, orderBy: correctPicks, orderDirection: desc) {
-        id tier cardIndex correctPicks totalPicks
-      }
-    }`);
-    return data.players;
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/players?select=*&order=correct_picks.desc&limit=50`,
+        { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` } }
+      );
+      if (!res.ok) throw new Error('supabase error');
+      const rows = await res.json();
+      return rows.map(r => ({
+        id:           r.address,
+        tier:         String(r.tier ?? 0),
+        cardIndex:    String(r.card_index ?? 0),
+        correctPicks: String(r.correct_picks ?? 0),
+      }));
+    } catch {
+      // fallback to subgraph
+      const data = await graphQuery(`{
+        players(first: 50, orderBy: correctPicks, orderDirection: desc) {
+          id tier cardIndex correctPicks totalPicks
+        }
+      }`);
+      return data.players;
+    }
   }
 
   async function getLeaderboardChain(addresses) {
