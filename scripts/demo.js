@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 // Glyph demo simulator
 // Usage:
 //   OWNER_KEY=0x... node demo.js setup               â†’ generate bots, fund, mint, predict
@@ -250,7 +250,7 @@ async function score() {
   const playerAddr  = process.env.PLAYER?.toLowerCase();
   const playerKey   = process.env.PLAYER_KEY; // optional â€” enables auto-upgrade for you
   if (!ownerKey)   { console.error('âŒ  Set OWNER_KEY env var'); process.exit(1); }
-  if (!playerAddr) { console.error('âŒ  Set PLAYER=<your-wallet> env var'); process.exit(1); }
+  if (!playerAddr) console.log('  No PLAYER set -- all wallets scored');
 
   const provider = await getProvider();
   const owner    = new ethers.Wallet(ownerKey, provider);
@@ -444,7 +444,7 @@ async function score() {
     for (const bot of botWallets) {
       await tryUpgrade(bot.address.toLowerCase(), bot.address.slice(0, 10) + '...');
     }
-    await tryUpgrade(playerAddr, 'YOUR CARD');
+    if (playerAddr) await tryUpgrade(playerAddr, 'YOUR CARD');
 
     // Running tally
     const onChain = playerTotal > 0 ? await contract.correctPicks(playerAddr) : 0n;

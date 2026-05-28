@@ -9,6 +9,15 @@ const PORT = process.env.PORT || 3000;
 const STATE_FILE = path.join(__dirname, 'state.json');
 const DEMO_SCRIPT = path.join(__dirname, 'scripts', 'demo.js');
 
+// Load .env from scripts/ if OWNER_KEY not already set
+if (!process.env.OWNER_KEY) {
+  try {
+    const env = fs.readFileSync(path.join(__dirname, 'scripts', '.env'), 'utf8');
+    const match = env.match(/OWNER_KEY\s*=\s*(\S+)/);
+    if (match) process.env.OWNER_KEY = match[1];
+  } catch {}
+}
+
 const MIME = {
   '.html': 'text/html',
   '.js':   'text/javascript',
