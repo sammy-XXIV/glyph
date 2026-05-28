@@ -85,7 +85,6 @@ contract Glyph is ERC721, Ownable, ReentrancyGuard {
         require(currentTier < LEGENDARY, "Already Legendary");
         require(correctPicks[msg.sender] >= THRESHOLDS[currentTier], "Not enough correct picks");
 
-        correctPicks[msg.sender] = 0;
         uint256 burned = tokenId;
         _burn(tokenId);
         playerToken[msg.sender] = 0;

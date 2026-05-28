@@ -260,7 +260,7 @@ const GLYPH = (() => {
   async function getLeaderboard() {
     try {
       const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/players?select=*&order=correct_picks.desc&limit=50`,
+        `${SUPABASE_URL}/rest/v1/players?select=*&order=tier.desc,correct_picks.desc&limit=50`,
         { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` } }
       );
       if (!res.ok) throw new Error('supabase error');
