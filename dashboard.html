@@ -730,6 +730,8 @@ async function init() {
       upgradeBtn.textContent = 'UPGRADING...';
       try {
         await GLYPH.upgradeCard();
+        upgradeBtn.textContent = 'UPGRADED! LOADING...';
+        await new Promise(r => setTimeout(r, 3000));
         window.location.reload();
       } catch(e) {
         alert('Upgrade failed: ' + (e.reason || e.message));
