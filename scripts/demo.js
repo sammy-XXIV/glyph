@@ -603,6 +603,11 @@ async function status() {
 }
 
 // â”€â”€ MAIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+process.on('unhandledRejection', err => {
+  console.error('[CRASH] Unhandled rejection:', err.message || err);
+  process.exit(1);
+});
+
 const cmd = process.argv[2];
 const cmds = { setup, score, status, upgrade };
 if (!cmds[cmd]) {
