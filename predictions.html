@@ -725,6 +725,7 @@ async function pollState() {
         const elapsed = Math.floor((Date.now() - s.ts) / 1000);
         s.secondsLeft = Math.max(0, s.secondsLeft - elapsed);
       }
+      if (_demoPaused) s.secondsLeft = demoState.secondsLeft; // freeze timer when paused
       demoState = s;
     }
   } catch(_) {}
