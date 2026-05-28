@@ -937,6 +937,9 @@ async function triggerDemo(action) {
     });
     const data = await res.json();
     if (!data.ok) alert(data.message);
+    // Instantly update pause state without waiting for next poll
+    if (action === 'pause')  { _demoPaused = true; }
+    if (action === 'resume') { _demoPaused = false; }
   } catch(e) {
     alert('Could not reach demo server');
   }
@@ -970,7 +973,7 @@ async function init() {
 
     document.getElementById('demo-controls').style.display = 'flex';
     syncDemoButtons();
-    setInterval(syncDemoButtons, 5000);
+    setInterval(syncDemoButtons, 1000);
 
     // Merge on-chain picks from subgraph (fills in anything missing from storage)
     try {
