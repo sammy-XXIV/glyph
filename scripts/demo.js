@@ -114,7 +114,20 @@ async function graphQuery(query) {
   return json.data;
 }
 
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+const PAUSE_FILE = join(__dirname, '..', 'demo.pause');
+function sleep(ms) {
+  return new Promise(resolve => {
+    const interval = 200;
+    let remaining = ms;
+    const tick = () => {
+      if (existsSync(PAUSE_FILE)) { setTimeout(tick, interval); return; }
+      if (remaining <= interval) { setTimeout(resolve, remaining); return; }
+      remaining -= interval;
+      setTimeout(tick, interval);
+    };
+    tick();
+  });
+}
 
 async function upsertPlayers(contract, addresses) {
   try {

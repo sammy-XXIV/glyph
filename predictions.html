@@ -749,11 +749,14 @@ function updateSubmitBar() {
 async function submitPicks() {
   const addr = await GLYPH.getWallet();
   if (!addr) { alert('Connect your wallet first.'); return; }
+  console.log('[submit] wallet:', addr, 'pending:', JSON.stringify(pending));
   const btn = document.getElementById('submit-btn');
   btn.disabled = true; btn.textContent = 'SUBMITTING...';
   try {
     for (const [matchId, choice] of Object.entries(pending)) {
+      console.log('[submit] sending predict matchId:', matchId, 'choice:', choice);
       await GLYPH.submitPrediction(Number(matchId), ['home','draw','away'].indexOf(choice));
+      console.log('[submit] predict done for match', matchId);
     }
     Object.assign(userPicks, pending);
     Object.keys(pending).forEach(k => delete pending[k]);

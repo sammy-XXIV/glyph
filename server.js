@@ -6,7 +6,8 @@ import { spawn } from 'child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
-const STATE_FILE = path.join(__dirname, 'state.json');
+const STATE_FILE  = path.join(__dirname, 'state.json');
+const PAUSE_FILE  = path.join(__dirname, 'demo.pause');
 const DEMO_SCRIPT = path.join(__dirname, 'scripts', 'demo.js');
 
 // Load .env from scripts/ if OWNER_KEY not already set
@@ -74,7 +75,7 @@ function stopDemo() {
 function pauseDemo() {
   if (!demoRunning || !demoProcess) return { ok: false, message: 'No demo running' };
   if (demoPaused) return { ok: false, message: 'Already paused' };
-  try { demoProcess.kill('SIGSTOP'); } catch {}
+  fs.writeFileSync(PAUSE_FILE, '1');
   demoPaused = true;
   return { ok: true, message: 'Demo paused' };
 }
@@ -82,7 +83,7 @@ function pauseDemo() {
 function resumeDemo() {
   if (!demoRunning || !demoProcess) return { ok: false, message: 'No demo running' };
   if (!demoPaused) return { ok: false, message: 'Not paused' };
-  try { demoProcess.kill('SIGCONT'); } catch {}
+  try { fs.unlinkSync(PAUSE_FILE); } catch {}
   demoPaused = false;
   return { ok: true, message: 'Demo resumed' };
 }
