@@ -733,7 +733,17 @@ async function pollState() {
 }
 
 // ── Pick & submit ──────────────────────────────────────────────────────────
-function pick(matchId, choice) {
+async function pick(matchId, choice) {
+  // If match is currently live, auto-submit immediately — no button press needed
+  if (demoState.phase === 'live' && demoState.matchId === matchId) {
+    if (userPicks[matchId] || pending[matchId]) return; // already picked
+    pending[matchId] = choice;
+    savePending();
+    updateSubmitBar();
+    renderLive();
+    await submitPicks();
+    return;
+  }
   if (pending[matchId] === choice) delete pending[matchId];
   else pending[matchId] = choice;
   savePending();
