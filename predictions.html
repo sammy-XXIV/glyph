@@ -752,25 +752,6 @@ async function savePickToSupabase(addr, matchId, choiceIndex) {
 }
 
 async function pick(matchId, choice) {
-  // If match is currently live, auto-submit immediately — no button press needed
-  if (demoState.phase === 'live' && demoState.matchId === matchId) {
-    if (userPicks[matchId] || pending[matchId]) return; // already picked
-    pending[matchId] = choice;
-    savePending();
-    updateSubmitBar();
-    renderLive();
-    // Save to Supabase instantly (reliable) + submit on-chain in background
-    const addr = await GLYPH.getWallet();
-    if (addr) {
-      const choiceIndex = ['home','draw','away'].indexOf(choice);
-      savePickToSupabase(addr, matchId, choiceIndex); // fire and forget
-      GLYPH.submitPrediction(matchId, choiceIndex).catch(() => {}); // best effort on-chain
-      Object.assign(userPicks, pending);
-      Object.keys(pending).forEach(k => delete pending[k]);
-      savePicks(); savePending(); updateSubmitBar(); renderLive();
-    }
-    return;
-  }
   if (pending[matchId] === choice) delete pending[matchId];
   else pending[matchId] = choice;
   savePending();
@@ -792,9 +773,9 @@ async function submitPicks() {
   btn.disabled = true; btn.textContent = 'SUBMITTING...';
   try {
     for (const [matchId, choice] of Object.entries(pending)) {
-      console.log('[submit] sending predict matchId:', matchId, 'choice:', choice);
-      await GLYPH.submitPrediction(Number(matchId), ['home','draw','away'].indexOf(choice));
-      console.log('[submit] predict done for match', matchId);
+      const choiceIndex = ['home','draw','away'].indexOf(choice);
+      savePickToSupabase(addr, Number(matchId), choiceIndex); // save to Supabase instantly
+      await GLYPH.submitPrediction(Number(matchId), choiceIndex); // then on-chain
     }
     Object.assign(userPicks, pending);
     Object.keys(pending).forEach(k => delete pending[k]);
