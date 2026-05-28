@@ -13,11 +13,14 @@ import readline from 'readline';
 
 const __dirname  = dirname(fileURLToPath(import.meta.url));
 
-const CA         = '0xbb3AC0CBB5B8164Db2047b3cB26927e7e43B7Bb5';
+const CA         = '0x8f52019264A0EB2Edb8b01383c24Bbb6ed6920eC';
+const BREAK_SECS  = Number(process.env.BREAK_SECS)  || 60;
+const MATCH_SECS  = Number(process.env.MATCH_SECS)  || 60;
+const RESULT_SECS = Number(process.env.RESULT_SECS) || 15;
 const SUPABASE_URL = 'https://epoflrlcaaupopwhozyz.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwb2ZscmxjYWF1cG9wd2hvenl6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjU5NDE5MywiZXhwIjoyMDkyMTcwMTkzfQ.4DQNv8TfB8okMvvQX5KoGPQSKYuOZLq9bY9qoI-KUXo';
 const USDT_CA    = '0x9e29b3AaDa05Bf2D2c827Af80Bd28Dc0b9b4FB0c';
-const GRAPH      = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.9';
+const GRAPH      = 'https://api.studio.thegraph.com/query/1753846/glyph/v0.0.10';
 const BOT_KEYS   = [
   '0x583dc5b9dc11530013bd427b8831aca5bbaddc3e4ce74fc0ad943dadcd461878',
   '0x1a55a9daad0d9fc46ce8bdaa33df0f2f734cd3a6e8a223f0bb9bbd4c470f7177',
@@ -302,7 +305,7 @@ async function score() {
   // Initial 1-minute countdown before the first match
   const first = DEMO_MATCHES[0];
   console.log(`\n  â³  First match starting in 1 minute: ${first.home.toUpperCase()} vs ${first.away.toUpperCase()}\n`);
-  for (let s = 60; s > 0; s--) {
+  for (let s = BREAK_SECS; s > 0; s--) {
     process.stdout.write(`\r  â³  Match starts in ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}   `);
     writeState({ phase:'break', secondsLeft:s, nextMatchId:first.id });
     await sleep(1000);
@@ -310,6 +313,7 @@ async function score() {
   process.stdout.write('\r' + ' '.repeat(40) + '\r');
 
   for (let i = 0; i < DEMO_MATCHES.length; i++) {
+    try {
     const m    = DEMO_MATCHES[i];
     const next = DEMO_MATCHES[i + 1];
 
@@ -346,7 +350,7 @@ async function score() {
     console.log(' âœ“\n');
 
     console.log('  â— MATCH IN PROGRESS...\n');
-    for (let s = 60; s > 0; s--) {
+    for (let s = MATCH_SECS; s > 0; s--) {
       process.stdout.write(`\r  â±  ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')} remaining   `);
       writeState({ phase:'live', matchId:m.id, secondsLeft:s });
       await sleep(1000);
@@ -358,7 +362,7 @@ async function score() {
     try {
       const latest = await provider.getBlockNumber();
       const filter = contract.filters.Predicted(null, m.id);
-      const logs   = await queryFilterChunked(contract, filter, 31435500, latest);
+      const logs   = await queryFilterChunked(contract, filter, 31512514, latest);
       for (const log of logs) {
         preds.push({ player: log.args.player.toLowerCase(), pick: Number(log.args.pick) });
       }
@@ -447,18 +451,20 @@ async function score() {
     if (playerAddr) await tryUpgrade(playerAddr, 'YOUR CARD');
 
     // Running tally
-    const onChain = playerTotal > 0 ? await contract.correctPicks(playerAddr) : 0n;
-    const tierId  = await contract.playerToken(playerAddr);
-    let tierNum = 0, threshold = THRESHOLDS[0];
-    if (tierId > 0n) { tierNum = Number(await contract.tier(tierId)); threshold = THRESHOLDS[tierNum] ?? null; }
-
-    console.log('\n  YOUR PROGRESS:');
-    console.log(`  ${TIER_NAMES[tierNum]} â†’ ${TIER_NAMES[Math.min(4, tierNum + 1)]}`);
-    console.log(`  ${bar(Number(onChain), threshold)}\n`);
-
+    if (playerAddr) {
+      const onChain = playerTotal > 0 ? await contract.correctPicks(playerAddr) : 0n;
+      const tierId  = await contract.playerToken(playerAddr);
+      let tierNum = 0, threshold = THRESHOLDS[0];
+      if (tierId > 0n) { tierNum = Number(await contract.tier(tierId)); threshold = THRESHOLDS[tierNum] ?? null; }
+  
+      console.log('\n  YOUR PROGRESS:');
+      console.log(`  ${TIER_NAMES[tierNum]} â†’ ${TIER_NAMES[Math.min(4, tierNum + 1)]}`);
+      console.log(`  ${bar(Number(onChain), threshold)}\n`);
+  
+    }
     if (next) {
       // 15-second result display window before break countdown starts
-      for (let s = 15; s > 0; s--) {
+      for (let s = RESULT_SECS; s > 0; s--) {
         process.stdout.write(`\r  ðŸ“Š  Results showing on site in ${s}s...   `);
         await sleep(1000);
       }
@@ -467,12 +473,15 @@ async function score() {
       console.log(`\n${'â”€'.repeat(52)}`);
       console.log(`  NEXT UP: ${next.group} Â· ${next.home.toUpperCase()} vs ${next.away.toUpperCase()}`);
       console.log(`${'â”€'.repeat(52)}\n`);
-      for (let s = 60; s > 0; s--) {
+      for (let s = BREAK_SECS; s > 0; s--) {
         process.stdout.write(`\r  â³  Next match in ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}   `);
         writeState({ phase:'break', secondsLeft:s, nextMatchId:next.id });
         await sleep(1000);
       }
       process.stdout.write('\r' + ' '.repeat(40) + '\r');
+    }
+    } catch (iterErr) {
+      console.error('  ⚠  Match iteration failed:', iterErr.shortMessage || iterErr.message);
     }
   }
   writeState({ phase:'done', matchId:null, secondsLeft:0 });
