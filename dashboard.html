@@ -679,7 +679,8 @@ async function init() {
     document.querySelector('.progress-card').innerHTML = `
       <div class="section-label">STATUS</div>
       <div class="next-tier" style="margin-top:8px;font-size:22px">★ <span>LEGENDARY</span></div>
-      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,0.3);margin-top:12px">YOU ARE ELIGIBLE TO CLAIM THE PRIZE POOL</div>`;
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,0.3);margin-top:12px">YOU ARE ELIGIBLE TO CLAIM THE PRIZE POOL</div>
+      <button onclick="claimPrizeNow()" style="margin-top:20px;width:100%;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:3px;color:#050510;background:#FFD700;border:none;height:56px;border-radius:28px;cursor:pointer;transition:transform 0.15s,opacity 0.2s">CLAIM PRIZE POOL</button>`;
   } else {
     document.querySelector('.next-tier').innerHTML = `${tierName} → <span>${nextTier}</span>`;
     document.getElementById('correct-count').textContent = correct;
@@ -742,6 +743,22 @@ async function init() {
     document.querySelector('.stats-col').appendChild(upgradeBtn);
   }
 }
+
+async function claimPrizeNow() {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'CLAIMING...';
+  try {
+    await GLYPH.claimPrize();
+    btn.textContent = 'CLAIMED ✓';
+    setTimeout(() => window.location.reload(), 2000);
+  } catch(e) {
+    alert('Claim failed: ' + (e.reason || e.message));
+    btn.disabled = false;
+    btn.textContent = 'CLAIM PRIZE POOL';
+  }
+}
+
 init();
 
 // render card
