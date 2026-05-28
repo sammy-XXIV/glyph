@@ -751,7 +751,7 @@ async function claimPrizeNow() {
   try {
     await GLYPH.claimPrize();
     btn.textContent = 'CLAIMED ✓';
-    setTimeout(() => window.location.reload(), 2000);
+    setTimeout(() => window.location.href = 'leaderboard.html', 1500);
   } catch(e) {
     alert('Claim failed: ' + (e.reason || e.message));
     btn.disabled = false;
