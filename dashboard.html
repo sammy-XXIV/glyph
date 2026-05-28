@@ -504,7 +504,9 @@ function populateNextMatch() {
 populateNextMatch();
 
 // â”€â”€ Demo state sync â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const DEMO_SERVER  = 'https://glyph-demo-production.up.railway.app';
+const DEMO_SERVER  = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  ? 'http://localhost:3000'
+  : 'https://glyph-demo-production.up.railway.app';
 const DEMO_MATCHES = [
   // GROUP A
   { id:1,  home:'USA',         away:'Mexico',      group:'GROUP A · MD1' },

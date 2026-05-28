@@ -718,7 +718,7 @@ setInterval(() => {
 // ── Poll state.json ────────────────────────────────────────────────────────
 async function pollState() {
   try {
-    const r = await fetch('https://glyph-demo-production.up.railway.app/state.json?t=' + Date.now());
+    const r = await fetch(DEMO_SERVER + '/state.json?t=' + Date.now());
     if (r.ok) {
       const s = await r.json();
       if (s.ts && s.secondsLeft > 0) {
@@ -913,7 +913,9 @@ function render() {
 }
 
 // ── Demo controls ──────────────────────────────────────────────────────────
-const DEMO_SERVER = 'https://glyph-demo-production.up.railway.app';
+const DEMO_SERVER = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  ? 'http://localhost:3000'
+  : 'https://glyph-demo-production.up.railway.app';
 
 async function triggerDemo(action) {
   const addr = await GLYPH.getWallet();
