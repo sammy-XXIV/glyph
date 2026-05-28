@@ -140,6 +140,7 @@ const GLYPH = (() => {
     if (contract) return;
     const addr = await getWallet();
     if (!addr) throw new Error('Wallet not connected');
+    contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
   }
 
   async function mintCard() {
