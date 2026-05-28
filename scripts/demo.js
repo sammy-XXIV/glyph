@@ -375,7 +375,7 @@ async function score() {
     try {
       const latest = await provider.getBlockNumber();
       const filter = contract.filters.Predicted(null, m.id);
-      const logs   = await queryFilterChunked(contract, filter, 31512514, latest);
+      const logs   = await queryFilterChunked(contract, filter, Math.max(31512514, latest - 2000), latest);
       for (const log of logs) {
         preds.push({ player: log.args.player.toLowerCase(), pick: Number(log.args.pick) });
       }
