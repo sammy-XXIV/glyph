@@ -774,8 +774,8 @@ async function submitPicks() {
   try {
     for (const [matchId, choice] of Object.entries(pending)) {
       const choiceIndex = ['home','draw','away'].indexOf(choice);
-      savePickToSupabase(addr, Number(matchId), choiceIndex); // save to Supabase instantly
-      await GLYPH.submitPrediction(Number(matchId), choiceIndex); // then on-chain
+      await GLYPH.submitPrediction(Number(matchId), choiceIndex); // on-chain first
+      savePickToSupabase(addr, Number(matchId), choiceIndex); // only save to Supabase after confirmed
     }
     Object.assign(userPicks, pending);
     Object.keys(pending).forEach(k => delete pending[k]);
