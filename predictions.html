@@ -733,6 +733,24 @@ async function pollState() {
 }
 
 // ── Pick & submit ──────────────────────────────────────────────────────────
+const SUPABASE_URL  = 'https://epoflrlcaaupopwhozyz.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwb2ZscmxjYWF1cG9wd2hvenl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTQxOTMsImV4cCI6MjA5MjE3MDE5M30.gh0fmVy1vNTmf0bjiDbcWmZZBBwwFAYrYruglc0h03g';
+
+async function savePickToSupabase(addr, matchId, choiceIndex) {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/picks`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON,
+        'Authorization': `Bearer ${SUPABASE_ANON}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates',
+      },
+      body: JSON.stringify({ player: addr.toLowerCase(), match_id: matchId, pick: choiceIndex }),
+    });
+  } catch {}
+}
+
 async function pick(matchId, choice) {
   // If match is currently live, auto-submit immediately — no button press needed
   if (demoState.phase === 'live' && demoState.matchId === matchId) {
@@ -741,7 +759,16 @@ async function pick(matchId, choice) {
     savePending();
     updateSubmitBar();
     renderLive();
-    await submitPicks();
+    // Save to Supabase instantly (reliable) + submit on-chain in background
+    const addr = await GLYPH.getWallet();
+    if (addr) {
+      const choiceIndex = ['home','draw','away'].indexOf(choice);
+      savePickToSupabase(addr, matchId, choiceIndex); // fire and forget
+      GLYPH.submitPrediction(matchId, choiceIndex).catch(() => {}); // best effort on-chain
+      Object.assign(userPicks, pending);
+      Object.keys(pending).forEach(k => delete pending[k]);
+      savePicks(); savePending(); updateSubmitBar(); renderLive();
+    }
     return;
   }
   if (pending[matchId] === choice) delete pending[matchId];

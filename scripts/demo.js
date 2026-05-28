@@ -370,16 +370,32 @@ async function score() {
     }
     process.stdout.write('\r' + ' '.repeat(40) + '\r');
 
-    // 1. Query chain events directly (reliable, no subgraph lag)
+    // 1. Query Supabase (most reliable — frontend saves picks here instantly)
     let preds = [];
+    try {
+      const res  = await fetch(`${SUPABASE_URL}/rest/v1/picks?match_id=eq.${m.id}&select=player,pick`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      const rows = await res.json();
+      for (const r of (rows || [])) {
+        preds.push({ player: r.player.toLowerCase(), pick: Number(r.pick) });
+      }
+      console.log(`  supabase: ${preds.length} pick(s) for match ${m.id}`);
+    } catch(e) {
+      console.log(`  supabase query failed: ${e.message}`);
+    }
+
+    // 2. Chain events as fallback (catches any missed by Supabase)
     try {
       const latest = await provider.getBlockNumber();
       const filter = contract.filters.Predicted(null, m.id);
-      const logs   = await queryFilterChunked(contract, filter, 31519000, latest);
+      const logs   = await queryFilterChunked(contract, filter, 31523000, latest);
       for (const log of logs) {
-        preds.push({ player: log.args.player.toLowerCase(), pick: Number(log.args.pick) });
+        const p = log.args.player.toLowerCase();
+        if (!preds.some(x => x.player === p))
+          preds.push({ player: p, pick: Number(log.args.pick) });
       }
-      console.log(`  chain events: ${preds.length} pick(s) for match ${m.id}`);
+      console.log(`  chain fallback: ${preds.length} total pick(s) for match ${m.id}`);
     } catch(e) {
       console.log(`  chain query failed: ${e.shortMessage || e.message}`);
     }
