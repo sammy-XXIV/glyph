@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 // Glyph demo simulator
 // Usage:
 //   OWNER_KEY=0x... node demo.js setup               â†’ generate bots, fund, mint, predict
@@ -343,26 +343,15 @@ async function score() {
     const [bot1, bot2] = botWallets;
     const bot1Pick = Math.floor(Math.random() * 3);
     const bot2Pick = i === 0 ? bot1Pick : (bot1Pick + 1) % 3;
-    const botsToPredict = [
-      { bot: bot1, pick: bot1Pick },
-      { bot: bot2, pick: bot2Pick },
-    ];
-    process.stdout.write('  Bots placing picks... ');
-    for (const { bot, pick } of botsToPredict) {
-      if (!botPicks[bot.address]) botPicks[bot.address] = {};
-      botPicks[bot.address][m.id] = pick;
-      try {
-        const bc = new ethers.Contract(CA, ABI, new ethers.Wallet(bot.privateKey, provider));
-        const tx = await bc.predict(m.id, pick);
-        await tx.wait();
-        process.stdout.write('.');
-      } catch(e) {
-        process.stdout.write('âš ');
-      }
-    }
-    console.log(' âœ“\n');
-
-    console.log('  â— MATCH IN PROGRESS...\n');
+    
+    if (!botPicks[bot1.address]) botPicks[bot1.address] = {};
+    if (!botPicks[bot2.address]) botPicks[bot2.address] = {};
+    botPicks[bot1.address][m.id] = bot1Pick;
+    botPicks[bot2.address][m.id] = bot2Pick;
+    console.log("  Bots recorded (skipped on-chain predict)
+");
+    console.log("  ● MATCH IN PROGRESS...
+");
     for (let s = MATCH_SECS; s > 0; s--) {
       process.stdout.write(`\r  â±  ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')} remaining   `);
       writeState({ phase:'live', matchId:m.id, secondsLeft:s });
